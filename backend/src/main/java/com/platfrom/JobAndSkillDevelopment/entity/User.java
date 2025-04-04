@@ -15,13 +15,12 @@ import java.util.List;
 @Entity
 @Data
 @Table(name = "user")
-@NoArgsConstructor
 @AllArgsConstructor
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-    @Column(unique = true, nullable = false)
+    @Column( nullable = false)
     String username;
 
     @Column(unique = true, nullable = true)
@@ -30,13 +29,22 @@ public class User implements UserDetails {
     @Column(nullable = false)
     String password;
 
-    boolean enabled;
-
     @Column(name = "verification_code")
     String verificationCode;
 
     @Column(name = "verification_expiration")
-    LocalDateTime verificationExpiration;
+    LocalDateTime verificationCodeExpiresAt;
+    boolean enabled;
+
+    public User(String username, String email, String password) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+    }
+
+    public User(){
+    }
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
