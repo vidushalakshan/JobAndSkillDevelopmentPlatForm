@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 public class RegisterUserDto {
     String email;
     String password;
-    String userName;
+    String username;
 }

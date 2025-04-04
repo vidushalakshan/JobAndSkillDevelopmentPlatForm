@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-class UserService {
+public class UserService {
     private final UserRepo userRepository;
     public UserService(UserRepo userRepository, EmailService emailService) {
         this.userRepository = userRepository;
@@ -20,3 +20,4 @@ class UserService {
         return users;
     }
 }
+
