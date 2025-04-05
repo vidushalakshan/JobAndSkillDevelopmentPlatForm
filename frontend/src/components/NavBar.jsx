@@ -4,9 +4,9 @@ import ThemeToggle from "./ThemeToggle";
 
 const Nav = () => {
   return (
-    <header className="w-full py-4 sm:px-10 px-5 flex justify-between items-center shadow-md bg-white dark:bg-gray-900">
+    <header className="w-full py-3 sm:px-10 px-5 flex justify-center items-center shadow-md bg-white dark:bg-gray-900">
       <nav className="flex w-full justify-center items-center screen-max-width">
-        <img src={navLogo} alt="Nav Logo" width={120} />
+        <img src={navLogo} alt="Nav Logo" width={120}/>
 
         <div className="flex flex-1 justify-center items-center gap-7 max-sm:hidden">
           <button className="px-6 py-2 rounded-2xl text-white font-semibold shadow-md transition-all bg-red-600 duration-200">
