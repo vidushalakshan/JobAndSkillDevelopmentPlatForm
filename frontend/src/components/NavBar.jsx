@@ -4,7 +4,7 @@ import ThemeToggle from "./ThemeToggle";
 
 const Nav = () => {
   return (
-    <header className="w-full py-3 sm:px-10 px-5 flex justify-center items-center shadow-md bg-white dark:bg-gray-900">
+    <header className="w-full py-3 sm:px-10 px-5 flex justify-center items-center shadow-md  z-50">
       <nav className="flex w-full justify-center items-center screen-max-width">
         <img src={navLogo} alt="Nav Logo" width={120}/>
 

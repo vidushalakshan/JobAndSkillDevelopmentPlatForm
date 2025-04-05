@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { SunIcon, MoonIcon } from "@heroicons/react/24/outline";
 
-const ThhemeToggle = () => {
+const ThemeToggle = () => {
     const [darkMode, setDarkMode] = useState(
         localStorage.getItem("theme") === "dark"
       );
@@ -30,4 +30,4 @@ const ThhemeToggle = () => {
       );
     };
 
-export default ThhemeToggle
+export default ThemeToggle;
