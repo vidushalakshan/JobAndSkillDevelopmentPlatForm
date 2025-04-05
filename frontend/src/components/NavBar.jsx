@@ -7,9 +7,11 @@ import ThemeToggle from "./ThemeToggle";
 import { useState } from "react";
 import SignUp from "../page/SignUp";
 import EmailVerification from "../page/EmailVerify";
+import Login from "../page/Login";
 
 const Nav = () => {
   const [isSignUpOpen, setisSignUpOpen] = useState(false);
+  const [isLoginOpen, setisLoginOpen] = useState(false);
 
   return (
     <>
@@ -35,13 +37,16 @@ const Nav = () => {
             >
               <UserPlusIcon className="w-6 h-6 text-gray-600" />
             </button>
-            <button className="px-3 py-2 rounded-lg text-white font-semibold shadow-md transition-all bg-orange-400 duration-200">
+            <button className="px-3 py-2 rounded-lg text-white font-semibold shadow-md transition-all bg-orange-400 duration-200"
+            onClick={() => setisLoginOpen(true)}
+            >
               <ArrowRightOnRectangleIcon className="w-6 h-6 text-gray-600" />
             </button>
           </div>
         </nav>
       </header>
-      {isSignUpOpen && <EmailVerification onClose={() => setisSignUpOpen(false)} />}
+      {isSignUpOpen && <SignUp onClose={() => setisSignUpOpen(false)} />}
+      {isLoginOpen && <Login onClose={() => setisLoginOpen(false)} />}
     </>
   );
 };
