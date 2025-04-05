@@ -1,11 +1,11 @@
-import { navLogo } from "../../utiils";
-import "./Nav.css";
+import { navLogo } from "../utiils";
 import { ArrowRightOnRectangleIcon, UserPlusIcon } from "@heroicons/react/24/outline";
+import ThemeToggle from "./ThemeToggle";
 
 const Nav = () => {
   return (
-    <header>
-      <nav>
+    <header className="w-full py-1 sm:px-10 px-5 flex justify-between items-center">
+      <nav className="flex w-full ">
         <img src={navLogo} alt="Nav Logo" width={120} />
 
         <div>
@@ -15,6 +15,7 @@ const Nav = () => {
           <button className="px-9 py-2 rounded-2xl text-white font-semibold shadow-md transition-all bg-orange-400 duration-200">
             Trainers
           </button>
+          <ThemeToggle />
         </div>
 
         <div>
