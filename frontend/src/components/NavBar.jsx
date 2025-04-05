@@ -6,6 +6,7 @@ import {
 import ThemeToggle from "./ThemeToggle";
 import { useState } from "react";
 import SignUp from "../page/SignUp";
+import EmailVerification from "../page/EmailVerify";
 
 const Nav = () => {
   const [isSignUpOpen, setisSignUpOpen] = useState(false);
@@ -40,7 +41,7 @@ const Nav = () => {
           </div>
         </nav>
       </header>
-      {isSignUpOpen && <SignUp onClose={() => setisSignUpOpen(false)} />}
+      {isSignUpOpen && <EmailVerification onClose={() => setisSignUpOpen(false)} />}
     </>
   );
 };

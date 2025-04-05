@@ -1,6 +1,13 @@
 import { FcGoogle } from "react-icons/fc";
 
-const SignUp = ({ onClose }) => {
+const SignUp = ({ onClose, onNext }) => {
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        // You can validate input here before proceeding
+        onNext();
+    };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white dark:bg-[#1e1e2f] rounded-2xl shadow-2xl w-full max-w-sm p-6">
@@ -16,7 +23,7 @@ const SignUp = ({ onClose }) => {
           </button>
         </div>
 
-        <form className="space-y-4">
+        <form className="space-y-4" onnSubmit={handleSubmit}>
           <input
             type="text"
             placeholder="Name"
