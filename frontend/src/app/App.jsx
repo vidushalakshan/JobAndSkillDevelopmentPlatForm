@@ -1,13 +1,13 @@
-
-import Nav from '../components/NavBar'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import DashBoard from '../page/DashBoard'
 import './App.css'
 
 function App() {
 
   return (
-    <div>
-        <Nav />
-    </div>
+    <Routes>
+      <Route path="*" element={<DashBoard />} />
+    </Routes>
       
   )
 }
