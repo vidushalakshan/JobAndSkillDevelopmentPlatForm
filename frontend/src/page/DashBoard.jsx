@@ -1,7 +1,8 @@
 import NavBar from "../components/NavBar";
 import SideBar from "../components/SideBar";
+import { Outlet } from "react-router-dom";
 
-const DashBoard = ({ children }) => {
+const DashBoard = ( ) => {
   return (
     <section className="h-screen flex flex-col  bg-white dark:bg-gradient-to-br from-[#7f5af0] via-[#2cb67d] to-[#16161a]">
       <div className="shrink-0 z-20 w-full">
@@ -10,7 +11,7 @@ const DashBoard = ({ children }) => {
       <div className="flex flex-1 overflow-hidden">
         <SideBar />
         <main className="flex-1 overflow-y-auto p-6 text-white">
-          {children}
+          <Outlet />
         </main>
       </div>
     </section>

@@ -1,18 +1,13 @@
-import { navLogo } from "../utiils";
+import { navLogo } from "../utils";
 import {
   ArrowRightOnRectangleIcon,
   UserPlusIcon,
 } from "@heroicons/react/24/outline";
 import ThemeToggle from "./ThemeToggle";
-import { useState } from "react";
-import SignUp from "../page/SignUp";
-import EmailVerification from "../page/EmailVerify";
-import Login from "../page/Login";
+import { useNavigate } from "react-router-dom";
 
 const Nav = () => {
-  const [isSignUpOpen, setisSignUpOpen] = useState(false);
-  const [isLoginOpen, setisLoginOpen] = useState(false);
-
+  const navigate = useNavigate();
   return (
     <>
       {" "}
@@ -33,20 +28,18 @@ const Nav = () => {
           <div className="flex items-center gap-7 max:sm:flex-1 justify-center ">
             <button
               className="px-3 py-2 rounded-lg text-white font-semibold shadow-md transition-all bg-orange-400 duration-200"
-              onClick={() => setisSignUpOpen(true)}
+              onClick={() => navigate("/signup")}
             >
               <UserPlusIcon className="w-6 h-6 text-gray-600" />
             </button>
             <button className="px-3 py-2 rounded-lg text-white font-semibold shadow-md transition-all bg-orange-400 duration-200"
-            onClick={() => setisLoginOpen(true)}
+            onClick={() => navigate("/login")}
             >
               <ArrowRightOnRectangleIcon className="w-6 h-6 text-gray-600" />
             </button>
           </div>
         </nav>
       </header>
-      {isSignUpOpen && <SignUp onClose={() => setisSignUpOpen(false)} />}
-      {isLoginOpen && <Login onClose={() => setisLoginOpen(false)} />}
     </>
   );
 };

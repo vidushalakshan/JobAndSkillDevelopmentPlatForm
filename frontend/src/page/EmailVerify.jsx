@@ -1,6 +1,6 @@
 const EmailVerification = ({ onClose }) => {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-white dark:bg-gradient-to-br from-[#7f5af0] via-[#2cb67d] to-[#16161a]">
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md p-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">Verify Email</h2>
