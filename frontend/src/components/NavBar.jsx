@@ -1,4 +1,4 @@
-import { navLogo } from "../utiils";
+import { navLogo } from "../utils";
 import {
   ArrowRightOnRectangleIcon,
   UserPlusIcon,

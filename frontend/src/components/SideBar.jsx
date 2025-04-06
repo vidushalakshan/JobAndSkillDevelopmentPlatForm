@@ -1,15 +1,6 @@
 import { NavLink } from "react-router-dom";
+import links from '../navigation/Routes'
 
-const links = [
-  { name: "IT Software", path: "/it-software" },
-  { name: "Accounting", path: "/accounting" },
-  { name: "Banking & Finance", path: "/banking-and-finance" },
-  { name: "Civil Engineer", path: "/civil-engineer" },
-  { name: "HR & Training", path: "/hr-and-training" },
-  { name: "IT Hardware", path: "/it-hardware" },
-  { name: "IT Telecome", path: "/it-telecome" },
-  { name: "Office Admin", path: "/office-admin" },
-];
 
 const SideBar = () => {
     return (
