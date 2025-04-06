@@ -1,16 +1,24 @@
 import { FcGoogle } from "react-icons/fc";
+import { useNavigate } from "react-router-dom";
 
 const Login = ({ onClose }) => {
+  const navigate = useNavigate();
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    // TODO: Handle login logic here
+  };
+
+  const handleNavigateToSignup = () => {
+    navigate("/signup");
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white dark:bg-gradient-to-br from-[#7f5af0] via-[#2cb67d] to-[#16161a]">
       <div className="bg-white dark:bg-[#1e1e2f] rounded-2xl shadow-2xl w-full max-w-sm p-6">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Log in</h2>
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+            Log in
+          </h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-red-500 text-2xl font-bold"
@@ -41,14 +49,19 @@ const Login = ({ onClose }) => {
 
         <div className="text-center mt-4 text-sm text-gray-600 dark:text-gray-400">
           Don't have an account?{" "}
-          <a href="#" className="text-blue-600 hover:underline dark:text-blue-400">
+          <button
+             className="text-blue-600 hover:underline dark:text-blue-400 font-medium"
+             onClick={handleNavigateToSignup} 
+          >
             Sign up
-          </a>
+          </button>
         </div>
 
         <div className="flex items-center my-4">
           <hr className="flex-1 border-gray-300 dark:border-gray-600" />
-          <span className="px-3 text-gray-500 dark:text-gray-400 text-sm">or</span>
+          <span className="px-3 text-gray-500 dark:text-gray-400 text-sm">
+            or
+          </span>
           <hr className="flex-1 border-gray-300 dark:border-gray-600" />
         </div>
 

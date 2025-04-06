@@ -23,16 +23,26 @@ const SignUp = ({ onClose }) => {
     });
   };
 
+  const handleNavigateToLogin = () => {
+    navigate("/login");
+  };
+
+
   const handleRegister = async (e) => {
-    e.preventDefault(); 
+    e.preventDefault();
     setLoading(true);
     setError("");
 
     try {
-      const response = await axios.post("http://localhost:8080/auth/signup", formData);
+      const response = await axios.post(
+        "http://localhost:8080/auth/signup",
+        formData
+      );
 
       if (response.status === 200 || response.status === 201) {
-        alert("Registration successful! Please check your email for verification.");
+        alert(
+          "Registration successful! Please check your email for verification."
+        );
         navigate("/login");
       }
     } catch (error) {
@@ -46,7 +56,7 @@ const SignUp = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white dark:bg-gradient-to-br from-[#7f5af0] via-[#2cb67d] to-[#16161a]">
       <div className="bg-white dark:bg-[#1e1e2f] rounded-2xl shadow-2xl w-full max-w-sm p-6">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
@@ -108,12 +118,12 @@ const SignUp = ({ onClose }) => {
 
         <div className="text-center mt-4 text-sm text-gray-600 dark:text-gray-400">
           Already have an account?{" "}
-          <a
-            href="#"
-            className="text-blue-600 hover:underline dark:text-blue-400"
+          <button
+            className="text-blue-600 hover:underline dark:text-blue-400 font-medium"
+            onClick={handleNavigateToLogin}
           >
             Log in
-          </a>
+          </button>
         </div>
 
         <div className="flex items-center my-4">
