@@ -1,9 +1,9 @@
-import axios from "axios";
 import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import instance from "../service/axios";
 
 const Login = ({ onClose }) => {
   const navigate = useNavigate();
@@ -33,22 +33,35 @@ const Login = ({ onClose }) => {
     setLoading(true);
     setError("");
 
-    try {
-      const response = await axios.post(
-        "http://localhost:8080/auth/login",
-        formData
-      );
+    if (!formData.email || !formData.password) {
+      toast.error("Please fill in all fields..");
+      setLoading(false);
+      return;
+    }
 
-      if (response.status === 200 || response.status === 201) {
-        toast.success("Login Successful!");
-        setTimeout(() => {
-          navigate("/");
-        }, 1500); // Navigate after 1.5 seconds to show the toast
+    try {
+      const response = await instance.post("auth/login", formData);
+
+
+      if (!response.data?.token) {
+        throw new Error("No token received");
       }
+
+      localStorage.setItem("token", response.data.token);
+
+      instance.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${response.data.token}`;
+     
+      toast.success("Login Successful!");
+      setTimeout(() => navigate("/"), 1500);
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || "Login failed. Please try again.";
-      toast.error(errorMessage);
+         error.response?.data?.message || 
+        error.response?.data?.error || 
+        error.message || 
+        "Login failed. Please try again.";
+
+        toast.error("Login failed. Please try again.");
     } finally {
       setLoading(false);
     }

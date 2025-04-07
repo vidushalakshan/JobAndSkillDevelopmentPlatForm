@@ -7,6 +7,8 @@ import com.platfrom.JobAndSkillDevelopment.entity.User;
 import com.platfrom.JobAndSkillDevelopment.repo.UserRepo;
 import jakarta.mail.MessagingException;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -44,20 +46,43 @@ public class AuthenticationService {
     }
 
     public User authenticate(LoginUserDto input) {
-        User user = userRepository.findByEmail(input.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+//        User user = userRepository.findByEmail(input.getEmail())
+//                .orElseThrow(() -> new RuntimeException("User not found"));
+//
+//        if (!user.isEnabled()) {
+//            throw new RuntimeException("Account not verified. Please verify your account.");
+//        }
+//
+//        if (!passwordEncoder.matches(input.getPassword(), user.getPassword())) {
+//            throw new RuntimeException("Invalid credentials");
+//        }
+//
+//        authenticationManager.authenticate(
+//                new UsernamePasswordAuthenticationToken(
+//                        input.getEmail(),
+//                        input.getPassword()
+//                )
+//        );
+//
+//        return user;
 
-        if (!user.isEnabled()) {
+        try {
+            // This will now properly validate credentials through your CustomAuthenticationProvider
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            input.getEmail(),
+                            input.getPassword()
+                    )
+            );
+
+            return userRepository.findByEmail(input.getEmail())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+        } catch (DisabledException e) {
             throw new RuntimeException("Account not verified. Please verify your account.");
+        } catch (BadCredentialsException e) {
+            throw new RuntimeException("Invalid credentials");
         }
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        input.getEmail(),
-                        input.getPassword()
-                )
-        );
 
-        return user;
     }
 
     public void verifyUser(VerifyUserDto input) {

@@ -1,11 +1,16 @@
 import axios from 'axios';
 
-const token = localStorage.getItem('iap-token');
 const instance = axios.create({
-    baseURL: 'http://localhost:8080',
-    headers: {
-        'Authorization': `Bearer ${token}`, 
-    }
-  });
+  baseURL: "http://localhost:8080",
+});
+
+// Add request interceptor
+instance.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 export default instance;
