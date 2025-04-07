@@ -1,15 +1,57 @@
+import axios from "axios";
+import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Login = ({ onClose }) => {
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-  };
-
   const handleNavigateToSignup = () => {
     navigate("/signup");
+  };
+
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [, setError] = useState("");
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/auth/login",
+        formData
+      );
+
+      if (response.status === 200 || response.status === 201) {
+        toast.success("Login Successful!");
+        setTimeout(() => {
+          navigate("/");
+        }, 1500); // Navigate after 1.5 seconds to show the toast
+      }
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Login failed. Please try again.";
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -27,31 +69,38 @@ const Login = ({ onClose }) => {
           </button>
         </div>
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
+        <form className="space-y-4" onSubmit={handleLogin}>
           <input
             type="email"
+            name="email"
             placeholder="Email"
+            value={formData.email}
+            onChange={handleChange}
             className="w-full px-4 py-3 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <input
             type="password"
             placeholder="Password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
             className="w-full px-4 py-3 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
           <button
             type="submit"
+            disabled={loading}
             className="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md"
           >
-            Log In
+            {loading ? "Loading..." : "Log In"}
           </button>
         </form>
 
         <div className="text-center mt-4 text-sm text-gray-600 dark:text-gray-400">
           Don't have an account?{" "}
           <button
-             className="text-blue-600 hover:underline dark:text-blue-400 font-medium"
-             onClick={handleNavigateToSignup} 
+            className="text-blue-600 hover:underline dark:text-blue-400 font-medium"
+            onClick={handleNavigateToSignup}
           >
             Sign up
           </button>

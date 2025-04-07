@@ -27,7 +27,6 @@ const SignUp = ({ onClose }) => {
     navigate("/login");
   };
 
-
   const handleRegister = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -40,10 +39,12 @@ const SignUp = ({ onClose }) => {
       );
 
       if (response.status === 200 || response.status === 201) {
-        alert(
-          "Registration successful! Please check your email for verification."
-        );
-        navigate("/login");
+        alert("Registration successful! Please check your email for verification." );
+        navigate("/verify" ,{
+            state : {
+                email: formData.email
+            }
+          });
       }
     } catch (error) {
       setError(
