@@ -2,6 +2,8 @@ import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const SignUp = ({ onClose }) => {
   const navigate = useNavigate();
@@ -39,18 +41,23 @@ const SignUp = ({ onClose }) => {
       );
 
       if (response.status === 200 || response.status === 201) {
-        alert("Registration successful! Please check your email for verification." );
-        navigate("/verify" ,{
-            state : {
-                email: formData.email
-            }
-          });
+        toast.success(
+          "Registration successful! Please check your email for verification."
+        );
+        setTimeout(() => {
+            navigate("/verify", {
+                state: {
+                  email: formData.email,
+                },
+              });
+        }, 1500);
       }
     } catch (error) {
-      setError(
+      const errorMessage = setError(
         error.response?.data?.message ||
           "Registration failed. Please try again."
       );
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
