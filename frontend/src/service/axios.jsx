@@ -1,11 +1,16 @@
 import axios from 'axios';
 
-const token = localStorage.getItem('iap-token');
+// const instance = axios.create({
+//   baseURL: "http://localhost:8080",
+// });
+
 const instance = axios.create({
-    baseURL: 'http://localhost:8080',
-    headers: {
-        'Authorization': `Bearer ${token}`, 
-    }
-  });
+  baseURL: "http://localhost:8080", // ✅ this is key
+  headers: {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  },
+});
+
 
 export default instance;

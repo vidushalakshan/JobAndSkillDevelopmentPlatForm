@@ -1,13 +1,22 @@
 import axios from "axios";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const EmailVerification = ({ onClose }) => {
   const navigate = useNavigate();
   const { state } = useLocation();
   const email = state?.email;
 
-  const [verificationCode, setVerificationCode] = useState(["", "", "", "", "", ""]);
+  const [verificationCode, setVerificationCode] = useState([
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+  ]);
   const [loading, setLoading] = useState(false);
   const [, setError] = useState("");
 
@@ -16,7 +25,7 @@ const EmailVerification = ({ onClose }) => {
       const newCode = [...verificationCode];
       newCode[index] = value;
       setVerificationCode(newCode);
-      
+
       // Auto-focus to next input
       if (value && index < 5) {
         document.getElementById(`code-input-${index + 1}`)?.focus();
@@ -30,23 +39,23 @@ const EmailVerification = ({ onClose }) => {
     setError("");
 
     try {
-      const response = await axios.post(
-        "http://localhost:8080/auth/verify",
-        {
-          email,
-          verificationCode: verificationCode.join("")
-        }
-      );
+      const response = await axios.post("http://localhost:8080/auth/verify", {
+        email,
+        verificationCode: verificationCode.join(""),
+      });
 
       if (response.status === 200 || response.status === 201) {
-        alert("Verification successful!");
-        navigate("/login");
+        toast.success("Verification successful!");
+        setTimeout(() => {
+          navigate("/login");
+        }, 1500);
       }
     } catch (error) {
-      setError(
+      const errorMessage = setError(
         error.response?.data?.message ||
-        "Verification failed. Please try again."
+          "Verification failed. Please try again."
       );
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -85,7 +94,11 @@ const EmailVerification = ({ onClose }) => {
                 value={verificationCode[index]}
                 onChange={(e) => handleCodeChange(index, e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === "Backspace" && !verificationCode[index] && index > 0) {
+                  if (
+                    e.key === "Backspace" &&
+                    !verificationCode[index] &&
+                    index > 0
+                  ) {
                     document.getElementById(`code-input-${index - 1}`)?.focus();
                   }
                 }}
@@ -96,7 +109,7 @@ const EmailVerification = ({ onClose }) => {
           <button
             type="submit"
             className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            disabled={loading || verificationCode.some(digit => digit === "")}
+            disabled={loading || verificationCode.some((digit) => digit === "")}
           >
             {loading ? "Loading..." : "Verify Code"}
           </button>
@@ -104,7 +117,7 @@ const EmailVerification = ({ onClose }) => {
 
         <div className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
           Didn't receive a code?{" "}
-          <button 
+          <button
             type="button"
             className="text-blue-600 hover:underline"
             onClick={() => alert("Resend functionality would go here")}

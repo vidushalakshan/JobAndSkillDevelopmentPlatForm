@@ -2,12 +2,16 @@ import { navLogo } from "../utils";
 import {
   ArrowRightOnRectangleIcon,
   UserPlusIcon,
+  UserCircleIcon,
 } from "@heroicons/react/24/outline";
 import ThemeToggle from "./ThemeToggle";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../context/context";
 
 const Nav = () => {
   const navigate = useNavigate();
+  const {user, logout} = useUser();
+
   return (
     <>
       {" "}
@@ -25,19 +29,42 @@ const Nav = () => {
             <ThemeToggle />
           </div>
 
-          <div className="flex items-center gap-7 max:sm:flex-1 justify-center ">
-            <button
-              className="px-3 py-2 rounded-lg text-white font-semibold shadow-md transition-all bg-orange-400 duration-200"
-              onClick={() => navigate("/signup")}
-            >
-              <UserPlusIcon className="w-6 h-6 text-gray-600" />
-            </button>
-            <button className="px-3 py-2 rounded-lg text-white font-semibold shadow-md transition-all bg-orange-400 duration-200"
-            onClick={() => navigate("/login")}
-            >
-              <ArrowRightOnRectangleIcon className="w-6 h-6 text-gray-600" />
-            </button>
-          </div>
+          <div className="flex items-center gap-7 max:sm:flex-1 justify-center">
+          {user ? (
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <UserCircleIcon className="w-6 h-6 text-gray-600" />
+                <span className="text-gray-700 dark:text-gray-300">
+                  {user.username}
+                </span>
+              </div>
+              <button
+                className="px-3 py-2 rounded-lg text-white font-semibold shadow-md transition-all bg-orange-400 duration-200"
+                onClick={() => {
+                  logout();
+                  navigate("/login");
+                }}
+              >
+                <ArrowRightOnRectangleIcon className="w-6 h-6 text-gray-600" />
+              </button>
+            </div>
+          ) : (
+            <>
+              <button
+                className="px-3 py-2 rounded-lg text-white font-semibold shadow-md transition-all bg-orange-400 duration-200"
+                onClick={() => navigate("/signup")}
+              >
+                <UserPlusIcon className="w-6 h-6 text-gray-600" />
+              </button>
+              <button
+                className="px-3 py-2 rounded-lg text-white font-semibold shadow-md transition-all bg-orange-400 duration-200"
+                onClick={() => navigate("/login")}
+              >
+                <ArrowRightOnRectangleIcon className="w-6 h-6 text-gray-600" />
+              </button>
+            </>
+          )}
+        </div>
         </nav>
       </header>
     </>
