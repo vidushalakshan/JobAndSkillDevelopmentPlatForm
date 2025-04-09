@@ -4,9 +4,13 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import instance from "../service/axios";
+import { useUser } from "../context/context";
+
+
 
 const Login = ({ onClose }) => {
   const navigate = useNavigate();
+  const { login } = useUser();
 
   const handleNavigateToSignup = () => {
     navigate("/signup");
@@ -41,29 +45,33 @@ const Login = ({ onClose }) => {
 
     try {
       const response = await instance.post("auth/login", formData);
-
-
-      if (!response.data?.token) {
+    
+      console.log("Raw Axios response:", response);
+      console.log("Response Data:", response.data);
+    
+      if (!response.data || !response.data.token) {
         throw new Error("No token received");
       }
-
+    
       localStorage.setItem("token", response.data.token);
-
-      instance.defaults.headers.common[
-        "Authorization"
-      ] = `Bearer ${response.data.token}`;
-     
+      instance.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
+    
+      login({
+        username: response.data.username || formData.email.split("@")[0],
+        email: formData.email,
+      });
+    
       toast.success("Login Successful!");
       setTimeout(() => navigate("/"), 1500);
+    
     } catch (error) {
-         error.response?.data?.message || 
-        error.response?.data?.error || 
-        error.message || 
-        "Login failed. Please try again.";
-
-        toast.error("Login failed. Please try again.");
-    } finally {
-      setLoading(false);
+      console.error("Login error:", error);
+      toast.error(
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.message ||
+        "Login failed. Please try again."
+      );
     }
   };
 
