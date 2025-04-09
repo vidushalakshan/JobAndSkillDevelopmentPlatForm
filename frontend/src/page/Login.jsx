@@ -57,6 +57,7 @@ const Login = ({ onClose }) => {
       instance.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
     
       login({
+        token: response.data.token, 
         username: response.data.username || formData.email.split("@")[0],
         email: formData.email,
       });
@@ -72,6 +73,7 @@ const Login = ({ onClose }) => {
         error.message ||
         "Login failed. Please try again."
       );
+      setLoading(false);
     }
   };
 
