@@ -3,6 +3,7 @@ package com.platfrom.JobAndSkillDevelopment.service;
 import com.platfrom.JobAndSkillDevelopment.dto.LoginUserDto;
 import com.platfrom.JobAndSkillDevelopment.dto.RegisterUserDto;
 import com.platfrom.JobAndSkillDevelopment.dto.VerifyUserDto;
+import com.platfrom.JobAndSkillDevelopment.entity.Role;
 import com.platfrom.JobAndSkillDevelopment.entity.User;
 import com.platfrom.JobAndSkillDevelopment.repo.UserRepo;
 import jakarta.mail.MessagingException;
@@ -38,6 +39,9 @@ public class AuthenticationService {
 
     public User signup(RegisterUserDto input) {
         User user = new User(input.getUsername(), input.getEmail(), passwordEncoder.encode(input.getPassword()));
+
+        user.setRole(input.getRole() != null ? input.getRole() : Role.USER);
+
         user.setVerificationCode(generateVerificationCode());
         user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
         user.setEnabled(false);
