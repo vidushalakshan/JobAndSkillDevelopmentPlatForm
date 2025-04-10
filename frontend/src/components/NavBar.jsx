@@ -8,6 +8,7 @@ import ThemeToggle from "./ThemeToggle";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/context";
 
+
 const Nav = () => {
   const navigate = useNavigate();
   const {user, logout} = useUser();
