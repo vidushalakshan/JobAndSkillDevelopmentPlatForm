@@ -12,6 +12,7 @@ const SignUp = ({ onClose }) => {
     username: "",
     email: "",
     password: "",
+    role: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -45,11 +46,11 @@ const SignUp = ({ onClose }) => {
           "Registration successful! Please check your email for verification."
         );
         setTimeout(() => {
-            navigate("/verify", {
-                state: {
-                  email: formData.email,
-                },
-              });
+          navigate("/verify", {
+            state: {
+              email: formData.email,
+            },
+          });
         }, 1500);
       }
     } catch (error) {
@@ -114,6 +115,23 @@ const SignUp = ({ onClose }) => {
                     {error}
                 </Typography>
             )} */}
+
+          <select
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-3 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="" disabled>
+              Select Role
+            </option>
+            <option value="USER">User</option>
+            <option value="LECTURER">Lecturer</option>
+            <option value="EMPLOYER">Employer</option>
+            <option value="TRAINER">Trainer</option>
+            <option value="ADMIN">Admin</option>
+          </select>
 
           <button
             type="submit"

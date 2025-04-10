@@ -10,4 +10,5 @@ import lombok.*;
 public class LoginUserDto {
     String email;
     String password;
+    String role;
 }
