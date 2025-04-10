@@ -5,6 +5,8 @@ import com.platfrom.JobAndSkillDevelopment.service.JobPostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping(value = "/api/v1/")
@@ -18,5 +20,24 @@ public class JobPostController {
         return jobPostService.saveJobPost(jobPostDto);
     }
 
+    @GetMapping("getjobs")
+    public List<JobPostDto> getJobs() {
+        return jobPostService.getAllJobPosts();
+    }
+
+    @PutMapping("updatejob")
+    public JobPostDto updateJob(@RequestBody JobPostDto jobPostDto) {
+        return jobPostService.updateJobPost(jobPostDto);
+    }
+
+    @DeleteMapping("deletejob/{id}")
+    public String deleteJob(@PathVariable Long id) {
+        return jobPostService.deleteJobPost(id);
+    }
+
+    @GetMapping("getjob/{id}")
+    public JobPostDto getJobById(@PathVariable Long id) {
+        return jobPostService.getJobPostById(id);
+    }
 
 }
