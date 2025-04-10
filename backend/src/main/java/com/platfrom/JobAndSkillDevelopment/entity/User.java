@@ -34,6 +34,9 @@ public class User implements UserDetails {
 
     @Column(name = "verification_expiration")
     LocalDateTime verificationCodeExpiresAt;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;;
     boolean enabled;
 
     public User(String username, String email, String password) {
@@ -48,7 +51,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return List.of(() -> "ROLE_" + this.role.name());
     }
 
     @Override
@@ -68,6 +71,6 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return UserDetails.super.isEnabled();
+        return this.enabled;
     }
 }
