@@ -41,7 +41,10 @@ public class SecurityConfiguration {
                         .requestMatchers(
                                 "/auth/**",
                                 "/api/v1/addjob",
-                                "/api/v1/getjobs"
+                                "/api/v1/getjobs",
+                                "/api/v1/updatejob",
+                                "/api/v1/deletejob/{id}",
+                                "/api/v1/getjob/{id}"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
