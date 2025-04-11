@@ -8,15 +8,16 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
-@RequestMapping(value = "/api/v1/")
+@CrossOrigin
+@RequestMapping(value = "/api/v1")
 public class JobPostController {
 
     @Autowired
     private JobPostService jobPostService;
 
-    @PostMapping("addjob")
+    @PostMapping("/addjob")
     public JobPostDto saveJob(@RequestBody JobPostDto jobPostDto) {
+        System.out.println("work controller");
         return jobPostService.saveJobPost(jobPostDto);
     }
 

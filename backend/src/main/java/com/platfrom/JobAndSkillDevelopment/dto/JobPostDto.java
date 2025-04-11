@@ -18,5 +18,5 @@ public class JobPostDto {
     String type;
     String salary;
     LocalDate deadline;
-    User user;
+    Long userId;
 }
