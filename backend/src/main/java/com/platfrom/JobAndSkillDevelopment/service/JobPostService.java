@@ -26,11 +26,11 @@ public class JobPostService {
     @Autowired
     private UserRepo userRepo;
 
-   public JobPostDto saveJobPost(JobPostDto jobPostDto) {
-       System.out.println("Received userId: " + jobPostDto.getUserId());
+   public JobPostDto saveJobPost(JobPostDto jobPostDto, String email) {
+       System.out.println("Authenticated user email: " + email);
        JobPost jobPost = modelMapper.map(jobPostDto, JobPost.class);
 
-       User user = userRepo.findById(Math.toIntExact(jobPostDto.getUserId()))
+       User user = userRepo.findByEmail(email)
                .orElseThrow(() -> new RuntimeException("User not found"));
 
        jobPost.setUser(user);

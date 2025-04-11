@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const PostJobModal = ({ onClose, onJobPosted }) => {
   const [formData, setFormData] = useState({
@@ -20,10 +22,10 @@ const PostJobModal = ({ onClose, onJobPosted }) => {
     e.preventDefault();
 
     try {
-      const token = localStorage.getItem('token'); // or wherever you store it
+      const token = localStorage.getItem('token');
 
       const response = await axios.post(
-        'http://localhost:8080/job/create',
+        'http://localhost:8080/api/v1/addjob',
         formData,
         {
           headers: {
@@ -32,7 +34,10 @@ const PostJobModal = ({ onClose, onJobPosted }) => {
         }
       );
 
-      if (response.status === 201) {
+      if (response.status === 201 || response.status === 200) {
+        toast.success(
+                  "Registration successful! Please check your email for verification."
+                );
         onJobPosted(response.data); // optional: update parent list
         onClose();
       }
