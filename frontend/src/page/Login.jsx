@@ -36,51 +36,52 @@ const Login = ({ onClose }) => {
     e.preventDefault();
     setLoading(true);
     setError("");
-
+  
     if (!formData.email || !formData.password) {
       toast.error("Please fill in all fields..");
       setLoading(false);
       return;
     }
-
+  
     try {
+      console.log("Sending login request with:", formData); // ✅ Add this
       const response = await instance.post("auth/login", formData);
-
-    const { token, role, username } = response.data;
-
-    if (!token) throw new Error("No token received");
-
-    localStorage.setItem("token", token);
-    localStorage.setItem("role", role);
-
-    instance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
-    login({
-      token,
-      username: username || formData.email.split("@")[0],
-      email: formData.email,
-      role,
-    });
-
-    toast.success("Login Successful!");
-
-    setTimeout(() => {
-      if (role === "TRAINER") navigate("/trainer/dashboard");
-      else if (role === "EMPLOYEE") navigate("/employee/home");
-      else if (role === "USER") navigate("/home");
-      else navigate("/");
-    }, 1500);
-
-  } catch (error) {
-    console.error("Login error:", error);
-    toast.error(
-      error.response?.data?.message ||
-      error.response?.data?.error ||
-      error.message ||
-      "Login failed. Please try again."
-    );
-    setLoading(false);
-  }
+  
+      const { token, role, username } = response.data;
+  
+      if (!token) throw new Error("No token received");
+  
+      localStorage.setItem("token", token);
+      localStorage.setItem("role", role);
+  
+      instance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  
+      login({
+        token,
+        username: username || formData.email.split("@")[0],
+        email: formData.email,
+        role,
+      });
+  
+      toast.success("Login Successful!");
+  
+      setTimeout(() => {
+        console.log("Navigating to:", role); // ✅ Add this
+        if (role === "TRAINER") navigate("/trainer/dashboard");
+        else if (role === "EMPLOYEE") navigate("/employee");
+        else if (role === "USER") navigate("/");
+      }, 1500);
+  
+    } catch (error) {
+      console.error("Login error:", error); // ✅ Log full error
+      toast.error(
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.message ||
+        "Login failed. Please try again."
+      );
+      setLoading(false);
+    }
   };
 
   return (
