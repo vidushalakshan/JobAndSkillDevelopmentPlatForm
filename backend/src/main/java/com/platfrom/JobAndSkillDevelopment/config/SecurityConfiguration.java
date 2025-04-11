@@ -38,7 +38,14 @@ public class SecurityConfiguration {
                 )
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers(
+                                "/auth/**",
+                                "/api/v1/addjob",
+                                "/api/v1/getjobs",
+                                "/api/v1/updatejob",
+                                "/api/v1/deletejob/{id}",
+                                "/api/v1/getjob/{id}"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

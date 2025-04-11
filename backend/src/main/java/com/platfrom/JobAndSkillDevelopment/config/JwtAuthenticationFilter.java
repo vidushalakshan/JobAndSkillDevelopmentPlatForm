@@ -17,6 +17,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -34,6 +35,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
         this.handlerExceptionResolver = handlerExceptionResolver;
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getServletPath();
+
+        // List of endpoints that don't require JWT
+        List<String> publicEndpoints = List.of(
+                "/api/v1/addjob",
+                "/api/v1//getjobs",
+                "/auth/login",
+                "/auth/register",
+                "/auth/verify"
+        );
+
+        return publicEndpoints.contains(path);
     }
 
     @Override
@@ -69,6 +86,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
             filterChain.doFilter(request, response);
+            System.out.println("Jwt filter triggered for: " + request.getRequestURI());
+
         }catch (Exception e) {
             handlerExceptionResolver.resolveException(request, response, null, e);
         }
