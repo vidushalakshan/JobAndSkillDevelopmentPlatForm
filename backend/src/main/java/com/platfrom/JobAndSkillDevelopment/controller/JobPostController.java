@@ -17,12 +17,12 @@ public class JobPostController {
 
     @PostMapping("/addjob")
     public JobPostDto saveJob(@RequestBody JobPostDto jobPostDto) {
-        System.out.println("work controller");
         return jobPostService.saveJobPost(jobPostDto);
     }
 
     @GetMapping("getjobs")
     public List<JobPostDto> getJobs() {
+        System.out.println("working getjobs");
         return jobPostService.getAllJobPosts();
     }
 
