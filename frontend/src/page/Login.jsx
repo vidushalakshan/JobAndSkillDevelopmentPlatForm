@@ -45,36 +45,42 @@ const Login = ({ onClose }) => {
 
     try {
       const response = await instance.post("auth/login", formData);
-    
-      console.log("Raw Axios response:", response);
-      console.log("Response Data:", response.data);
-    
-      if (!response.data || !response.data.token) {
-        throw new Error("No token received");
-      }
-    
-      localStorage.setItem("token", response.data.token);
-      instance.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
-    
-      login({
-        token: response.data.token, 
-        username: response.data.username || formData.email.split("@")[0],
-        email: formData.email,
-      });
-    
-      toast.success("Login Successful!");
-      setTimeout(() => navigate("/"), 1500);
-    
-    } catch (error) {
-      console.error("Login error:", error);
-      toast.error(
-        error.response?.data?.message ||
-        error.response?.data?.error ||
-        error.message ||
-        "Login failed. Please try again."
-      );
-      setLoading(false);
-    }
+
+    const { token, role, username } = response.data;
+
+    if (!token) throw new Error("No token received");
+
+    localStorage.setItem("token", token);
+    localStorage.setItem("role", role);
+
+    instance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+    login({
+      token,
+      username: username || formData.email.split("@")[0],
+      email: formData.email,
+      role,
+    });
+
+    toast.success("Login Successful!");
+
+    setTimeout(() => {
+      if (role === "TRAINER") navigate("/trainer/dashboard");
+      else if (role === "EMPLOYEE") navigate("/employee/home");
+      else if (role === "USER") navigate("/home");
+      else navigate("/");
+    }, 1500);
+
+  } catch (error) {
+    console.error("Login error:", error);
+    toast.error(
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      error.message ||
+      "Login failed. Please try again."
+    );
+    setLoading(false);
+  }
   };
 
   return (
