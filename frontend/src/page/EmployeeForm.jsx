@@ -22,6 +22,8 @@ const PostJobModal = ({ onClose, onJobPosted }) => {
     e.preventDefault();
 
     try {
+      console.log("helo");
+      
       const token = localStorage.getItem('token');
 
       const response = await axios.post(
