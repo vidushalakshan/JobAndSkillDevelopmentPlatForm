@@ -18,7 +18,6 @@ public class JobPostController {
 
     @PostMapping("/addjob")
     public JobPostDto saveJob(@RequestBody JobPostDto jobPostDto, Principal principal) {
-        System.out.println("Hello world im comming");
         return jobPostService.saveJobPost(jobPostDto, principal.getName());
     }
 
