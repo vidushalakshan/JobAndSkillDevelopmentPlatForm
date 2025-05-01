@@ -53,6 +53,10 @@ public class User implements UserDetails {
     public User(){
     }
 
+    @Override
+    public String getUsername() {
+        return  this.username;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

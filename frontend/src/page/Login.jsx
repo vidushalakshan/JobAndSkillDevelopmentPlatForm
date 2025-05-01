@@ -46,24 +46,38 @@ const Login = ({ onClose }) => {
     try {
       const response = await instance.post("auth/login", formData);
     
-      console.log("Raw Axios response:", response);
-      console.log("Response Data:", response.data);
+      const { token, role, username } = response.data;
+
+      if(!token) throw new Error("NO token received");
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("role", role);
     
-      if (!response.data || !response.data.token) {
-        throw new Error("No token received");
-      }
-    
-      localStorage.setItem("token", response.data.token);
-      instance.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
-    
+      instance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
       login({
-        token: response.data.token, 
-        username: response.data.username || formData.email.split("@")[0],
+        token,
+        username: username || formData.email.split("@")[0],
         email: formData.email,
+        role,
       });
-    
-      toast.success("Login Successful!");
-      setTimeout(() => navigate("/"), 1500);
+
+      toast.success("Login successful!");
+
+      setTimeout(() => {
+        console.log("Role:", role);
+        
+        if (role ==="TRAINER") {
+          navigate("/trainer");
+        }else if (role === "EMPLOYEE") {
+          navigate("/employee");
+        }
+        else if (role === "ADMIN") {
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/");
+        }
+      }, 1500);
     
     } catch (error) {
       console.error("Login error:", error);

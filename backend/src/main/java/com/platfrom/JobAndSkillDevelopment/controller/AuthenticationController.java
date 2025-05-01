@@ -1,5 +1,6 @@
 package com.platfrom.JobAndSkillDevelopment.controller;
 
+
 import com.platfrom.JobAndSkillDevelopment.dto.LoginUserDto;
 import com.platfrom.JobAndSkillDevelopment.dto.RegisterUserDto;
 import com.platfrom.JobAndSkillDevelopment.dto.VerifyUserDto;
@@ -7,6 +8,7 @@ import com.platfrom.JobAndSkillDevelopment.entity.User;
 import com.platfrom.JobAndSkillDevelopment.responses.LoginResponse;
 import com.platfrom.JobAndSkillDevelopment.service.AuthenticationService;
 import com.platfrom.JobAndSkillDevelopment.service.JwtService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,10 +36,24 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginUserDto loginUserDto){
-        User authenticatedUser = authenticationService.authenticate(loginUserDto);
-        String jwtToken = jwtService.generateToken(authenticatedUser);
-        LoginResponse loginResponse = new LoginResponse(jwtToken, jwtService.getExpirationTime());
-        return ResponseEntity.ok(loginResponse);
+        System.out.println("login work");
+        try {
+            User authenticatedUser = authenticationService.authenticate(loginUserDto);
+            System.out.println("authUser"+authenticatedUser);
+            String jwtToken = jwtService.generateToken(authenticatedUser);
+            System.out.println("jwtToken"+jwtToken);
+            LoginResponse loginResponse = new LoginResponse(
+                    jwtToken,
+                    jwtService.getExpirationTime(),
+                    authenticatedUser.getUsername(),
+                    authenticatedUser.getRole().name()
+            );
+            System.out.println("req ok send ..");
+            return ResponseEntity.ok(loginResponse);
+        } catch (Exception e) {
+            e.printStackTrace(); // 👈 prints the actual error
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
 
     @PostMapping("/verify")
