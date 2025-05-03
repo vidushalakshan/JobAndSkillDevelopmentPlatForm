@@ -4,11 +4,11 @@ import axios from 'axios';
 const PostJobModal = ({ onClose, onJobPosted }) => {
   const [formData, setFormData] = useState({
     title: '',
+    description: '',
     location: '',
     type: '',
     salary: '',
     deadline: '',
-    description: '',
   });
 
   const handleChange = (e) => {
@@ -20,7 +20,7 @@ const PostJobModal = ({ onClose, onJobPosted }) => {
     e.preventDefault();
 
     try {
-      const token = localStorage.getItem('token'); // or wherever you store it
+      const token = localStorage.getItem('token');
 
       const response = await axios.post(
         'http://localhost:8080/job/create',

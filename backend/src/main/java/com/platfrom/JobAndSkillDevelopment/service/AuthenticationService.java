@@ -30,7 +30,7 @@ public class AuthenticationService {
             AuthenticationManager authenticationManager,
             PasswordEncoder passwordEncoder,
             EmailService emailService
-    ) {
+    ){
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -148,10 +148,10 @@ public class AuthenticationService {
             e.printStackTrace();
         }
     }
+
     private String generateVerificationCode() {
         Random random = new Random();
         int code = random.nextInt(900000) + 100000;
         return String.valueOf(code);
     }
-
 }

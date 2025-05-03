@@ -27,7 +27,8 @@ public class JobPostService {
     private UserRepo userRepo;
 
    public JobPostDto saveJobPost(JobPostDto jobPostDto) {
-       System.out.println("Received userId: " + jobPostDto.getUserId());
+       System.out.println("Received userId: " + jobPostDto.getUsername());
+
        JobPost jobPost = modelMapper.map(jobPostDto, JobPost.class);
 
        User user = userRepo.findById(Math.toIntExact(jobPostDto.getUserId()))
@@ -37,12 +38,23 @@ public class JobPostService {
        jobPostRepo.save(jobPost);
 
        System.out.println("Job post saved successfully");
-       return jobPostDto;
+
+       //Map back to Dto with username
+       JobPostDto responseDto = modelMapper.map(jobPost, JobPostDto.class);
+       responseDto.setUserId(user.getId());
+       responseDto.setUsername(user.getUsername());
+
+       return responseDto;
    }
 
    public List<JobPostDto> getAllJobPosts() {
-       List<JobPost> jobPostList = jobPostRepo.findAll();
-       return modelMapper.map(jobPostList, new TypeToken<List<JobPostDto>>() {}.getType());
+       List<JobPost> jobPostList = jobPostRepo.findAllWithUser();
+       return jobPostList.stream().map(post -> {
+           JobPostDto dto = modelMapper.map(post, JobPostDto.class);
+           dto.setUsername(post.getUser().getUsername());
+           dto.setUserId(post.getUser().getId());
+           return dto;
+       }).toList();
    }
 
    public JobPostDto updateJobPost(JobPostDto jobPostDto) {
@@ -59,6 +71,4 @@ public class JobPostService {
        JobPost item = jobPostRepo.findJobPostById(id);
        return modelMapper.map(item, JobPostDto.class);
    }
-
-
 }
