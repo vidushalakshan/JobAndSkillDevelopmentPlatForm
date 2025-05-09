@@ -49,8 +49,13 @@ const EmployeeDashboard = () => {
       setShowModal(false);
       setEditJob(null);
     } catch (err) {
-      toast.error('Operation failed. Please try again.');
+      toast.error('Operation failed. Please try again.',err.message);
     }
+  };
+
+  const handleEdit = (job) => {
+    setEditJob(job);
+    setShowModal(true);
   };
 
   const handleDelete = async (id) => {
@@ -59,7 +64,7 @@ const EmployeeDashboard = () => {
       setJobs(jobs.filter((job) => job.id !== id));
       toast.success('Job deleted successfully');
     } catch (err) {
-      toast.error('Failed to delete job');
+      toast.error('Failed to delete job', err.message);
     }
   };
 
