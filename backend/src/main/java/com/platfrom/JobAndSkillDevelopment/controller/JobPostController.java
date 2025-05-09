@@ -18,6 +18,11 @@ public class JobPostController {
 
     @PostMapping("/addjob")
     public JobPostDto saveJob(@RequestBody JobPostDto jobPostDto, Principal principal) {
+        if (principal == null) {
+            throw new RuntimeException("User not authenticated");
+        }
+
+        System.out.println("Authenticated user: " + principal.getName());
         return jobPostService.saveJobPost(jobPostDto, principal.getName());
     }
 

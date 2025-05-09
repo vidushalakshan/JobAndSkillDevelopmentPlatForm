@@ -43,7 +43,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // List of endpoints that don't require JWT
         List<String> publicEndpoints = List.of(
-                "/api/v1/addjob",
                 "/api/v1/getjobs",
                 "/auth/login",
                 "/auth/register",

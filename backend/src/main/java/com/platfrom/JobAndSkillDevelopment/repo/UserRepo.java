@@ -11,5 +11,7 @@ public interface UserRepo  extends CrudRepository<User, Integer> {
 
     Optional<User> findByEmail(String email);
 
+    Optional<User> findByUsername(String username);
+
     Optional<User> findByVerificationCode(String verificationCode);
 }

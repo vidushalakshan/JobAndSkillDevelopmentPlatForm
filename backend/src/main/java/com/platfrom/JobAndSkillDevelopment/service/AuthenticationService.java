@@ -50,26 +50,6 @@ public class AuthenticationService {
     }
 
     public User authenticate(LoginUserDto input) {
-//        User user = userRepository.findByEmail(input.getEmail())
-//                .orElseThrow(() -> new RuntimeException("User not found"));
-//
-//        if (!user.isEnabled()) {
-//            throw new RuntimeException("Account not verified. Please verify your account.");
-//        }
-//
-//        if (!passwordEncoder.matches(input.getPassword(), user.getPassword())) {
-//            throw new RuntimeException("Invalid credentials");
-//        }
-//
-//        authenticationManager.authenticate(
-//                new UsernamePasswordAuthenticationToken(
-//                        input.getEmail(),
-//                        input.getPassword()
-//                )
-//        );
-//
-//        return user;
-
         try {
             // This will now properly validate credentials through your CustomAuthenticationProvider
             authenticationManager.authenticate(
@@ -86,7 +66,6 @@ public class AuthenticationService {
         } catch (BadCredentialsException e) {
             throw new RuntimeException("Invalid credentials");
         }
-
     }
 
     public void verifyUser(VerifyUserDto input) {

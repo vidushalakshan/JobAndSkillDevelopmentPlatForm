@@ -40,7 +40,6 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
                                 "/auth/**",
-                                "/api/v1/addjob",
                                 "/api/v1/getjobs",
                                 "/api/v1/updatejob",
                                 "/api/v1/deletejob/{id}",
