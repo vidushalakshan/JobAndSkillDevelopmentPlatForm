@@ -46,6 +46,7 @@ const Login = ({ onClose }) => {
     try {
       console.log("Sending login request with:", formData); // ✅ Add this
       const response = await instance.post("auth/login", formData);
+<<<<<<< HEAD
   
       const { token, role, username } = response.data;
   
@@ -56,12 +57,25 @@ const Login = ({ onClose }) => {
   
       instance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
   
+=======
+    
+      const { token, role, username } = response.data;
+
+      if(!token) throw new Error("NO token received");
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("role", role);
+    
+      instance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+>>>>>>> 909e0bd946b1dc5e15f0482c9ad4ad9c0a1aeb05
       login({
         token,
         username: username || formData.email.split("@")[0],
         email: formData.email,
         role,
       });
+<<<<<<< HEAD
   
       toast.success("Login Successful!");
   
@@ -72,6 +86,26 @@ const Login = ({ onClose }) => {
         else if (role === "USER") navigate("/");
       }, 1500);
   
+=======
+
+      toast.success("Login successful!");
+
+      setTimeout(() => {
+        console.log("Role:", role);
+        
+        if (role ==="TRAINER") {
+          navigate("/trainer");
+        }else if (role === "EMPLOYEE") {
+          navigate("/employee");
+        }
+        else if (role === "ADMIN") {
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/");
+        }
+      }, 1500);
+    
+>>>>>>> 909e0bd946b1dc5e15f0482c9ad4ad9c0a1aeb05
     } catch (error) {
       console.error("Login error:", error); // ✅ Log full error
       toast.error(

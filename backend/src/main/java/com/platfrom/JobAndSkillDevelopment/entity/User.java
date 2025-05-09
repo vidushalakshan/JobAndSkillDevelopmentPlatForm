@@ -58,9 +58,14 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
+<<<<<<< HEAD
         return this.username;
     }
 
+=======
+        return  this.username;
+    }
+>>>>>>> 909e0bd946b1dc5e15f0482c9ad4ad9c0a1aeb05
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
