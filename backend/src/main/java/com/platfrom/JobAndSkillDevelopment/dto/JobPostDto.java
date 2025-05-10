@@ -1,6 +1,5 @@
 package com.platfrom.JobAndSkillDevelopment.dto;
 
-import com.platfrom.JobAndSkillDevelopment.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,5 +17,10 @@ public class JobPostDto {
     String type;
     String salary;
     LocalDate deadline;
-    Long userId;
+<<<<<<< HEAD
 }
+=======
+    Long userId;
+    String username;
+}
+>>>>>>> 909e0bd946b1dc5e15f0482c9ad4ad9c0a1aeb05

@@ -1,5 +1,7 @@
 package com.platfrom.JobAndSkillDevelopment.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,6 +34,11 @@ public class JobPost {
     LocalDate deadline;
 
     @ManyToOne
+<<<<<<< HEAD
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference
+=======
+    @JoinColumn(name = "user_id",nullable = false)
+>>>>>>> 909e0bd946b1dc5e15f0482c9ad4ad9c0a1aeb05
     private User user;
 }

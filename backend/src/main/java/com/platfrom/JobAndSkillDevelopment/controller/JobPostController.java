@@ -5,6 +5,7 @@ import com.platfrom.JobAndSkillDevelopment.service.JobPostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -16,8 +17,13 @@ public class JobPostController {
     private JobPostService jobPostService;
 
     @PostMapping("/addjob")
-    public JobPostDto saveJob(@RequestBody JobPostDto jobPostDto) {
-        return jobPostService.saveJobPost(jobPostDto);
+    public JobPostDto saveJob(@RequestBody JobPostDto jobPostDto, Principal principal) {
+        if (principal == null) {
+            throw new RuntimeException("User not authenticated");
+        }
+
+        System.out.println("Authenticated user: " + principal.getName());
+        return jobPostService.saveJobPost(jobPostDto, principal.getName());
     }
 
     @GetMapping("getjobs")

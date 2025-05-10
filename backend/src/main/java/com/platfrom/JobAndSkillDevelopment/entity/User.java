@@ -1,5 +1,7 @@
 package com.platfrom.JobAndSkillDevelopment.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -39,6 +41,7 @@ public class User implements UserDetails {
     private Role role;;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<JobPost> jobPosts = new ArrayList<>();
 
 
@@ -53,6 +56,16 @@ public class User implements UserDetails {
     public User(){
     }
 
+    @Override
+    public String getUsername() {
+<<<<<<< HEAD
+        return this.username;
+    }
+
+=======
+        return  this.username;
+    }
+>>>>>>> 909e0bd946b1dc5e15f0482c9ad4ad9c0a1aeb05
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

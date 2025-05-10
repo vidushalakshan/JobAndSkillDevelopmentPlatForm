@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/JobAndSkillDevelopment.iml" filepath="$PROJECT_DIR$/.idea/JobAndSkillDevelopment.iml" />
+      <module fileurl="file://$PROJECT_DIR$/backend/JobAndSkillDevelopment.iml" filepath="$PROJECT_DIR$/backend/JobAndSkillDevelopment.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/JobAndSkillDevelopmentPlatForm.iml" filepath="$PROJECT_DIR$/.idea/JobAndSkillDevelopmentPlatForm.iml" />
     </modules>
   </component>
 </project>

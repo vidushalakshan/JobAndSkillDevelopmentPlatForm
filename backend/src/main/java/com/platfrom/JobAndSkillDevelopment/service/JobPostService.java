@@ -26,23 +26,40 @@ public class JobPostService {
     @Autowired
     private UserRepo userRepo;
 
+<<<<<<< HEAD
+   public JobPostDto saveJobPost(JobPostDto jobPostDto, String email) {
+       System.out.println("Authenticated user email: " + email);
+=======
    public JobPostDto saveJobPost(JobPostDto jobPostDto) {
-       System.out.println("Received userId: " + jobPostDto.getUserId());
+       System.out.println("Received userId: " + jobPostDto.getUsername());
+
+>>>>>>> 909e0bd946b1dc5e15f0482c9ad4ad9c0a1aeb05
        JobPost jobPost = modelMapper.map(jobPostDto, JobPost.class);
 
-       User user = userRepo.findById(Math.toIntExact(jobPostDto.getUserId()))
+       User user = userRepo.findByEmail(email)
                .orElseThrow(() -> new RuntimeException("User not found"));
 
        jobPost.setUser(user);
        jobPostRepo.save(jobPost);
 
        System.out.println("Job post saved successfully");
-       return jobPostDto;
+
+       //Map back to Dto with username
+       JobPostDto responseDto = modelMapper.map(jobPost, JobPostDto.class);
+       responseDto.setUserId(user.getId());
+       responseDto.setUsername(user.getUsername());
+
+       return responseDto;
    }
 
    public List<JobPostDto> getAllJobPosts() {
-       List<JobPost> jobPostList = jobPostRepo.findAll();
-       return modelMapper.map(jobPostList, new TypeToken<List<JobPostDto>>() {}.getType());
+       List<JobPost> jobPostList = jobPostRepo.findAllWithUser();
+       return jobPostList.stream().map(post -> {
+           JobPostDto dto = modelMapper.map(post, JobPostDto.class);
+           dto.setUsername(post.getUser().getUsername());
+           dto.setUserId(post.getUser().getId());
+           return dto;
+       }).toList();
    }
 
    public JobPostDto updateJobPost(JobPostDto jobPostDto) {
@@ -59,6 +76,4 @@ public class JobPostService {
        JobPost item = jobPostRepo.findJobPostById(id);
        return modelMapper.map(item, JobPostDto.class);
    }
-
-
 }
