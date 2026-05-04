@@ -29,9 +29,15 @@ public class JobPost {
     @Column(nullable = false)
     String type;
     String salary;
+    @com.fasterxml.jackson.annotation.JsonFormat(pattern = "yyyy-MM-dd")
     LocalDate deadline;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = true)
+    private JobStatus status = JobStatus.PENDING;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private User user;
 }

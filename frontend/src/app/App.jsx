@@ -6,11 +6,13 @@ import SignUp from '../page/SignUp';
 import EmailVerification from '../page/EmailVerify';
 import routes from '../navigation/Routes';
 import EmployeeDashboard from '../page/EmployeeDashboard';
+import Home from '../page/Home';
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<DashBoard />}>
+        <Route index element={<Home />} />
         {routes.map((route) => (
           <Route key={route.path} path={route.path.slice(1)} element={route.element} />
         ))}

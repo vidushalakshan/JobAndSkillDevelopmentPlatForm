@@ -40,12 +40,9 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
                                 "/auth/**",
-                                "/api/v1/addjob",
-                                "/api/v1/getjobs",
-                                "/api/v1/updatejob",
-                                "/api/v1/deletejob/{id}",
-                                "/api/v1/getjob/{id}"
+                                "/job/approved"
                         ).permitAll()
+                        .requestMatchers("/job/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
@@ -60,7 +57,7 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("https://app-backend.com", "http://localhost:8080", "http://localhost:5173"));
+        configuration.setAllowedOrigins(List.of("https://app-backend.com","http://localhost:5173","http://localhost:8080"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
 
@@ -68,5 +65,4 @@ public class SecurityConfiguration {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
 }

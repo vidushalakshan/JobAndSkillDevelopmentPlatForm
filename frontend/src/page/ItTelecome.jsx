@@ -1,8 +1,8 @@
-import React from 'react'
+import JobCategoryView from '../components/JobCategoryView'
 
 const ItTelecome = () => {
   return (
-    <div>ItTelecome</div>
+    <JobCategoryView title="IT Telecommunication" />
   )
 }
 

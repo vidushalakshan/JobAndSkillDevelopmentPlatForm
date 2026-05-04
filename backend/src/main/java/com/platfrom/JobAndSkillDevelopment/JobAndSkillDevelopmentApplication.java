@@ -14,6 +14,7 @@ public class JobAndSkillDevelopmentApplication {
 		System.setProperty("JWT_SECRET_KEY", dotenv.get("JWT_SECRET_KEY"));
 		System.setProperty("SUPPORT_EMAIL", dotenv.get("SUPPORT_EMAIL"));
 		System.setProperty("APP_PASSWORD", dotenv.get("APP_PASSWORD"));
+		System.setProperty("GOOGLE_CLIENT_ID", dotenv.get("GOOGLE_CLIENT_ID"));
 
 		SpringApplication.run(JobAndSkillDevelopmentApplication.class, args);
 	}

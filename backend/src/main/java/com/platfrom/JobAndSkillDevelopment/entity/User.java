@@ -38,6 +38,9 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;;
 
+    @Column(name = "picture_url")
+    private String pictureUrl;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<JobPost> jobPosts = new ArrayList<>();
 
@@ -60,18 +63,23 @@ public class User implements UserDetails {
     }
 
     @Override
+    public String getUsername() {
+        return this.email;
+    }
+
+    @Override
     public boolean isAccountNonExpired() {
-        return UserDetails.super.isAccountNonExpired();
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return UserDetails.super.isAccountNonLocked();
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return UserDetails.super.isCredentialsNonExpired();
+        return true;
     }
 
     @Override

@@ -1,0 +1,71 @@
+package com.platfrom.JobAndSkillDevelopment.controller;
+
+import com.platfrom.JobAndSkillDevelopment.dto.JobRequest;
+import com.platfrom.JobAndSkillDevelopment.entity.JobPost;
+import com.platfrom.JobAndSkillDevelopment.entity.JobStatus;
+import com.platfrom.JobAndSkillDevelopment.entity.User;
+import com.platfrom.JobAndSkillDevelopment.service.JobService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/job")
+@CrossOrigin(origins = "http://localhost:5173")
+public class JobController {
+    private final JobService jobService;
+
+    public JobController(JobService jobService) {
+        this.jobService = jobService;
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<JobPost> createJob(@RequestBody JobRequest jobRequest, @AuthenticationPrincipal User user) {
+        JobPost job = new JobPost();
+        job.setTitle(jobRequest.getTitle());
+        job.setDescription(jobRequest.getDescription());
+        job.setLocation(jobRequest.getLocation());
+        job.setType(jobRequest.getType());
+        job.setSalary(jobRequest.getSalary());
+        job.setDeadline(jobRequest.getDeadline());
+        
+        return ResponseEntity.ok(jobService.createJob(job, user));
+    }
+
+    @GetMapping("/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getAllJobs() {
+        try {
+            return ResponseEntity.ok(jobService.getAllJobs());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Error fetching all jobs: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/approved")
+    public ResponseEntity<?> getApprovedJobs() {
+        try {
+            return ResponseEntity.ok(jobService.getApprovedJobs());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Error fetching approved jobs: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("/{id}/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<JobPost> updateStatus(@PathVariable Long id, @RequestParam JobStatus status) {
+        return ResponseEntity.ok(jobService.updateStatus(id, status));
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> deleteJob(@PathVariable Long id) {
+        jobService.deleteJob(id);
+        return ResponseEntity.ok("Job deleted successfully");
+    }
+}

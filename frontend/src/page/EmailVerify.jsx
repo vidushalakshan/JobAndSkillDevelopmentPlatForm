@@ -51,10 +51,11 @@ const EmailVerification = ({ onClose }) => {
         }, 1500);
       }
     } catch (error) {
-      const errorMessage = setError(
+      const errorMessage =
         error.response?.data?.message ||
-          "Verification failed. Please try again."
-      );
+        error.response?.data?.error ||
+        "Verification failed. Please try again.";
+      setError(errorMessage);
       toast.error(errorMessage);
     } finally {
       setLoading(false);

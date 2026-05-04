@@ -44,8 +44,10 @@ export const UserProvider = ({ children }) => {
         if (!isExpired) {
           instance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
           setUser({
-            username: decoded.username || decoded.name || decoded.email?.split("@")[0],
+            username: decoded.username,
             email: decoded.email,
+            pictureUrl: decoded.pictureUrl,
+            role: decoded.role,
           });
 
           // Set auto-logout timer
@@ -64,10 +66,10 @@ export const UserProvider = ({ children }) => {
     }
   }, []);
 
-  const login = ({ token, username, email }) => {
+  const login = ({ token, username, email, pictureUrl, role }) => {
     localStorage.setItem("token", token);
     instance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    setUser({ username, email });
+    setUser({ username, email, pictureUrl, role });
 
     const { exp } = jwtDecode(token);
     const expiryTime = exp * 1000 - Date.now();

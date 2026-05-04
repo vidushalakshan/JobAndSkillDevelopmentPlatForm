@@ -1,8 +1,8 @@
-import React from 'react'
+import JobCategoryView from '../components/JobCategoryView'
 
 const ItHardware = () => {
   return (
-    <div>ItHardware</div>
+    <JobCategoryView title="IT Hardware" />
   )
 }
 

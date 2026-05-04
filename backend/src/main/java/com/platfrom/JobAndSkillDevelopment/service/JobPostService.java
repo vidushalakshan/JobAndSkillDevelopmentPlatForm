@@ -30,7 +30,7 @@ public class JobPostService {
        System.out.println("Received userId: " + jobPostDto.getUserId());
        JobPost jobPost = modelMapper.map(jobPostDto, JobPost.class);
 
-       User user = userRepo.findById(Math.toIntExact(jobPostDto.getUserId()))
+       User user = userRepo.findById(jobPostDto.getUserId())
                .orElseThrow(() -> new RuntimeException("User not found"));
 
        jobPost.setUser(user);

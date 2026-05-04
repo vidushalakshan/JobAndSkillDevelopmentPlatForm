@@ -1,8 +1,8 @@
-import React from 'react'
+import JobCategoryView from '../components/JobCategoryView'
 
 const OfficeAdmin = () => {
   return (
-    <div>OfficeAdmin</div>
+    <JobCategoryView title="Office Administration" />
   )
 }
 

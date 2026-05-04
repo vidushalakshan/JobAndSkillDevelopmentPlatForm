@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { SunIcon, MoonIcon } from "@heroicons/react/24/outline";
+import { motion, AnimatePresence } from "framer-motion";
 
 const ThemeToggle = () => {
     const [darkMode, setDarkMode] = useState(
@@ -15,17 +16,28 @@ const ThemeToggle = () => {
           localStorage.setItem("theme", "light");
         }
       }, [darkMode]);
+
     return (
         <button
           onClick={() => setDarkMode(!darkMode)}
-          className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 transition"
+          className="p-2.5 rounded-2xl bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 transition-all hover:scale-110 active:scale-95"
           title="Toggle Theme"
         >
-          {darkMode ? (
-            <SunIcon className="w-6 h-6 text-yellow-400" />
-          ) : (
-            <MoonIcon className="w-6 h-6 text-gray-800" />
-          )}
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={darkMode ? "dark" : "light"}
+              initial={{ y: -20, opacity: 0, rotate: -90 }}
+              animate={{ y: 0, opacity: 1, rotate: 0 }}
+              exit={{ y: 20, opacity: 0, rotate: 90 }}
+              transition={{ duration: 0.2 }}
+            >
+              {darkMode ? (
+                <SunIcon className="w-5 h-5 text-yellow-400" />
+              ) : (
+                <MoonIcon className="w-5 h-5 text-blue-600" />
+              )}
+            </motion.div>
+          </AnimatePresence>
         </button>
       );
     };

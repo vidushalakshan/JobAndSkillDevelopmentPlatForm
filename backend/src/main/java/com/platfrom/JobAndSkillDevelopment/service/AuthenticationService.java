@@ -15,8 +15,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.Random;
+
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
+import org.springframework.beans.factory.annotation.Value;
 
 @Service
 public class AuthenticationService {
@@ -24,6 +31,9 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final EmailService emailService;
+
+    @Value("${google.client.id:YOUR_GOOGLE_CLIENT_ID}")
+    private String googleClientId;
 
     public AuthenticationService(
             UserRepo userRepository,
@@ -37,6 +47,7 @@ public class AuthenticationService {
         this.emailService = emailService;
     }
 
+    @org.springframework.transaction.annotation.Transactional
     public User signup(RegisterUserDto input) {
         User user = new User(input.getUsername(), input.getEmail(), passwordEncoder.encode(input.getPassword()));
 
@@ -45,7 +56,13 @@ public class AuthenticationService {
         user.setVerificationCode(generateVerificationCode());
         user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
         user.setEnabled(false);
-        sendVerificationEmail(user);
+        
+        try {
+            sendVerificationEmail(user);
+        } catch (Exception e) {
+            System.err.println("Error sending verification email: " + e.getMessage());
+        }
+        
         return userRepository.save(user);
     }
 
@@ -118,7 +135,11 @@ public class AuthenticationService {
             }
             user.setVerificationCode(generateVerificationCode());
             user.setVerificationCodeExpiresAt(LocalDateTime.now().plusHours(1));
-            sendVerificationEmail(user);
+            try {
+                sendVerificationEmail(user);
+            } catch (Exception e) {
+                System.err.println("Error resending verification email: " + e.getMessage());
+            }
             userRepository.save(user);
         } else {
             throw new RuntimeException("User not found");
@@ -151,7 +172,43 @@ public class AuthenticationService {
     private String generateVerificationCode() {
         Random random = new Random();
         int code = random.nextInt(900000) + 100000;
-        return String.valueOf(code);
+        String verificationCode = String.valueOf(code);
+        System.out.println("DEBUG: Generated Verification Code: " + verificationCode);
+        return verificationCode;
+    }
+
+    public User loginWithGoogle(String idTokenString) throws Exception {
+        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
+                .setAudience(Collections.singletonList(googleClientId))
+                .build();
+
+        GoogleIdToken idToken = verifier.verify(idTokenString);
+        if (idToken != null) {
+            GoogleIdToken.Payload payload = idToken.getPayload();
+
+            String email = payload.getEmail();
+            String name = (String) payload.get("name");
+            String pictureUrl = (String) payload.get("picture");
+
+            return userRepository.findByEmail(email).map(user -> {
+                if (user.getPictureUrl() == null) {
+                    user.setPictureUrl(pictureUrl);
+                    return userRepository.save(user);
+                }
+                return user;
+            }).orElseGet(() -> {
+                User newUser = new User();
+                newUser.setEmail(email);
+                newUser.setUsername(name);
+                newUser.setPictureUrl(pictureUrl);
+                newUser.setPassword(passwordEncoder.encode(java.util.UUID.randomUUID().toString())); // Better random password
+                newUser.setRole(Role.USER);
+                newUser.setEnabled(true);
+                return userRepository.save(newUser);
+            });
+        } else {
+            throw new RuntimeException("Invalid Google ID Token");
+        }
     }
 
 }

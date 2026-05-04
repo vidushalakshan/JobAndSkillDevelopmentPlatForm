@@ -4,15 +4,20 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { GoogleLogin } from "@react-oauth/google";
+import instance from "../service/axios";
 
-const SignUp = ({ onClose }) => {
+import { useUser } from "../context/context";
+import { motion } from "framer-motion";
+
+const SignUp = () => {
   const navigate = useNavigate();
+  const { login } = useUser();
 
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
-    role: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -36,8 +41,8 @@ const SignUp = ({ onClose }) => {
     setError("");
 
     try {
-      const response = await axios.post(
-        "http://localhost:8080/auth/signup",
+      const response = await instance.post(
+        "auth/signup",
         formData
       );
 
@@ -54,119 +59,134 @@ const SignUp = ({ onClose }) => {
         }, 1500);
       }
     } catch (error) {
-      const errorMessage = setError(
+      const errorMessage =
         error.response?.data?.message ||
-          "Registration failed. Please try again."
-      );
+        error.response?.data?.error ||
+        "Registration failed. Please try again.";
+      setError(errorMessage);
       toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      const response = await instance.post("auth/google", {
+        idToken: credentialResponse.credential,
+      });
+
+      if (response.data.token) {
+        login({
+          token: response.data.token,
+          username: response.data.username,
+          email: response.data.email,
+          pictureUrl: response.data.pictureUrl,
+          role: response.data.role
+        });
+        toast.success("Google Sign Up Successful!");
+        setTimeout(() => navigate("/"), 1500);
+      }
+    } catch (error) {
+      console.error("Google Login Error:", error);
+      toast.error("Google Login failed.");
+    }
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white dark:bg-gradient-to-br from-[#7f5af0] via-[#2cb67d] to-[#16161a]">
-      <div className="bg-white dark:bg-[#1e1e2f] rounded-2xl shadow-2xl w-full max-w-sm p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-            Sign up
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-red-500 text-2xl font-bold"
-          >
-            &times;
-          </button>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-[#0f172a] relative overflow-hidden px-4">
+      {/* Animated Background Orbs */}
+      <div className="absolute top-0 -left-4 w-72 h-72 bg-purple-300 dark:bg-purple-900 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+      <div className="absolute top-0 -right-4 w-72 h-72 bg-yellow-300 dark:bg-yellow-900 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+      <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 dark:bg-pink-900 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white dark:bg-white/5 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-3xl shadow-2xl w-full max-w-md p-8 relative z-10"
+      >
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Create Account</h2>
+          <p className="text-gray-500 dark:text-gray-400">Join the future of professional growth</p>
         </div>
 
-        <form className="space-y-4" onSubmit={handleRegister}>
-          <input
-            type="text"
-            name="username"
-            placeholder="Name"
-            value={formData.username}
-            onChange={handleChange}
-            className="w-full px-4 py-3 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            className="w-full px-4 py-3 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            className="w-full px-4 py-3 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-
-          {/* {error && (
-                <Typography
-                    variant="subtitle2"
-                    color = "error"
-                    align="center"
-                    sx={{ mt: 1}}
-                >
-                    {error}
-                </Typography>
-            )} */}
-
-          <select
-            name="role"
-            value={formData.role}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-3 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="" disabled>
-              Select Role
-            </option>
-            <option value="USER">User</option>
-            <option value="LECTURER">Lecturer</option>
-            <option value="EMPLOYER">Employer</option>
-            <option value="TRAINER">Trainer</option>
-            <option value="ADMIN">Admin</option>
-          </select>
+        <form className="space-y-5" onSubmit={handleRegister}>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 ml-1">Full Name</label>
+            <input
+              type="text"
+              name="username"
+              placeholder="John Doe"
+              value={formData.username}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-white/5 text-gray-900 dark:text-white border border-gray-200 dark:border-white/10 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 ml-1">Email Address</label>
+            <input
+              type="email"
+              name="email"
+              placeholder="john@example.com"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-white/5 text-gray-900 dark:text-white border border-gray-200 dark:border-white/10 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 ml-1">Password</label>
+            <input
+              type="password"
+              name="password"
+              placeholder="••••••••"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-white/5 text-gray-900 dark:text-white border border-gray-200 dark:border-white/10 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+            />
+          </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md"
+            className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-blue-500/30 transition-all transform hover:scale-[1.02] active:scale-95 disabled:opacity-50"
           >
-            {loading ? "Loading..." : " Sign Up"}
+            {loading ? "Creating Account..." : "Sign Up"}
           </button>
         </form>
 
-        <div className="text-center mt-4 text-sm text-gray-600 dark:text-gray-400">
+        <div className="relative my-8">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-200 dark:border-white/10"></div>
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-2 bg-transparent text-gray-500 dark:text-gray-400">Or continue with</span>
+          </div>
+        </div>
+
+        <div className="flex justify-center mb-8">
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={() => toast.error("Google Login Failed")}
+            useOneTap
+            shape="pill"
+            theme="filled_blue"
+            width="100%"
+          />
+        </div>
+
+        <div className="text-center text-sm text-gray-500 dark:text-gray-400">
           Already have an account?{" "}
           <button
-            className="text-blue-600 hover:underline dark:text-blue-400 font-medium"
+            className="text-blue-500 hover:underline font-bold"
             onClick={handleNavigateToLogin}
           >
             Log in
           </button>
         </div>
-
-        <div className="flex items-center my-4">
-          <hr className="flex-1 border-gray-300 dark:border-gray-600" />
-          <span className="px-3 text-gray-500 dark:text-gray-400 text-sm">
-            or
-          </span>
-          <hr className="flex-1 border-gray-300 dark:border-gray-600" />
-        </div>
-
-        <button className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition">
-          <FcGoogle className="w-5 h-5" />
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-            Sign up with Google
-          </span>
-        </button>
-      </div>
+      </motion.div>
     </div>
   );
 };

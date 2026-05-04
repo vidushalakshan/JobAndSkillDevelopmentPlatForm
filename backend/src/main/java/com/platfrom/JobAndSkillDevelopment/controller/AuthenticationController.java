@@ -9,6 +9,7 @@ import com.platfrom.JobAndSkillDevelopment.service.AuthenticationService;
 import com.platfrom.JobAndSkillDevelopment.service.JwtService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.Map;
 
 @RequestMapping("/auth")
 @RestController
@@ -36,7 +37,14 @@ public class AuthenticationController {
     public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginUserDto loginUserDto){
         User authenticatedUser = authenticationService.authenticate(loginUserDto);
         String jwtToken = jwtService.generateToken(authenticatedUser);
-        LoginResponse loginResponse = new LoginResponse(jwtToken, jwtService.getExpirationTime());
+        LoginResponse loginResponse = new LoginResponse(
+            jwtToken, 
+            jwtService.getExpirationTime(),
+            authenticatedUser.getUsername(),
+            authenticatedUser.getEmail(),
+            authenticatedUser.getPictureUrl(),
+            authenticatedUser.getRole().name()
+        );
         return ResponseEntity.ok(loginResponse);
     }
 
@@ -56,6 +64,26 @@ public class AuthenticationController {
             authenticationService.resendVerificationCode(email);
             return ResponseEntity.ok("Verification code sent");
         } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/google")
+    public ResponseEntity<?> googleLogin(@RequestBody Map<String, String> payload) {
+        try {
+            String idToken = payload.get("idToken");
+            User authenticatedUser = authenticationService.loginWithGoogle(idToken);
+            String jwtToken = jwtService.generateToken(authenticatedUser);
+            LoginResponse loginResponse = new LoginResponse(
+                jwtToken, 
+                jwtService.getExpirationTime(),
+                authenticatedUser.getUsername(),
+                authenticatedUser.getEmail(),
+                authenticatedUser.getPictureUrl(),
+                authenticatedUser.getRole().name()
+            );
+            return ResponseEntity.ok(loginResponse);
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
