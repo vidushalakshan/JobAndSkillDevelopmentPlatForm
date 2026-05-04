@@ -5,11 +5,14 @@ import { BriefcaseIcon, AcademicCapIcon, RocketLaunchIcon, ArrowRightIcon, MapPi
 import { useUser } from "../context/context";
 import { useEffect, useState } from "react";
 import instance from "../service/axios";
+import { AnimatePresence } from "framer-motion";
+import ApplyModal from "../components/ApplyModal";
 
 const Home = () => {
   const navigate = useNavigate();
   const { user } = useUser();
   const [jobs, setJobs] = useState([]);
+  const [selectedJob, setSelectedJob] = useState(null);
 
   useEffect(() => {
     const fetchApproved = async () => {
@@ -163,7 +166,10 @@ const Home = () => {
                 </div>
                 <div className="flex justify-between items-center pt-6 border-t border-gray-200 dark:border-white/10">
                   <div className="font-bold text-blue-500">{job.salary || 'Competitive'}</div>
-                  <button className="px-5 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-xs font-bold rounded-xl hover:scale-105 transition-transform">
+                  <button 
+                    onClick={() => setSelectedJob(job)}
+                    className="px-5 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-xs font-bold rounded-xl hover:scale-105 transition-transform"
+                  >
                     Apply
                   </button>
                 </div>
@@ -176,6 +182,15 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      <AnimatePresence>
+        {selectedJob && (
+          <ApplyModal 
+            job={selectedJob} 
+            onClose={() => setSelectedJob(null)} 
+          />
+        )}
+      </AnimatePresence>
 
       {/* Categories Bento Grid */}
       <section id="categories" className="py-20 bg-gray-50 dark:bg-[#111827]">
