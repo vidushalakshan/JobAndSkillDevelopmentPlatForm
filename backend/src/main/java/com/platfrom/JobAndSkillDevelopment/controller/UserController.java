@@ -1,4 +1,6 @@
 package com.platfrom.JobAndSkillDevelopment.controller;
+
+import com.platfrom.JobAndSkillDevelopment.dto.UserProfileRequest;
 import com.platfrom.JobAndSkillDevelopment.entity.Role;
 import com.platfrom.JobAndSkillDevelopment.entity.User;
 import com.platfrom.JobAndSkillDevelopment.service.UserService;
@@ -15,6 +17,7 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:5173")
 public class UserController {
     private final UserService userService;
+
     public UserController(UserService userService) {
         this.userService = userService;
     }
@@ -24,6 +27,18 @@ public class UserController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = (User) authentication.getPrincipal();
         return ResponseEntity.ok(currentUser);
+    }
+
+    // Get my full profile
+    @GetMapping("/profile")
+    public ResponseEntity<User> getMyProfile() {
+        return ResponseEntity.ok(userService.getMyProfile());
+    }
+
+    // Update my profile
+    @PutMapping("/profile")
+    public ResponseEntity<User> updateMyProfile(@RequestBody UserProfileRequest req) {
+        return ResponseEntity.ok(userService.updateMyProfile(req));
     }
 
     @GetMapping("/")
@@ -46,4 +61,3 @@ public class UserController {
         return ResponseEntity.ok(userService.updateRole(id, role));
     }
 }
-

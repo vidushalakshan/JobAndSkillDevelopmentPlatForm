@@ -8,7 +8,7 @@ import {
   FiBriefcase, FiUsers, FiFileText, FiLogOut, FiSettings,
   FiTrendingUp, FiCheckCircle, FiClock, FiXCircle, FiTrash2,
   FiPlus, FiRefreshCw, FiGrid, FiAlertCircle, FiChevronRight,
-  FiActivity, FiSearch, FiFilter
+  FiActivity, FiSearch, FiFilter, FiBook
 } from "react-icons/fi";
 
 const JOB_CATEGORIES = [
@@ -136,6 +136,7 @@ const AdminDashboard = () => {
   const [pendingJobs, setPendingJobs] = useState([]);
   const [applications, setApplications] = useState([]);
   const [users, setUsers] = useState([]);
+  const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showPostModal, setShowPostModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -153,12 +154,14 @@ const AdminDashboard = () => {
         instance.get("/job/pending"),
         instance.get("/apply/all"),
         instance.get("/users/"),
+        instance.get("/courses/all"),
       ]);
       
       if (responses[0].status === "fulfilled") setJobs(responses[0].value.data);
       if (responses[1].status === "fulfilled") setPendingJobs(responses[1].value.data);
       if (responses[2].status === "fulfilled") setApplications(responses[2].value.data);
       if (responses[3].status === "fulfilled") setUsers(responses[3].value.data);
+      if (responses[4].status === "fulfilled") setCourses(responses[4].value.data);
 
       if (responses.some(r => r.status === "rejected")) {
         toast.warn("Some data could not be loaded.");
@@ -214,6 +217,31 @@ const AdminDashboard = () => {
     } catch { toast.error("Failed to update role."); }
   };
 
+  const handlePublishCourse = async (id) => {
+    try {
+      await instance.put(`/courses/${id}/publish`);
+      toast.success("Course published & live!");
+      fetchAll();
+    } catch { toast.error("Failed to publish course."); }
+  };
+
+  const handleUnpublishCourse = async (id) => {
+    try {
+      await instance.put(`/courses/${id}/unpublish`);
+      toast.success("Course unpublished.");
+      fetchAll();
+    } catch { toast.error("Action failed."); }
+  };
+
+  const handleDeleteCourse = async (id) => {
+    if (!window.confirm("Delete this course permanently?")) return;
+    try {
+      await instance.delete(`/courses/${id}`);
+      toast.success("Course deleted.");
+      fetchAll();
+    } catch { toast.error("Delete failed."); }
+  };
+
   if (!user || user.role !== "ADMIN") return null;
 
   const tabs = [
@@ -221,6 +249,7 @@ const AdminDashboard = () => {
     { id: "approvals", label: "Queue", icon: FiClock, badge: pendingJobs.length },
     { id: "all-jobs", label: "All Jobs", icon: FiBriefcase },
     { id: "applications", label: "Candidates", icon: FiFileText },
+    { id: "courses", label: "Courses", icon: FiBook, badge: courses.filter(c => !c.published).length || null },
     { id: "users", label: "Users", icon: FiUsers },
   ];
 
@@ -238,7 +267,7 @@ const AdminDashboard = () => {
               <FiTrendingUp className="text-white w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-xl font-black tracking-tight dark:text-white">Antigravity</h1>
+              <h1 className="text-xl font-black tracking-tight dark:text-white">JobSkill Admin</h1>
               <p className="text-[10px] font-black uppercase tracking-widest text-blue-500">Admin Console</p>
             </div>
           </div>
@@ -479,6 +508,90 @@ const AdminDashboard = () => {
                       ))}
                     </tbody>
                   </table>
+                </div>
+              </div>
+            )}
+
+            {/* COURSES TABLE */}
+            {activeTab === "courses" && (
+              <div className="bg-white dark:bg-[#111127] rounded-[2.5rem] border border-gray-100 dark:border-white/5 overflow-hidden shadow-2xl shadow-black/[0.02]">
+                <div className="flex items-center justify-between px-10 py-8 border-b border-gray-100 dark:border-white/5">
+                  <div>
+                    <h3 className="text-2xl font-black">Course Management</h3>
+                    <p className="text-sm text-gray-400 mt-1 font-medium">
+                      <span className="text-amber-500 font-black">{courses.filter(c => !c.published).length} pending review</span>
+                      {" · "}{courses.filter(c => c.published).length} live
+                    </p>
+                  </div>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left">
+                    <thead>
+                      <tr className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 border-b border-gray-100 dark:border-white/5">
+                        <th className="px-8 py-6">Course</th>
+                        <th className="px-8 py-6">Category / Level</th>
+                        <th className="px-8 py-6">Instructor</th>
+                        <th className="px-8 py-6">Status</th>
+                        <th className="px-8 py-6 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 dark:divide-white/5">
+                      {courses
+                        .filter(c => c.title?.toLowerCase().includes(searchTerm.toLowerCase()))
+                        .map(course => (
+                        <tr key={course.id} className="group hover:bg-gray-50/50 dark:hover:bg-white/[0.01] transition-all">
+                          <td className="px-8 py-6">
+                            <div className="flex items-center gap-4">
+                              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-500/10 to-indigo-500/10 flex items-center justify-center">
+                                <FiBook className="w-5 h-5 text-purple-500" />
+                              </div>
+                              <div>
+                                <p className="font-black text-gray-900 dark:text-white">{course.title}</p>
+                                <p className="text-[10px] font-bold text-gray-400">{course.price || "Free"} · {course.duration}</p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-8 py-6">
+                            <p className="text-sm font-bold text-gray-700 dark:text-gray-300">{course.category}</p>
+                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{course.level}</p>
+                          </td>
+                          <td className="px-8 py-6 text-sm font-bold text-gray-600 dark:text-gray-300">{course.instructor || "—"}</td>
+                          <td className="px-8 py-6">
+                            {course.published ? (
+                              <span className="px-3 py-1 text-xs font-black uppercase tracking-wider rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30">Live</span>
+                            ) : (
+                              <span className="px-3 py-1 text-xs font-black uppercase tracking-wider rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/30 animate-pulse">Pending Review</span>
+                            )}
+                          </td>
+                          <td className="px-8 py-6">
+                            <div className="flex items-center justify-end gap-2">
+                              {!course.published ? (
+                                <button onClick={() => handlePublishCourse(course.id)}
+                                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-black transition-all shadow-lg shadow-emerald-500/20">
+                                  <FiCheckCircle className="w-4 h-4" /> Publish
+                                </button>
+                              ) : (
+                                <button onClick={() => handleUnpublishCourse(course.id)}
+                                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500 hover:text-white text-amber-600 text-xs font-black transition-all border border-amber-500/20">
+                                  <FiXCircle className="w-4 h-4" /> Unpublish
+                                </button>
+                              )}
+                              <button onClick={() => handleDeleteCourse(course.id)}
+                                className="p-2 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all">
+                                <FiTrash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {courses.length === 0 && (
+                    <div className="py-20 text-center text-gray-400">
+                      <FiBook className="w-12 h-12 mx-auto mb-4 opacity-30" />
+                      <p className="font-bold">No courses submitted yet.</p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}

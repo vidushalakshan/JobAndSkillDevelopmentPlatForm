@@ -40,11 +40,13 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
                                 "/auth/**",
-                                "/job/approved"
+                                "/job/approved",
+                                "/courses/published"
                         ).permitAll()
                         .requestMatchers("/job/all", "/job/pending", "/job/admin-create", "/job/*/status").hasRole("ADMIN")
                         .requestMatchers("/apply/all", "/apply/*/status").hasRole("ADMIN")
                         .requestMatchers("/users/", "/users/*/role").hasRole("ADMIN")
+                        .requestMatchers("/courses/all", "/courses/*/publish", "/courses/*/unpublish", "/courses/*/delete").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

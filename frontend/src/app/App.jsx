@@ -1,28 +1,30 @@
 import { Routes, Route } from 'react-router-dom';
-import DashBoard from '../page/DashBoard';
 import './App.css';
 import Login from '../page/Login';
 import SignUp from '../page/SignUp';
 import EmailVerification from '../page/EmailVerify';
-import routes from '../navigation/Routes';
-import EmployeeDashboard from '../page/EmployeeDashboard';
 import Home from '../page/Home';
 import AdminDashboard from '../page/AdminDashboard';
 import MyJobsPage from '../page/MyJobsPage';
+import MainLayout from '../page/MainLayout';
+import JobSearch from '../page/JobSearch';
+import UserProfile from '../page/UserProfile';
+import CoursesPage from '../page/CoursesPage';
 
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<DashBoard />}>
-        <Route index element={<Home />} />
-        {routes.map((route) => (
-          <Route key={route.path} path={route.path.slice(1)} element={route.element} />
-        ))}
+      <Route element={<MainLayout />}>
+        <Route path="/" element={<Home />} />
+        <Route path="/jobs" element={<JobSearch />} />
+        <Route path="/courses" element={<CoursesPage />} />
+        <Route path="/profile" element={<UserProfile />} />
       </Route>
+      
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/verify" element={<EmailVerification />} />
-      <Route path='/employee' element={<EmployeeDashboard />} />
+      
       <Route path='/admin' element={<AdminDashboard />} />
       <Route path='/my-jobs' element={<MyJobsPage />} />
     </Routes>

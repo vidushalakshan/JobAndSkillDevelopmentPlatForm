@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import links from "../navigation/Routes";
+// Removed legacy links import
 import { BriefcaseIcon, AcademicCapIcon, RocketLaunchIcon, ArrowRightIcon, MapPinIcon } from "@heroicons/react/24/outline";
 import { useUser } from "../context/context";
 import { useEffect, useState } from "react";
@@ -97,7 +97,7 @@ const Home = () => {
               </button>
             )}
             <button
-              onClick={() => document.getElementById("categories").scrollIntoView({ behavior: "smooth" })}
+              onClick={() => navigate("/jobs")}
               className="px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white border border-white/30 rounded-full font-bold text-lg transition-all"
             >
               Explore Jobs
@@ -137,10 +137,10 @@ const Home = () => {
               <div className="h-1.5 w-20 bg-blue-600 rounded-full"></div>
             </div>
             <button 
-              onClick={() => document.getElementById("categories").scrollIntoView({ behavior: "smooth" })}
+              onClick={() => navigate("/jobs")}
               className="text-blue-500 font-bold hover:underline flex items-center gap-1"
             >
-              View all categories <ArrowRightIcon className="w-4 h-4" />
+              View all opportunities <ArrowRightIcon className="w-4 h-4" />
             </button>
           </div>
 
@@ -222,23 +222,26 @@ const Home = () => {
       </section>
 
       {/* Categories Bento Grid */}
-      <section id="categories" className="py-20 bg-gray-50 dark:bg-[#111827]">
+      <section className="py-20 bg-gray-50 dark:bg-[#111827]">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Explore Opportunities</h2>
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Explore by Industry</h2>
             <p className="text-gray-600 dark:text-gray-400">Choose from a wide range of industries and start your growth.</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {links.map((link, index) => (
+            {[
+              "IT Software", "IT Hardware", "Accounting", "Banking & Finance",
+              "Civil Engineering", "HR & Training", "Office Admin", "IT Telecom"
+            ].map((category, index) => (
               <motion.div
-                key={link.path}
+                key={category}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
                 viewport={{ once: true }}
                 whileHover={{ scale: 1.02 }}
-                onClick={() => navigate(link.path)}
+                onClick={() => navigate("/jobs")}
                 className="cursor-pointer group relative overflow-hidden rounded-3xl h-64 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-lg p-8 flex flex-col justify-end"
               >
                 <div className="absolute top-8 left-8 p-3 rounded-2xl bg-blue-500/10 text-blue-500 group-hover:bg-blue-500 group-hover:text-white transition-all">
@@ -246,7 +249,7 @@ const Home = () => {
                 </div>
                 <div className="relative z-10">
                   <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-blue-500 transition-colors">
-                    {link.name.replace(/([A-Z])/g, ' $1').trim()}
+                    {category}
                   </h3>
                   <div className="w-0 group-hover:w-12 h-1 bg-blue-500 transition-all duration-300"></div>
                 </div>
@@ -261,9 +264,10 @@ const Home = () => {
         <div className="max-w-7xl mx-auto px-4 text-center">
           <div className="text-2xl font-bold text-gray-900 dark:text-white mb-6">JobSkill Platform</div>
           <div className="flex justify-center gap-8 mb-8 text-gray-500 dark:text-gray-400">
+            <a href="/jobs" className="hover:text-blue-500 transition">Find Jobs</a>
+            <a href="/courses" className="hover:text-blue-500 transition">Courses</a>
             <a href="#" className="hover:text-blue-500 transition">About Us</a>
             <a href="#" className="hover:text-blue-500 transition">Privacy Policy</a>
-            <a href="#" className="hover:text-blue-500 transition">Contact</a>
           </div>
           <p className="text-gray-400 text-sm">© 2026 JobSkill Platform. All rights reserved.</p>
         </div>

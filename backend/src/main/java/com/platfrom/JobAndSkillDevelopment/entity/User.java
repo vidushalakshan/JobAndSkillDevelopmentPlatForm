@@ -41,8 +41,28 @@ public class User implements UserDetails {
     @Column(name = "picture_url")
     private String pictureUrl;
 
+    // --- Professional Profile Fields ---
+    @Column(length = 500)
+    private String headline; // e.g. "Senior Software Engineer at Google"
+
+    @Column(length = 2000)
+    private String bio;
+
+    private String phone;
+    private String location;
+    private String website;
+
+    @Column(name = "skills", length = 1000)
+    private String skills; // Comma-separated list
+
+    @Column(name = "resume_url")
+    private String resumeUrl;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<JobPost> jobPosts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Course> courses = new ArrayList<>();
 
 
     boolean enabled;
