@@ -7,6 +7,7 @@ import EmailVerification from '../page/EmailVerify';
 import routes from '../navigation/Routes';
 import EmployeeDashboard from '../page/EmployeeDashboard';
 import Home from '../page/Home';
+import AdminDashboard from '../page/AdminDashboard';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
       <Route path="/signup" element={<SignUp />} />
       <Route path="/verify" element={<EmailVerification />} />
       <Route path='/employee' element={<EmployeeDashboard />} />
+      <Route path='/admin' element={<AdminDashboard />} />
     </Routes>
   );
 }

@@ -53,14 +53,17 @@ const Login = () => {
       localStorage.setItem("token", response.data.token);
       instance.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
     
+      const role = response.data.role;
+
       login({
         token: response.data.token, 
         username: response.data.username || formData.email.split("@")[0],
         email: formData.email,
+        role: role,
       });
     
       toast.success("Login Successful!");
-      setTimeout(() => navigate("/"), 1500);
+      setTimeout(() => navigate(role === "ADMIN" ? "/admin" : "/"), 1500);
     
     } catch (error) {
       console.error("Login error:", error);
