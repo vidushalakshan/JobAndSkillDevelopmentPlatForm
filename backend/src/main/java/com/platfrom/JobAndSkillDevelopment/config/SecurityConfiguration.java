@@ -33,7 +33,7 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors // 👈 correct lambda-style config
+                .cors(cors -> cors
                         .configurationSource(corsConfigurationSource())
                 )
                 .csrf(csrf -> csrf.disable())
@@ -42,7 +42,9 @@ public class SecurityConfiguration {
                                 "/auth/**",
                                 "/job/approved"
                         ).permitAll()
-                        .requestMatchers("/job/**").authenticated()
+                        .requestMatchers("/job/all", "/job/pending", "/job/admin-create", "/job/*/status").hasRole("ADMIN")
+                        .requestMatchers("/apply/all", "/apply/*/status").hasRole("ADMIN")
+                        .requestMatchers("/users/", "/users/*/role").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

@@ -90,10 +90,10 @@ const Home = () => {
               </button>
             ) : (
               <button
-                onClick={() => navigate(user.role === 'ADMIN' ? '/employee-dashboard' : '/')}
+                onClick={() => navigate(user.role === 'ADMIN' ? '/admin' : '/my-jobs')}
                 className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-bold text-lg transition-all transform hover:scale-105 shadow-lg flex items-center gap-2"
               >
-                Go to Dashboard <ArrowRightIcon className="w-5 h-5" />
+                Go to {user.role === 'ADMIN' ? 'Admin Console' : 'My Activity'} <ArrowRightIcon className="w-5 h-5" />
               </button>
             )}
             <button
@@ -191,6 +191,35 @@ const Home = () => {
           />
         )}
       </AnimatePresence>
+
+      {/* Post a Job CTA */}
+      <section className="py-24 bg-white dark:bg-[#0f172a]">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="relative overflow-hidden rounded-[3rem] bg-gradient-to-br from-blue-600 to-indigo-900 p-12 md:p-20 text-center text-white shadow-2xl">
+            {/* Background Orbs */}
+            <div className="absolute -top-24 -left-24 w-64 h-64 bg-white/10 blur-3xl rounded-full"></div>
+            <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-blue-500/20 blur-3xl rounded-full"></div>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="relative z-10 max-w-2xl mx-auto"
+            >
+              <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tight">Looking to hire top talent?</h2>
+              <p className="text-lg md:text-xl text-blue-100 mb-10 font-medium">
+                Join thousands of employers and reach the best candidates for your team. Post your job today and find the perfect match.
+              </p>
+              <button 
+                onClick={() => navigate(user ? "/my-jobs" : "/login")}
+                className="px-10 py-5 bg-white text-blue-600 rounded-full font-black text-xl shadow-2xl hover:scale-105 transition-transform"
+              >
+                Post a Job Now
+              </button>
+            </motion.div>
+          </div>
+        </div>
+      </section>
 
       {/* Categories Bento Grid */}
       <section id="categories" className="py-20 bg-gray-50 dark:bg-[#111827]">

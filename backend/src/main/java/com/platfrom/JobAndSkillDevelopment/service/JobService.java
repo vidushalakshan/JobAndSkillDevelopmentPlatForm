@@ -21,12 +21,26 @@ public class JobService {
         return jobRepo.save(job);
     }
 
+    public JobPost createJobAsAdmin(JobPost job, User user) {
+        job.setUser(user);
+        job.setStatus(JobStatus.APPROVED);
+        return jobRepo.save(job);
+    }
+
     public List<JobPost> getAllJobs() {
         return jobRepo.findAll();
     }
 
     public List<JobPost> getApprovedJobs() {
         return jobRepo.findByStatus(JobStatus.APPROVED);
+    }
+
+    public List<JobPost> getPendingJobs() {
+        return jobRepo.findByStatus(JobStatus.PENDING);
+    }
+
+    public List<JobPost> getMyJobs(User user) {
+        return jobRepo.findByUser(user);
     }
 
     public JobPost updateStatus(Long jobId, JobStatus status) {
@@ -39,3 +53,4 @@ public class JobService {
         jobRepo.deleteById(jobId);
     }
 }
+

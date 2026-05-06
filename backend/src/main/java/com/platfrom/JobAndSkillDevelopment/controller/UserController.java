@@ -1,13 +1,12 @@
 package com.platfrom.JobAndSkillDevelopment.controller;
+import com.platfrom.JobAndSkillDevelopment.entity.Role;
 import com.platfrom.JobAndSkillDevelopment.entity.User;
 import com.platfrom.JobAndSkillDevelopment.service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -28,8 +27,23 @@ public class UserController {
     }
 
     @GetMapping("/")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<User>> allUsers() {
-        List <User> users = userService.allUsers();
+        List<User> users = userService.allUsers();
         return ResponseEntity.ok(users);
     }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return ResponseEntity.ok("User deleted successfully");
+    }
+
+    @PutMapping("/{id}/role")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<User> updateRole(@PathVariable Long id, @RequestParam Role role) {
+        return ResponseEntity.ok(userService.updateRole(id, role));
+    }
 }
+

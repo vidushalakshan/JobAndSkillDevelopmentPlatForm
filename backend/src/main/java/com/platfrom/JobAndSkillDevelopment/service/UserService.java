@@ -1,5 +1,6 @@
 package com.platfrom.JobAndSkillDevelopment.service;
 
+import com.platfrom.JobAndSkillDevelopment.entity.Role;
 import com.platfrom.JobAndSkillDevelopment.entity.User;
 import com.platfrom.JobAndSkillDevelopment.repo.UserRepo;
 import org.springframework.stereotype.Service;
@@ -19,5 +20,15 @@ public class UserService {
         userRepository.findAll().forEach(users::add);
         return users;
     }
-}
 
+    public void deleteUser(Long id) {
+        userRepository.deleteById(id);
+    }
+
+    public User updateRole(Long id, Role role) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setRole(role);
+        return userRepository.save(user);
+    }
+}

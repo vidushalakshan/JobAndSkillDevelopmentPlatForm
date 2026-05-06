@@ -8,6 +8,7 @@ import routes from '../navigation/Routes';
 import EmployeeDashboard from '../page/EmployeeDashboard';
 import Home from '../page/Home';
 import AdminDashboard from '../page/AdminDashboard';
+import MyJobsPage from '../page/MyJobsPage';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
       <Route path="/verify" element={<EmailVerification />} />
       <Route path='/employee' element={<EmployeeDashboard />} />
       <Route path='/admin' element={<AdminDashboard />} />
+      <Route path='/my-jobs' element={<MyJobsPage />} />
     </Routes>
   );
 }

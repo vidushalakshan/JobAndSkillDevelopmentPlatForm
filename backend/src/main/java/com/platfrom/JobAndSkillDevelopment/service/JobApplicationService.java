@@ -1,5 +1,6 @@
 package com.platfrom.JobAndSkillDevelopment.service;
 
+import com.platfrom.JobAndSkillDevelopment.entity.ApplicationStatus;
 import com.platfrom.JobAndSkillDevelopment.entity.JobApplication;
 import com.platfrom.JobAndSkillDevelopment.entity.JobPost;
 import com.platfrom.JobAndSkillDevelopment.entity.User;
@@ -34,4 +35,16 @@ public class JobApplicationService {
     public List<JobApplication> getApplicationsForJob(Long jobId) {
         return applicationRepo.findByJob_Id(jobId);
     }
+
+    public List<JobApplication> getAllApplications() {
+        return applicationRepo.findAll();
+    }
+
+    public JobApplication updateStatus(Long id, ApplicationStatus status) {
+        JobApplication app = applicationRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Application not found"));
+        app.setStatus(status);
+        return applicationRepo.save(app);
+    }
 }
+
