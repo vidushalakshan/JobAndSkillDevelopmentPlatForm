@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import instance from "../service/axios";
-import { toast } from "react-hot-toast";
+import { toast } from "react-toastify";
 
 const ApplyModal = ({ job, onClose }) => {
   const [coverLetter, setCoverLetter] = useState("");
