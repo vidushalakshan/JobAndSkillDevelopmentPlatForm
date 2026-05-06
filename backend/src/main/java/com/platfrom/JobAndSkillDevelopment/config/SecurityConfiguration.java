@@ -41,7 +41,9 @@ public class SecurityConfiguration {
                         .requestMatchers(
                                 "/auth/**",
                                 "/job/approved",
-                                "/courses/published"
+                                "/courses/published",
+                                "/profile/talents",
+                                "/profile/talents/**"
                         ).permitAll()
                         .requestMatchers("/job/all", "/job/pending", "/job/admin-create", "/job/*/status").hasRole("ADMIN")
                         .requestMatchers("/apply/all", "/apply/*/status").hasRole("ADMIN")

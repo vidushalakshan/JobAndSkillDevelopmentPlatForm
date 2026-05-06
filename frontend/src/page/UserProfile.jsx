@@ -3,10 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/context";
 import instance from "../service/axios";
 import { toast } from "react-toastify";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   FiUser, FiMapPin, FiPhone, FiGlobe, FiBriefcase,
-  FiEdit3, FiSave, FiX, FiArrowLeft, FiAward, FiLink
+  FiEdit3, FiSave, FiX, FiArrowLeft, FiAward, FiLink,
+  FiBook, FiPlus, FiTrash2, FiCalendar
 } from "react-icons/fi";
 
 const SKILL_SUGGESTIONS = [
@@ -26,33 +27,49 @@ const UserProfile = () => {
   const [skillInput, setSkillInput] = useState("");
   const [skills, setSkills] = useState([]);
 
+  const [education, setEducation] = useState([]);
+  const [experience, setExperience] = useState([]);
+  const [showEduModal, setShowEduModal] = useState(false);
+  const [showExpModal, setShowExpModal] = useState(false);
+  const [eduForm, setEduForm] = useState({ institution: "", degree: "", fieldOfStudy: "", startYear: "", endYear: "", description: "", current: false });
+  const [expForm, setExpForm] = useState({ company: "", role: "", description: "", startDate: "", endDate: "", current: false, location: "" });
+
+
   useEffect(() => {
     if (!user) navigate("/login");
   }, [user, navigate]);
 
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchAllData = async () => {
       try {
-        const res = await instance.get("/users/profile");
-        setProfile(res.data);
-        const fetchedSkills = res.data.skills ? res.data.skills.split(",").map(s => s.trim()).filter(Boolean) : [];
+        const [profRes, eduRes, expRes] = await Promise.all([
+          instance.get("/users/profile"),
+          instance.get("/profile/education"),
+          instance.get("/profile/experience")
+        ]);
+
+        setProfile(profRes.data);
+        const fetchedSkills = profRes.data.skills ? profRes.data.skills.split(",").map(s => s.trim()).filter(Boolean) : [];
         setSkills(fetchedSkills);
         setForm({
-          username: res.data.username || "",
-          headline: res.data.headline || "",
-          bio: res.data.bio || "",
-          phone: res.data.phone || "",
-          location: res.data.location || "",
-          website: res.data.website || "",
-          resumeUrl: res.data.resumeUrl || "",
+          username: profRes.data.username || "",
+          headline: profRes.data.headline || "",
+          bio: profRes.data.bio || "",
+          phone: profRes.data.phone || "",
+          location: profRes.data.location || "",
+          website: profRes.data.website || "",
+          resumeUrl: profRes.data.resumeUrl || "",
         });
+
+        setEducation(eduRes.data);
+        setExperience(expRes.data);
       } catch (err) {
-        toast.error("Failed to load profile.");
+        toast.error("Failed to load profile data.");
       } finally {
         setLoading(false);
       }
     };
-    if (user) fetchProfile();
+    if (user) fetchAllData();
   }, [user]);
 
   const handleSave = async () => {
@@ -83,6 +100,50 @@ const UserProfile = () => {
 
   const removeSkill = (skill) => setSkills(skills.filter(s => s !== skill));
 
+  const handleSaveEdu = async () => {
+    try {
+      const res = await instance.post("/profile/education", eduForm);
+      setEducation([...education, res.data]);
+      setShowEduModal(false);
+      setEduForm({ institution: "", degree: "", fieldOfStudy: "", startYear: "", endYear: "", description: "", current: false });
+      toast.success("Education added!");
+    } catch (err) {
+      toast.error("Failed to add education.");
+    }
+  };
+
+  const handleDeleteEdu = async (id) => {
+    try {
+      await instance.delete(`/profile/education/${id}`);
+      setEducation(education.filter(e => e.id !== id));
+      toast.success("Education removed.");
+    } catch (err) {
+      toast.error("Failed to remove education.");
+    }
+  };
+
+  const handleSaveExp = async () => {
+    try {
+      const res = await instance.post("/profile/experience", expForm);
+      setExperience([...experience, res.data]);
+      setShowExpModal(false);
+      setExpForm({ company: "", role: "", description: "", startDate: "", endDate: "", current: false, location: "" });
+      toast.success("Experience added!");
+    } catch (err) {
+      toast.error("Failed to add experience.");
+    }
+  };
+
+  const handleDeleteExp = async (id) => {
+    try {
+      await instance.delete(`/profile/experience/${id}`);
+      setExperience(experience.filter(e => e.id !== id));
+      toast.success("Experience removed.");
+    } catch (err) {
+      toast.error("Failed to remove experience.");
+    }
+  };
+
   if (!user) return null;
 
   return (
@@ -92,6 +153,61 @@ const UserProfile = () => {
         <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-blue-500/5 blur-[120px] rounded-full"></div>
         <div className="absolute top-[30%] -right-[10%] w-[30%] h-[30%] bg-indigo-500/5 blur-[120px] rounded-full"></div>
       </div>
+
+      {/* Education Modal */}
+      <AnimatePresence>
+        {showEduModal && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setShowEduModal(false)} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+             <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}
+              className="relative bg-white dark:bg-[#111127] rounded-[2.5rem] border border-gray-200 dark:border-white/10 shadow-2xl w-full max-w-lg p-8 z-10">
+               <h3 className="text-2xl font-black mb-6">Add Education</h3>
+               <div className="space-y-4">
+                 <input placeholder="Institution (e.g. Stanford University)" value={eduForm.institution} onChange={e => setEduForm({...eduForm, institution: e.target.value})} className="w-full bg-gray-50 dark:bg-white/5 rounded-2xl px-5 py-3 text-sm font-medium border border-gray-200 dark:border-white/10 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none" />
+                 <input placeholder="Degree (e.g. BSc Computer Science)" value={eduForm.degree} onChange={e => setEduForm({...eduForm, degree: e.target.value})} className="w-full bg-gray-50 dark:bg-white/5 rounded-2xl px-5 py-3 text-sm font-medium border border-gray-200 dark:border-white/10 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none" />
+                 <input placeholder="Field of Study" value={eduForm.fieldOfStudy} onChange={e => setEduForm({...eduForm, fieldOfStudy: e.target.value})} className="w-full bg-gray-50 dark:bg-white/5 rounded-2xl px-5 py-3 text-sm font-medium border border-gray-200 dark:border-white/10 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none" />
+                 <div className="flex gap-4">
+                    <input placeholder="Start Year" value={eduForm.startYear} onChange={e => setEduForm({...eduForm, startYear: e.target.value})} className="w-full bg-gray-50 dark:bg-white/5 rounded-2xl px-5 py-3 text-sm font-medium border border-gray-200 dark:border-white/10 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none" />
+                    {!eduForm.current && <input placeholder="End Year" value={eduForm.endYear} onChange={e => setEduForm({...eduForm, endYear: e.target.value})} className="w-full bg-gray-50 dark:bg-white/5 rounded-2xl px-5 py-3 text-sm font-medium border border-gray-200 dark:border-white/10 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none" />}
+                 </div>
+                 <label className="flex items-center gap-2 text-sm font-bold text-gray-600 dark:text-gray-300">
+                   <input type="checkbox" checked={eduForm.current} onChange={e => setEduForm({...eduForm, current: e.target.checked})} className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" /> I currently study here
+                 </label>
+                 <button onClick={handleSaveEdu} className="w-full py-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black transition-all">Save Education</button>
+               </div>
+             </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Experience Modal */}
+      <AnimatePresence>
+        {showExpModal && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setShowExpModal(false)} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+             <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}
+              className="relative bg-white dark:bg-[#111127] rounded-[2.5rem] border border-gray-200 dark:border-white/10 shadow-2xl w-full max-w-lg p-8 z-10">
+               <h3 className="text-2xl font-black mb-6">Add Experience</h3>
+               <div className="space-y-4">
+                 <input placeholder="Company (e.g. Google)" value={expForm.company} onChange={e => setExpForm({...expForm, company: e.target.value})} className="w-full bg-gray-50 dark:bg-white/5 rounded-2xl px-5 py-3 text-sm font-medium border border-gray-200 dark:border-white/10 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none" />
+                 <input placeholder="Role (e.g. Senior Developer)" value={expForm.role} onChange={e => setExpForm({...expForm, role: e.target.value})} className="w-full bg-gray-50 dark:bg-white/5 rounded-2xl px-5 py-3 text-sm font-medium border border-gray-200 dark:border-white/10 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none" />
+                 <input placeholder="Location" value={expForm.location} onChange={e => setExpForm({...expForm, location: e.target.value})} className="w-full bg-gray-50 dark:bg-white/5 rounded-2xl px-5 py-3 text-sm font-medium border border-gray-200 dark:border-white/10 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none" />
+                 <div className="flex gap-4">
+                    <input placeholder="Start Date (e.g. Jan 2022)" value={expForm.startDate} onChange={e => setExpForm({...expForm, startDate: e.target.value})} className="w-full bg-gray-50 dark:bg-white/5 rounded-2xl px-5 py-3 text-sm font-medium border border-gray-200 dark:border-white/10 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none" />
+                    {!expForm.current && <input placeholder="End Date" value={expForm.endDate} onChange={e => setExpForm({...expForm, endDate: e.target.value})} className="w-full bg-gray-50 dark:bg-white/5 rounded-2xl px-5 py-3 text-sm font-medium border border-gray-200 dark:border-white/10 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none" />}
+                 </div>
+                 <label className="flex items-center gap-2 text-sm font-bold text-gray-600 dark:text-gray-300">
+                   <input type="checkbox" checked={expForm.current} onChange={e => setExpForm({...expForm, current: e.target.checked})} className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" /> I currently work here
+                 </label>
+                 <textarea placeholder="Describe your responsibilities and achievements..." rows={3} value={expForm.description} onChange={e => setExpForm({...expForm, description: e.target.value})} className="w-full bg-gray-50 dark:bg-white/5 rounded-2xl px-5 py-3 text-sm font-medium border border-gray-200 dark:border-white/10 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none resize-none" />
+                 <button onClick={handleSaveExp} className="w-full py-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black transition-all">Save Experience</button>
+               </div>
+             </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       <div className="max-w-5xl mx-auto px-8 pt-16">
         {/* Back Button */}
@@ -206,8 +322,98 @@ const UserProfile = () => {
               )}
             </motion.div>
 
-            {/* Skills */}
+            {/* Experience Section */}
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+              className="bg-white dark:bg-[#111127] rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-2xl p-10">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-black flex items-center gap-3">
+                  <div className="w-1.5 h-6 bg-purple-500 rounded-full"></div> Work Experience
+                </h2>
+                {editing && (
+                  <button onClick={() => setShowExpModal(true)} className="flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-700 bg-blue-50 dark:bg-blue-500/10 px-4 py-2 rounded-xl transition-all">
+                    <FiPlus /> Add
+                  </button>
+                )}
+              </div>
+              
+              <div className="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-gray-200 dark:before:via-white/10 before:to-transparent">
+                {experience.length === 0 ? (
+                  <p className="text-gray-400 italic text-sm text-center">No experience added yet.</p>
+                ) : (
+                  experience.map((exp, i) => (
+                    <div key={exp.id} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
+                      {/* Timeline Dot */}
+                      <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white dark:border-[#111127] bg-purple-500 text-white shrink-0 md:order-1 md:group-odd:-ml-5 md:group-even:-mr-5 shadow-sm z-10">
+                        <FiBriefcase className="w-4 h-4" />
+                      </div>
+                      
+                      {/* Content Card */}
+                      <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-gray-50 dark:bg-white/5 p-6 rounded-2xl border border-gray-100 dark:border-white/10">
+                        <div className="flex justify-between items-start mb-2">
+                          <h4 className="font-black text-lg text-gray-900 dark:text-white">{exp.role}</h4>
+                          {editing && (
+                            <button onClick={() => handleDeleteExp(exp.id)} className="text-gray-400 hover:text-red-500 transition-colors">
+                              <FiTrash2 className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                        <p className="font-bold text-blue-600 dark:text-blue-400 mb-2">{exp.company}</p>
+                        <p className="text-xs font-bold text-gray-400 mb-4 flex items-center gap-2">
+                          <FiCalendar /> {exp.startDate} - {exp.current ? "Present" : exp.endDate}
+                        </p>
+                        {exp.description && <p className="text-sm text-gray-600 dark:text-gray-300 font-medium leading-relaxed">{exp.description}</p>}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </motion.div>
+
+            {/* Education Section */}
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+              className="bg-white dark:bg-[#111127] rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-2xl p-10">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-black flex items-center gap-3">
+                  <div className="w-1.5 h-6 bg-emerald-500 rounded-full"></div> Education
+                </h2>
+                {editing && (
+                  <button onClick={() => setShowEduModal(true)} className="flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-700 bg-blue-50 dark:bg-blue-500/10 px-4 py-2 rounded-xl transition-all">
+                    <FiPlus /> Add
+                  </button>
+                )}
+              </div>
+              
+              <div className="space-y-4">
+                {education.length === 0 ? (
+                  <p className="text-gray-400 italic text-sm">No education added yet.</p>
+                ) : (
+                  education.map(edu => (
+                    <div key={edu.id} className="flex gap-4 p-6 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 group">
+                      <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0">
+                        <FiBook className="w-6 h-6 text-emerald-500" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h4 className="font-black text-lg text-gray-900 dark:text-white">{edu.institution}</h4>
+                            <p className="font-bold text-emerald-600 dark:text-emerald-400 mb-1">{edu.degree} {edu.fieldOfStudy && `in ${edu.fieldOfStudy}`}</p>
+                            <p className="text-xs font-bold text-gray-400 mb-2">{edu.startYear} - {edu.current ? "Present" : edu.endYear}</p>
+                          </div>
+                          {editing && (
+                            <button onClick={() => handleDeleteEdu(edu.id)} className="text-gray-400 hover:text-red-500 transition-colors">
+                              <FiTrash2 className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </motion.div>
+
+            {/* Skills */}
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
               className="bg-white dark:bg-[#111127] rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-2xl p-10">
               <h2 className="text-xl font-black mb-6 flex items-center gap-3">
                 <div className="w-1.5 h-6 bg-indigo-500 rounded-full"></div> Skills & Expertise
@@ -243,22 +449,6 @@ const UserProfile = () => {
                   </div>
                 </div>
               )}
-            </motion.div>
-
-            {/* Quick Stats */}
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-              className="grid grid-cols-2 md:grid-cols-3 gap-6">
-              {[
-                { label: "Profile Views", value: "—", icon: FiUser, color: "text-blue-500" },
-                { label: "Skills Listed", value: skills.length, icon: FiAward, color: "text-indigo-500" },
-                { label: "Member Since", value: "2026", icon: FiBriefcase, color: "text-purple-500" },
-              ].map((stat, i) => (
-                <div key={stat.label} className="bg-white dark:bg-[#111127] rounded-[2rem] border border-gray-100 dark:border-white/5 p-8 shadow-xl">
-                  <stat.icon className={`w-8 h-8 ${stat.color} mb-4`} />
-                  <div className="text-4xl font-black mb-1">{stat.value}</div>
-                  <p className="text-xs font-black uppercase tracking-widest text-gray-400">{stat.label}</p>
-                </div>
-              ))}
             </motion.div>
           </div>
         )}

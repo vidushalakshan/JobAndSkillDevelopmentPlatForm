@@ -10,6 +10,7 @@ import MainLayout from '../page/MainLayout';
 import JobSearch from '../page/JobSearch';
 import UserProfile from '../page/UserProfile';
 import CoursesPage from '../page/CoursesPage';
+import TalentSearch from '../page/TalentSearch';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/jobs" element={<JobSearch />} />
         <Route path="/courses" element={<CoursesPage />} />
+        <Route path="/talents" element={<TalentSearch />} />
         <Route path="/profile" element={<UserProfile />} />
       </Route>
       

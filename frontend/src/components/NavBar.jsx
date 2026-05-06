@@ -28,6 +28,7 @@ const Nav = () => {
             {[
               { label: "Find Jobs", to: "/jobs" },
               { label: "Courses", to: "/courses" },
+              { label: "Talents", to: "/talents" },
             ].map(({ label, to }) => (
               <NavLink key={to} to={to} className={({ isActive }) =>
                 `px-5 py-2 rounded-full text-sm font-bold transition-all duration-200 ${isActive
