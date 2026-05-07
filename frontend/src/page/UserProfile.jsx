@@ -6,15 +6,24 @@ import { toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FiUser, FiMapPin, FiPhone, FiGlobe, FiBriefcase,
-  FiEdit3, FiSave, FiX, FiArrowLeft, FiAward, FiLink,
-  FiBook, FiPlus, FiTrash2, FiCalendar
+  FiEdit3, FiSave, FiX, FiArrowLeft, FiPlus, 
+  FiTrash2, FiCalendar, FiBook, FiLink, FiCpu
 } from "react-icons/fi";
 
 const SKILL_SUGGESTIONS = [
-  "JavaScript", "React", "Node.js", "Python", "Java", "Spring Boot",
-  "SQL", "Machine Learning", "UI/UX Design", "Project Management",
-  "Data Analysis", "AWS", "Docker", "TypeScript", "Figma"
+  "JavaScript", "React", "Node.js", "Python", "AWS", "Docker", "TypeScript", "Figma"
 ];
+
+// Animation Variants
+const fadeInUp = {
+  initial: { opacity: 0, y: 30 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, scale: 0.95 }
+};
+
+const staggerContainer = {
+  animate: { transition: { staggerChildren: 0.1 } }
+};
 
 const UserProfile = () => {
   const { user, login } = useUser();
@@ -26,20 +35,16 @@ const UserProfile = () => {
   const [form, setForm] = useState({});
   const [skillInput, setSkillInput] = useState("");
   const [skills, setSkills] = useState([]);
-
   const [education, setEducation] = useState([]);
   const [experience, setExperience] = useState([]);
   const [showEduModal, setShowEduModal] = useState(false);
   const [showExpModal, setShowExpModal] = useState(false);
-  const [eduForm, setEduForm] = useState({ institution: "", degree: "", fieldOfStudy: "", startYear: "", endYear: "", description: "", current: false });
-  const [expForm, setExpForm] = useState({ company: "", role: "", description: "", startDate: "", endDate: "", current: false, location: "" });
 
+  const [eduForm, setEduForm] = useState({ institution: "", degree: "", fieldOfStudy: "", startYear: "", endYear: "", current: false });
+  const [expForm, setExpForm] = useState({ company: "", role: "", description: "", startDate: "", endDate: "", current: false, location: "" });
 
   useEffect(() => {
     if (!user) navigate("/login");
-  }, [user, navigate]);
-
-  useEffect(() => {
     const fetchAllData = async () => {
       try {
         const [profRes, eduRes, expRes] = await Promise.all([
@@ -47,44 +52,30 @@ const UserProfile = () => {
           instance.get("/profile/education"),
           instance.get("/profile/experience")
         ]);
-
         setProfile(profRes.data);
-        const fetchedSkills = profRes.data.skills ? profRes.data.skills.split(",").map(s => s.trim()).filter(Boolean) : [];
-        setSkills(fetchedSkills);
-        setForm({
-          username: profRes.data.username || "",
-          headline: profRes.data.headline || "",
-          bio: profRes.data.bio || "",
-          phone: profRes.data.phone || "",
-          location: profRes.data.location || "",
-          website: profRes.data.website || "",
-          resumeUrl: profRes.data.resumeUrl || "",
-        });
-
+        setSkills(profRes.data.skills ? profRes.data.skills.split(",").map(s => s.trim()).filter(Boolean) : []);
+        setForm({ ...profRes.data });
         setEducation(eduRes.data);
         setExperience(expRes.data);
       } catch (err) {
-        toast.error("Failed to load profile data.");
+        toast.error("Failed to sync profile.");
       } finally {
         setLoading(false);
       }
     };
     if (user) fetchAllData();
-  }, [user]);
+  }, [user, navigate]);
 
   const handleSave = async () => {
     setSaving(true);
     try {
-      const res = await instance.put("/users/profile", {
-        ...form,
-        skills: skills.join(", "),
-      });
+      const res = await instance.put("/users/profile", { ...form, skills: skills.join(", ") });
       setProfile(res.data);
       login({ ...user, username: res.data.username });
       setEditing(false);
-      toast.success("Profile updated successfully!");
+      toast.success("Profile Polished.");
     } catch (err) {
-      toast.error("Failed to save profile.");
+      toast.error("Save failed.");
     } finally {
       setSaving(false);
     }
@@ -92,367 +83,201 @@ const UserProfile = () => {
 
   const addSkill = (skill) => {
     const trimmed = skill.trim();
-    if (trimmed && !skills.includes(trimmed)) {
-      setSkills([...skills, trimmed]);
-    }
+    if (trimmed && !skills.includes(trimmed)) setSkills([...skills, trimmed]);
     setSkillInput("");
-  };
-
-  const removeSkill = (skill) => setSkills(skills.filter(s => s !== skill));
-
-  const handleSaveEdu = async () => {
-    try {
-      const res = await instance.post("/profile/education", eduForm);
-      setEducation([...education, res.data]);
-      setShowEduModal(false);
-      setEduForm({ institution: "", degree: "", fieldOfStudy: "", startYear: "", endYear: "", description: "", current: false });
-      toast.success("Education added!");
-    } catch (err) {
-      toast.error("Failed to add education.");
-    }
-  };
-
-  const handleDeleteEdu = async (id) => {
-    try {
-      await instance.delete(`/profile/education/${id}`);
-      setEducation(education.filter(e => e.id !== id));
-      toast.success("Education removed.");
-    } catch (err) {
-      toast.error("Failed to remove education.");
-    }
-  };
-
-  const handleSaveExp = async () => {
-    try {
-      const res = await instance.post("/profile/experience", expForm);
-      setExperience([...experience, res.data]);
-      setShowExpModal(false);
-      setExpForm({ company: "", role: "", description: "", startDate: "", endDate: "", current: false, location: "" });
-      toast.success("Experience added!");
-    } catch (err) {
-      toast.error("Failed to add experience.");
-    }
-  };
-
-  const handleDeleteExp = async (id) => {
-    try {
-      await instance.delete(`/profile/experience/${id}`);
-      setExperience(experience.filter(e => e.id !== id));
-      toast.success("Experience removed.");
-    } catch (err) {
-      toast.error("Failed to remove experience.");
-    }
   };
 
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0a0a14] pb-20" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-      {/* Background Orbs */}
-      <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none -z-10">
-        <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-blue-500/5 blur-[120px] rounded-full"></div>
-        <div className="absolute top-[30%] -right-[10%] w-[30%] h-[30%] bg-indigo-500/5 blur-[120px] rounded-full"></div>
+    <div className="min-h-screen bg-[#050505] text-white selection:bg-blue-500/30 font-sans antialiased overflow-x-hidden mt-[90px]">
+      {/* Cinematic Background */}
+      <div className="fixed inset-0 z-0">
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-600/10 blur-[150px] rounded-full animate-pulse" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-600/10 blur-[150px] rounded-full" />
       </div>
 
-      {/* Education Modal */}
-      <AnimatePresence>
-        {showEduModal && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={() => setShowEduModal(false)} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-             <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}
-              className="relative bg-white dark:bg-[#111127] rounded-[2.5rem] border border-gray-200 dark:border-white/10 shadow-2xl w-full max-w-lg p-8 z-10">
-               <h3 className="text-2xl font-black mb-6">Add Education</h3>
-               <div className="space-y-4">
-                 <input placeholder="Institution (e.g. Stanford University)" value={eduForm.institution} onChange={e => setEduForm({...eduForm, institution: e.target.value})} className="w-full bg-gray-50 dark:bg-white/5 rounded-2xl px-5 py-3 text-sm font-medium border border-gray-200 dark:border-white/10 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none" />
-                 <input placeholder="Degree (e.g. BSc Computer Science)" value={eduForm.degree} onChange={e => setEduForm({...eduForm, degree: e.target.value})} className="w-full bg-gray-50 dark:bg-white/5 rounded-2xl px-5 py-3 text-sm font-medium border border-gray-200 dark:border-white/10 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none" />
-                 <input placeholder="Field of Study" value={eduForm.fieldOfStudy} onChange={e => setEduForm({...eduForm, fieldOfStudy: e.target.value})} className="w-full bg-gray-50 dark:bg-white/5 rounded-2xl px-5 py-3 text-sm font-medium border border-gray-200 dark:border-white/10 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none" />
-                 <div className="flex gap-4">
-                    <input placeholder="Start Year" value={eduForm.startYear} onChange={e => setEduForm({...eduForm, startYear: e.target.value})} className="w-full bg-gray-50 dark:bg-white/5 rounded-2xl px-5 py-3 text-sm font-medium border border-gray-200 dark:border-white/10 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none" />
-                    {!eduForm.current && <input placeholder="End Year" value={eduForm.endYear} onChange={e => setEduForm({...eduForm, endYear: e.target.value})} className="w-full bg-gray-50 dark:bg-white/5 rounded-2xl px-5 py-3 text-sm font-medium border border-gray-200 dark:border-white/10 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none" />}
-                 </div>
-                 <label className="flex items-center gap-2 text-sm font-bold text-gray-600 dark:text-gray-300">
-                   <input type="checkbox" checked={eduForm.current} onChange={e => setEduForm({...eduForm, current: e.target.checked})} className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" /> I currently study here
-                 </label>
-                 <button onClick={handleSaveEdu} className="w-full py-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black transition-all">Save Education</button>
-               </div>
-             </motion.div>
+      <div className="relative z-10 max-w-5xl mx-auto px-6 py-12">
+        {/* Navigation */}
+        <header className="flex justify-between items-center mb-12">
+          <button onClick={() => navigate(-1)} className="group flex items-center gap-3 text-sm font-medium text-gray-400 hover:text-white transition-all">
+            <FiArrowLeft className="group-hover:-translate-x-1 transition-transform" /> Back to Feed
+          </button>
+          <div className="flex gap-4">
+            {editing ? (
+              <div className="flex gap-2">
+                <button onClick={() => setEditing(false)} className="px-6 py-2 rounded-full border border-white/10 hover:bg-white/5 transition-all text-sm">Cancel</button>
+                <button onClick={handleSave} disabled={saving} className="px-8 py-2 rounded-full bg-white text-black font-bold text-sm hover:bg-gray-200 transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+                  {saving ? "Processing..." : "Save Identity"}
+                </button>
+              </div>
+            ) : (
+              <button onClick={() => setEditing(true)} className="flex items-center gap-2 px-6 py-2 rounded-full bg-white/5 border border-white/10 hover:border-white/20 transition-all text-sm font-medium">
+                <FiEdit3 className="text-blue-400" /> Edit Profile
+              </button>
+            )}
           </div>
-        )}
-      </AnimatePresence>
-
-      {/* Experience Modal */}
-      <AnimatePresence>
-        {showExpModal && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={() => setShowExpModal(false)} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-             <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}
-              className="relative bg-white dark:bg-[#111127] rounded-[2.5rem] border border-gray-200 dark:border-white/10 shadow-2xl w-full max-w-lg p-8 z-10">
-               <h3 className="text-2xl font-black mb-6">Add Experience</h3>
-               <div className="space-y-4">
-                 <input placeholder="Company (e.g. Google)" value={expForm.company} onChange={e => setExpForm({...expForm, company: e.target.value})} className="w-full bg-gray-50 dark:bg-white/5 rounded-2xl px-5 py-3 text-sm font-medium border border-gray-200 dark:border-white/10 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none" />
-                 <input placeholder="Role (e.g. Senior Developer)" value={expForm.role} onChange={e => setExpForm({...expForm, role: e.target.value})} className="w-full bg-gray-50 dark:bg-white/5 rounded-2xl px-5 py-3 text-sm font-medium border border-gray-200 dark:border-white/10 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none" />
-                 <input placeholder="Location" value={expForm.location} onChange={e => setExpForm({...expForm, location: e.target.value})} className="w-full bg-gray-50 dark:bg-white/5 rounded-2xl px-5 py-3 text-sm font-medium border border-gray-200 dark:border-white/10 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none" />
-                 <div className="flex gap-4">
-                    <input placeholder="Start Date (e.g. Jan 2022)" value={expForm.startDate} onChange={e => setExpForm({...expForm, startDate: e.target.value})} className="w-full bg-gray-50 dark:bg-white/5 rounded-2xl px-5 py-3 text-sm font-medium border border-gray-200 dark:border-white/10 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none" />
-                    {!expForm.current && <input placeholder="End Date" value={expForm.endDate} onChange={e => setExpForm({...expForm, endDate: e.target.value})} className="w-full bg-gray-50 dark:bg-white/5 rounded-2xl px-5 py-3 text-sm font-medium border border-gray-200 dark:border-white/10 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none" />}
-                 </div>
-                 <label className="flex items-center gap-2 text-sm font-bold text-gray-600 dark:text-gray-300">
-                   <input type="checkbox" checked={expForm.current} onChange={e => setExpForm({...expForm, current: e.target.checked})} className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" /> I currently work here
-                 </label>
-                 <textarea placeholder="Describe your responsibilities and achievements..." rows={3} value={expForm.description} onChange={e => setExpForm({...expForm, description: e.target.value})} className="w-full bg-gray-50 dark:bg-white/5 rounded-2xl px-5 py-3 text-sm font-medium border border-gray-200 dark:border-white/10 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none resize-none" />
-                 <button onClick={handleSaveExp} className="w-full py-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black transition-all">Save Experience</button>
-               </div>
-             </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      <div className="max-w-5xl mx-auto px-8 pt-16">
-        {/* Back Button */}
-        <button onClick={() => navigate(-1)} className="group flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-blue-500 transition-all mb-10">
-          <FiArrowLeft className="transition-transform group-hover:-translate-x-1" /> Back
-        </button>
+        </header>
 
         {loading ? (
-          <div className="space-y-6">
-            {[1, 2, 3].map(i => <div key={i} className="h-48 bg-white dark:bg-[#111127] rounded-[2rem] animate-pulse" />)}
+          <div className="space-y-8 animate-pulse">
+            <div className="h-64 bg-white/5 rounded-[3rem]" />
+            <div className="h-40 bg-white/5 rounded-[3rem]" />
           </div>
         ) : (
-          <div className="space-y-6">
-            {/* Profile Header Card */}
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-              className="relative bg-white dark:bg-[#111127] rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-2xl overflow-hidden">
-              {/* Cover Gradient */}
-              <div className="h-32 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 relative">
-                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLW9wYWNpdHk9IjAuMSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIiAvPjwvc3ZnPg==')] opacity-30"></div>
-              </div>
-
-              <div className="px-10 pb-10">
-                <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 -mt-12 mb-8">
-                  {/* Avatar */}
-                  <div className="w-24 h-24 rounded-[1.5rem] bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-4xl font-black border-4 border-white dark:border-[#111127] shadow-xl overflow-hidden">
-                    {profile?.pictureUrl ? (
-                      <img src={profile.pictureUrl} alt="Avatar" className="w-full h-full object-cover" />
-                    ) : (
-                      (profile?.username || "U")[0].toUpperCase()
-                    )}
+          <motion.div variants={staggerContainer} initial="initial" animate="animate" className="space-y-8">
+            
+            {/* Header Hero */}
+            <motion.section variants={fadeInUp} className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-[3rem] blur-3xl opacity-20 group-hover:opacity-30 transition-opacity" />
+              <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-[3rem] p-10 overflow-hidden">
+                <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
+                  <div className="relative">
+                    <div className="w-32 h-32 rounded-3xl bg-gradient-to-br from-blue-500 to-indigo-600 p-[2px]">
+                      <div className="w-full h-full rounded-3xl bg-[#0a0a0a] flex items-center justify-center text-4xl font-light">
+                         {profile?.pictureUrl ? <img src={profile.pictureUrl} className="w-full h-full object-cover rounded-3xl" /> : profile?.username?.[0]}
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Edit / Save Buttons */}
-                  <div className="flex gap-3">
+                  <div className="flex-1 text-center md:text-left space-y-4">
                     {editing ? (
-                      <>
-                        <button onClick={() => setEditing(false)} className="flex items-center gap-2 px-6 py-3 rounded-2xl border border-gray-200 dark:border-white/10 text-sm font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-all">
-                          <FiX /> Cancel
-                        </button>
-                        <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-8 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-black shadow-xl shadow-blue-500/20 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50">
-                          <FiSave /> {saving ? "Saving..." : "Save Changes"}
-                        </button>
-                      </>
+                      <div className="space-y-3">
+                        <input value={form.username} onChange={e => setForm({...form, username: e.target.value})} className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 w-full text-2xl font-bold focus:border-blue-500 outline-none" placeholder="Full Name" />
+                        <input value={form.headline} onChange={e => setForm({...form, headline: e.target.value})} className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 w-full text-blue-400 focus:border-blue-500 outline-none" placeholder="Headline" />
+                      </div>
                     ) : (
-                      <button onClick={() => setEditing(true)} className="flex items-center gap-2 px-8 py-3 rounded-2xl bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-sm font-black transition-all border border-gray-200 dark:border-white/10">
-                        <FiEdit3 /> Edit Profile
-                      </button>
+                      <>
+                        <h1 className="text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-white to-gray-400 leading-tight">
+                          {profile?.username}
+                        </h1>
+                        <p className="text-xl text-blue-400 font-medium">{profile?.headline || "Pioneer in tech"}</p>
+                      </>
                     )}
+                    
+                    <div className="flex flex-wrap justify-center md:justify-start gap-6 text-sm text-gray-400 pt-2">
+                      <span className="flex items-center gap-2"><FiMapPin className="text-blue-500"/> {profile?.location || "Remote"}</span>
+                      {profile?.website && <a href={profile.website} className="flex items-center gap-2 hover:text-white transition-colors"><FiGlobe className="text-blue-500"/> Portfolio</a>}
+                      {profile?.resumeUrl && <a href={profile.resumeUrl} className="flex items-center gap-2 text-indigo-400 hover:text-indigo-300"><FiLink /> CV</a>}
+                    </div>
                   </div>
                 </div>
-
-                {/* Name & Headline */}
-                {editing ? (
-                  <div className="space-y-4 mb-6">
-                    <input value={form.username} onChange={e => setForm({ ...form, username: e.target.value })}
-                      placeholder="Full Name"
-                      className="text-3xl font-black w-full bg-gray-50 dark:bg-white/5 rounded-2xl px-6 py-3 border border-gray-200 dark:border-white/10 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500" />
-                    <input value={form.headline} onChange={e => setForm({ ...form, headline: e.target.value })}
-                      placeholder="Your professional headline (e.g. Senior Software Engineer at Google)"
-                      className="text-base font-medium w-full bg-gray-50 dark:bg-white/5 rounded-2xl px-6 py-3 border border-gray-200 dark:border-white/10 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-gray-500" />
-                  </div>
-                ) : (
-                  <div className="mb-6">
-                    <h1 className="text-4xl font-black mb-2">{profile?.username}</h1>
-                    <p className="text-lg text-blue-500 font-bold">{profile?.headline || <span className="text-gray-400 italic font-medium text-base">Add a professional headline...</span>}</p>
-                  </div>
-                )}
-
-                {/* Meta Info */}
-                {editing ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {[
-                      { key: "location", icon: FiMapPin, placeholder: "City, Country" },
-                      { key: "phone", icon: FiPhone, placeholder: "Phone number" },
-                      { key: "website", icon: FiGlobe, placeholder: "https://yourwebsite.com" },
-                      { key: "resumeUrl", icon: FiLink, placeholder: "Resume URL (Google Drive, etc.)" },
-                    ].map(({ key, icon: Icon, placeholder }) => (
-                      <div key={key} className="flex items-center gap-3 bg-gray-50 dark:bg-white/5 rounded-2xl px-5 py-3 border border-gray-200 dark:border-white/10">
-                        <Icon className="w-5 h-5 text-gray-400 shrink-0" />
-                        <input value={form[key]} onChange={e => setForm({ ...form, [key]: e.target.value })}
-                          placeholder={placeholder}
-                          className="flex-1 text-sm font-medium bg-transparent focus:outline-none placeholder:text-gray-400" />
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="flex flex-wrap gap-4 text-sm font-bold text-gray-500 dark:text-gray-400">
-                    {profile?.location && <span className="flex items-center gap-1.5"><FiMapPin />{profile.location}</span>}
-                    {profile?.phone && <span className="flex items-center gap-1.5"><FiPhone />{profile.phone}</span>}
-                    {profile?.website && <a href={profile.website} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-blue-500 hover:underline"><FiGlobe />{profile.website}</a>}
-                    {profile?.resumeUrl && <a href={profile.resumeUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-indigo-500 hover:underline"><FiLink />View Resume</a>}
-                  </div>
-                )}
               </div>
-            </motion.div>
+            </motion.section>
 
-            {/* About / Bio */}
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-              className="bg-white dark:bg-[#111127] rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-2xl p-10">
-              <h2 className="text-xl font-black mb-6 flex items-center gap-3">
-                <div className="w-1.5 h-6 bg-blue-500 rounded-full"></div> About Me
-              </h2>
-              {editing ? (
-                <textarea value={form.bio} onChange={e => setForm({ ...form, bio: e.target.value })}
-                  placeholder="Write a short bio about yourself, your experience, and what you're looking for..."
-                  rows={5}
-                  className="w-full bg-gray-50 dark:bg-white/5 rounded-2xl px-6 py-4 text-sm font-medium leading-relaxed border border-gray-200 dark:border-white/10 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 resize-none" />
-              ) : (
-                <p className="text-gray-600 dark:text-gray-300 leading-relaxed font-medium text-base">
-                  {profile?.bio || <span className="text-gray-400 italic">No bio yet. Click "Edit Profile" to add one.</span>}
-                </p>
-              )}
-            </motion.div>
+            {/* Content Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {/* Left Column: Bio & Skills */}
+              <div className="md:col-span-2 space-y-8">
+                <motion.section variants={fadeInUp} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-[2.5rem] p-8">
+                  <h3 className="text-lg font-bold mb-6 flex items-center gap-3">
+                    <span className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500"><FiUser size={16}/></span>
+                    Professional Narrative
+                  </h3>
+                  {editing ? (
+                    <textarea value={form.bio} onChange={e => setForm({...form, bio: e.target.value})} rows={5} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-gray-300 focus:border-blue-500 outline-none resize-none" />
+                  ) : (
+                    <p className="text-gray-400 leading-relaxed text-lg font-light">{profile?.bio || "No narrative established yet."}</p>
+                  )}
+                </motion.section>
 
-            {/* Experience Section */}
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-              className="bg-white dark:bg-[#111127] rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-2xl p-10">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-black flex items-center gap-3">
-                  <div className="w-1.5 h-6 bg-purple-500 rounded-full"></div> Work Experience
-                </h2>
-                {editing && (
-                  <button onClick={() => setShowExpModal(true)} className="flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-700 bg-blue-50 dark:bg-blue-500/10 px-4 py-2 rounded-xl transition-all">
-                    <FiPlus /> Add
-                  </button>
-                )}
-              </div>
-              
-              <div className="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-gray-200 dark:before:via-white/10 before:to-transparent">
-                {experience.length === 0 ? (
-                  <p className="text-gray-400 italic text-sm text-center">No experience added yet.</p>
-                ) : (
-                  experience.map((exp, i) => (
-                    <div key={exp.id} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
-                      {/* Timeline Dot */}
-                      <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white dark:border-[#111127] bg-purple-500 text-white shrink-0 md:order-1 md:group-odd:-ml-5 md:group-even:-mr-5 shadow-sm z-10">
-                        <FiBriefcase className="w-4 h-4" />
-                      </div>
-                      
-                      {/* Content Card */}
-                      <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-gray-50 dark:bg-white/5 p-6 rounded-2xl border border-gray-100 dark:border-white/10">
-                        <div className="flex justify-between items-start mb-2">
-                          <h4 className="font-black text-lg text-gray-900 dark:text-white">{exp.role}</h4>
-                          {editing && (
-                            <button onClick={() => handleDeleteExp(exp.id)} className="text-gray-400 hover:text-red-500 transition-colors">
-                              <FiTrash2 className="w-4 h-4" />
-                            </button>
-                          )}
-                        </div>
-                        <p className="font-bold text-blue-600 dark:text-blue-400 mb-2">{exp.company}</p>
-                        <p className="text-xs font-bold text-gray-400 mb-4 flex items-center gap-2">
-                          <FiCalendar /> {exp.startDate} - {exp.current ? "Present" : exp.endDate}
-                        </p>
-                        {exp.description && <p className="text-sm text-gray-600 dark:text-gray-300 font-medium leading-relaxed">{exp.description}</p>}
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </motion.div>
-
-            {/* Education Section */}
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-              className="bg-white dark:bg-[#111127] rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-2xl p-10">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-black flex items-center gap-3">
-                  <div className="w-1.5 h-6 bg-emerald-500 rounded-full"></div> Education
-                </h2>
-                {editing && (
-                  <button onClick={() => setShowEduModal(true)} className="flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-700 bg-blue-50 dark:bg-blue-500/10 px-4 py-2 rounded-xl transition-all">
-                    <FiPlus /> Add
-                  </button>
-                )}
-              </div>
-              
-              <div className="space-y-4">
-                {education.length === 0 ? (
-                  <p className="text-gray-400 italic text-sm">No education added yet.</p>
-                ) : (
-                  education.map(edu => (
-                    <div key={edu.id} className="flex gap-4 p-6 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 group">
-                      <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0">
-                        <FiBook className="w-6 h-6 text-emerald-500" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex justify-between items-start">
+                <motion.section variants={fadeInUp} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-[2.5rem] p-8">
+                  <div className="flex justify-between items-center mb-8">
+                    <h3 className="text-lg font-bold flex items-center gap-3">
+                      <span className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-500"><FiBriefcase size={16}/></span>
+                      Experience
+                    </h3>
+                    {editing && <button onClick={() => setShowExpModal(true)} className="p-2 hover:bg-white/10 rounded-full transition-colors text-blue-400"><FiPlus size={20}/></button>}
+                  </div>
+                  
+                  <div className="space-y-10 border-l border-white/10 ml-4 pl-8 relative">
+                    {experience.map((exp, idx) => (
+                      <div key={exp.id} className="relative">
+                        <div className="absolute -left-[41px] top-1 w-4 h-4 rounded-full bg-[#050505] border-2 border-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.5)]" />
+                        <div className="flex justify-between items-start group">
                           <div>
-                            <h4 className="font-black text-lg text-gray-900 dark:text-white">{edu.institution}</h4>
-                            <p className="font-bold text-emerald-600 dark:text-emerald-400 mb-1">{edu.degree} {edu.fieldOfStudy && `in ${edu.fieldOfStudy}`}</p>
-                            <p className="text-xs font-bold text-gray-400 mb-2">{edu.startYear} - {edu.current ? "Present" : edu.endYear}</p>
+                            <h4 className="text-xl font-bold">{exp.role}</h4>
+                            <p className="text-purple-400 font-medium mb-2">{exp.company}</p>
+                            <p className="text-xs text-gray-500 uppercase tracking-widest mb-4">{exp.startDate} — {exp.current ? "Present" : exp.endDate}</p>
+                            <p className="text-gray-400 font-light text-sm">{exp.description}</p>
                           </div>
-                          {editing && (
-                            <button onClick={() => handleDeleteEdu(edu.id)} className="text-gray-400 hover:text-red-500 transition-colors">
-                              <FiTrash2 className="w-4 h-4" />
-                            </button>
-                          )}
+                          {editing && <button onClick={() => handleDeleteExp(exp.id)} className="opacity-0 group-hover:opacity-100 p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-all"><FiTrash2 /></button>}
                         </div>
                       </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </motion.div>
-
-            {/* Skills */}
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
-              className="bg-white dark:bg-[#111127] rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-2xl p-10">
-              <h2 className="text-xl font-black mb-6 flex items-center gap-3">
-                <div className="w-1.5 h-6 bg-indigo-500 rounded-full"></div> Skills & Expertise
-              </h2>
-              <div className="flex flex-wrap gap-3 mb-4">
-                {skills.map(skill => (
-                  <span key={skill} className="flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300 text-sm font-bold rounded-2xl border border-blue-200 dark:border-blue-500/20">
-                    {skill}
-                    {editing && <button onClick={() => removeSkill(skill)} className="hover:text-red-500 transition-colors"><FiX className="w-3.5 h-3.5" /></button>}
-                  </span>
-                ))}
-                {skills.length === 0 && !editing && <p className="text-gray-400 italic text-sm">No skills added yet.</p>}
-              </div>
-
-              {editing && (
-                <div className="mt-6">
-                  <div className="flex gap-3 mb-4">
-                    <input value={skillInput} onChange={e => setSkillInput(e.target.value)}
-                      onKeyDown={e => e.key === "Enter" && (e.preventDefault(), addSkill(skillInput))}
-                      placeholder="Type a skill and press Enter..."
-                      className="flex-1 bg-gray-50 dark:bg-white/5 rounded-2xl px-6 py-3 text-sm font-medium border border-gray-200 dark:border-white/10 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500" />
-                    <button onClick={() => addSkill(skillInput)}
-                      className="px-6 py-3 bg-blue-600 text-white text-sm font-black rounded-2xl hover:bg-blue-700 transition-all">Add</button>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    <p className="w-full text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Quick Add:</p>
-                    {SKILL_SUGGESTIONS.filter(s => !skills.includes(s)).slice(0, 8).map(s => (
-                      <button key={s} onClick={() => addSkill(s)}
-                        className="px-3 py-1.5 text-xs font-bold rounded-xl bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-500/10 hover:text-blue-600 transition-all border border-gray-200 dark:border-white/10">
-                        + {s}
-                      </button>
                     ))}
                   </div>
-                </div>
-              )}
+                </motion.section>
+              </div>
+
+              {/* Right Column: Skills & Education */}
+              <div className="space-y-8">
+                <motion.section variants={fadeInUp} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-[2.5rem] p-8">
+                  <h3 className="text-lg font-bold mb-6 flex items-center gap-3">
+                    <span className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-500"><FiCpu size={16}/></span>
+                    Expertise
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {skills.map(skill => (
+                      <span key={skill} className="px-4 py-1.5 rounded-xl bg-white/5 border border-white/5 text-xs font-medium text-gray-300 flex items-center gap-2 hover:border-white/20 transition-all cursor-default">
+                        {skill}
+                        {editing && <FiX className="hover:text-red-400 cursor-pointer" onClick={() => setSkills(skills.filter(s => s !== skill))} />}
+                      </span>
+                    ))}
+                  </div>
+                  {editing && (
+                    <div className="mt-4 flex gap-2">
+                      <input value={skillInput} onChange={e => setSkillInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && addSkill(skillInput)} placeholder="Add skill..." className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs outline-none focus:border-blue-500" />
+                    </div>
+                  )}
+                </motion.section>
+
+                <motion.section variants={fadeInUp} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-[2.5rem] p-8">
+                  <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-lg font-bold flex items-center gap-3">
+                      <span className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500"><FiBook size={16}/></span>
+                      Education
+                    </h3>
+                    {editing && <button onClick={() => setShowEduModal(true)} className="text-blue-400"><FiPlus /></button>}
+                  </div>
+                  <div className="space-y-6">
+                    {education.map(edu => (
+                      <div key={edu.id} className="group relative">
+                        <h4 className="text-sm font-bold">{edu.institution}</h4>
+                        <p className="text-xs text-gray-500">{edu.degree}</p>
+                        <p className="text-[10px] text-emerald-500 font-bold mt-1 uppercase tracking-tighter">{edu.startYear} - {edu.endYear}</p>
+                        {editing && <button onClick={() => handleDeleteEdu(edu.id)} className="absolute right-0 top-0 opacity-0 group-hover:opacity-100 text-red-500 transition-opacity"><FiTrash2 size={14}/></button>}
+                      </div>
+                    ))}
+                  </div>
+                </motion.section>
+              </div>
+            </div>
+
+          </motion.div>
+        )}
+      </div>
+
+      {/* Luxury Modal Component Placeholder */}
+      <AnimatePresence>
+        {(showEduModal || showExpModal) && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => {setShowEduModal(false); setShowExpModal(false)}} className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="relative bg-[#111] border border-white/10 p-8 rounded-[3rem] w-full max-w-md shadow-2xl">
+              <h2 className="text-2xl font-bold mb-6">{showEduModal ? "Academic Background" : "Work History"}</h2>
+              <div className="space-y-4">
+                 <button 
+                  onClick={() => {
+                    showEduModal ? handleSaveEdu() : handleSaveExp();
+                  }}
+                  className="w-full py-4 rounded-2xl bg-blue-600 text-white font-bold hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20"
+                 >
+                  Confirm Entry
+                 </button>
+              </div>
             </motion.div>
           </div>
         )}
-      </div>
+      </AnimatePresence>
     </div>
   );
 };
