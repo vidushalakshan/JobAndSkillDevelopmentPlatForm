@@ -1,157 +1,198 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { navLogo } from "../utils";
 import {
   ArrowRightOnRectangleIcon,
   UserCircleIcon,
+  Squares2X2Icon,
+  AcademicCapIcon,
+  BriefcaseIcon,
+  UserGroupIcon,
+  ChevronDownIcon
 } from "@heroicons/react/24/outline";
 import ThemeToggle from "./ThemeToggle";
-import { useNavigate, NavLink } from "react-router-dom";
+import { useNavigate, NavLink, useLocation } from "react-router-dom";
 import { useUser } from "../context/context";
 
 const Nav = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, logout } = useUser();
   const [showProfile, setShowProfile] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  // Handle scroll effect for a "floating" feel
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const navLinks = [
+    { label: "Find Jobs", to: "/jobs", icon: <BriefcaseIcon className="w-4 h-4" /> },
+    { label: "Courses", to: "/courses", icon: <AcademicCapIcon className="w-4 h-4" /> },
+    { label: "Talents", to: "/talents", icon: <UserGroupIcon className="w-4 h-4" /> },
+  ];
 
   return (
-    <>
-      <header className="w-full py-4 sm:px-12 px-6 flex justify-center items-center transition-all duration-300">
-        <nav className="flex w-full justify-between items-center max-w-7xl mx-auto">
-          {/* Logo */}
-          <div className="flex items-center cursor-pointer" onClick={() => navigate("/")}>
-            <img src={navLogo} alt="Nav Logo" width={140} className="hover:opacity-80 transition" />
+    <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 ${
+      scrolled ? "py-3 px-4" : "py-5 px-6"
+    }`}>
+      <div className={`max-w-7xl mx-auto flex items-center justify-between transition-all duration-500 rounded-[2rem] px-6 py-2 ${
+        scrolled 
+        ? "bg-white/80 dark:bg-black/40 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.05)] border border-white/20 dark:border-white/10" 
+        : "bg-transparent"
+      }`}>
+        
+        {/* --- LOGO SECTION --- */}
+        <div 
+          className="group flex items-center gap-2 cursor-pointer" 
+          onClick={() => navigate("/")}
+        >
+          <div className="bg-blue-600 p-2 rounded-xl rotate-3 group-hover:rotate-0 transition-transform duration-300 shadow-lg shadow-blue-500/20">
+             <img src={navLogo} alt="Logo" className="w-8 h-8 object-contain brightness-0 invert" />
           </div>
+          <span className="text-xl font-black tracking-tighter text-gray-900 dark:text-white">
+            CAREER<span className="text-blue-600">FLOW</span>
+          </span>
+        </div>
 
-          {/* Main Navigation Links */}
-          <div className="hidden md:flex items-center gap-2 bg-gray-100/80 dark:bg-white/5 px-2 py-1.5 rounded-full border border-gray-200 dark:border-white/10 backdrop-blur-sm">
-            {[
-              { label: "Find Jobs", to: "/jobs" },
-              { label: "Courses", to: "/courses" },
-              { label: "Talents", to: "/talents" },
-            ].map(({ label, to }) => (
-              <NavLink key={to} to={to} className={({ isActive }) =>
-                `px-5 py-2 rounded-full text-sm font-bold transition-all duration-200 ${isActive
-                  ? "bg-white dark:bg-white/10 text-blue-600 dark:text-blue-400 shadow-md"
-                  : "text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
-                }`
-              }>
-                {label}
-              </NavLink>
-            ))}
-          </div>
-
-          {/* Right Side */}
-          <div className="flex items-center gap-4">
-            <ThemeToggle />
-            {user ? (
-              <div className="relative">
-                <div
-                  className="flex items-center gap-3 bg-gray-100 dark:bg-white/10 px-4 py-2 rounded-full border border-gray-200 dark:border-white/10 cursor-pointer hover:bg-gray-200 dark:hover:bg-white/20 transition-all"
-                  onClick={() => setShowProfile(!showProfile)}
-                >
-                  {user.pictureUrl ? (
-                    <img src={user.pictureUrl} alt="User" className="w-8 h-8 rounded-full border-2 border-blue-500" />
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-sm font-black">
-                      {(user.username || "U")[0].toUpperCase()}
-                    </div>
+        {/* --- CENTER NAVIGATION --- */}
+        <div className="hidden md:flex items-center gap-1">
+          {navLinks.map(({ label, to, icon }) => (
+            <NavLink 
+              key={to} 
+              to={to} 
+              className={({ isActive }) => `
+                relative flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300
+                ${isActive 
+                  ? "text-blue-600 dark:text-blue-400" 
+                  : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5"}
+              `}
+            >
+              {({ isActive }) => (
+                <>
+                  {icon}
+                  {label}
+                  {isActive && (
+                    <motion.div 
+                      layoutId="nav-underline"
+                      className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-blue-600 rounded-full"
+                    />
                   )}
-                  <span className="text-sm font-bold text-gray-700 dark:text-gray-200 hidden sm:block">
-                    {user.username}
-                  </span>
+                </>
+              )}
+            </NavLink>
+          ))}
+        </div>
+
+        {/* --- RIGHT SECTION --- */}
+        <div className="flex items-center gap-3">
+          <div className="hidden sm:block mr-2">
+            <ThemeToggle />
+          </div>
+
+          {user ? (
+            <div className="relative">
+              <button
+                onClick={() => setShowProfile(!showProfile)}
+                className="flex items-center gap-2 pl-2 pr-4 py-1.5 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-full hover:shadow-md transition-all active:scale-95"
+              >
+                <div className="relative">
+                    {user.pictureUrl ? (
+                    <img src={user.pictureUrl} alt="User" className="w-8 h-8 rounded-full border border-white dark:border-gray-800" />
+                    ) : (
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white text-xs font-black">
+                        {(user.username || "U")[0].toUpperCase()}
+                    </div>
+                    )}
+                    <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-white dark:border-gray-900 rounded-full" />
                 </div>
+                <ChevronDownIcon className={`w-4 h-4 text-gray-500 transition-transform duration-300 ${showProfile ? "rotate-180" : ""}`} />
+              </button>
 
-                {/* Profile Popup */}
-                <AnimatePresence>
-                  {showProfile && (
+              <AnimatePresence>
+                {showProfile && (
+                  <>
+                    <div className="fixed inset-0 z-10" onClick={() => setShowProfile(false)} />
                     <motion.div
-                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      initial={{ opacity: 0, y: 15, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                      className="absolute right-0 mt-3 w-72 bg-white dark:bg-[#1e1e2f] rounded-[2rem] shadow-2xl border border-gray-200 dark:border-white/10 p-6 z-[100]"
+                      exit={{ opacity: 0, y: 15, scale: 0.95 }}
+                      className="absolute right-0 mt-4 w-72 bg-white dark:bg-[#0f1115] rounded-[2rem] shadow-2xl border border-gray-100 dark:border-white/5 p-2 z-20 overflow-hidden"
                     >
-                      <div className="flex flex-col items-center text-center mb-6">
-                        {user.pictureUrl ? (
-                          <img src={user.pictureUrl} alt="User Large" className="w-20 h-20 rounded-full border-4 border-blue-500 mb-4 shadow-xl" />
-                        ) : (
-                          <div className="w-20 h-20 rounded-[1.25rem] bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-3xl font-black mb-4 shadow-xl">
-                            {(user.username || "U")[0].toUpperCase()}
-                          </div>
-                        )}
-                        <h3 className="text-xl font-black text-gray-900 dark:text-white">{user.username}</h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{user.email}</p>
-                        <span className="mt-2 px-3 py-1 bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 text-xs font-black rounded-full uppercase tracking-wider">
-                          {user.role}
-                        </span>
-                      </div>
-
-                      <div className="space-y-1">
-                        {user.role === "ADMIN" && (
-                          <button
-                            onClick={() => { navigate("/admin"); setShowProfile(false); }}
-                            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-500/10 text-sm font-bold text-blue-600 dark:text-blue-400 transition-colors"
-                          >
-                            <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-                            Admin Console
-                          </button>
-                        )}
-                        <button
-                          onClick={() => { navigate("/profile"); setShowProfile(false); }}
-                          className="w-full text-left px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-white/5 text-sm font-bold transition-colors flex items-center gap-3"
-                        >
-                          <UserCircleIcon className="w-5 h-5 text-gray-400" />
-                          My Profile
-                        </button>
-                        <button
-                          onClick={() => { navigate("/my-jobs"); setShowProfile(false); }}
-                          className="w-full text-left px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-white/5 text-sm font-bold transition-colors flex items-center gap-3"
-                        >
-                          <span className="w-5 h-5 text-gray-400 flex items-center justify-center text-base">📋</span>
-                          My Activity
-                        </button>
-                        <button
-                          onClick={() => { navigate("/courses"); setShowProfile(false); }}
-                          className="w-full text-left px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-white/5 text-sm font-bold transition-colors flex items-center gap-3"
-                        >
-                          <span className="w-5 h-5 text-gray-400 flex items-center justify-center text-base">🎓</span>
-                          My Courses
-                        </button>
-                        <div className="pt-2 border-t border-gray-100 dark:border-white/5">
-                          <button
-                            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 text-sm font-bold transition-colors"
-                            onClick={() => { logout(); navigate("/login"); setShowProfile(false); }}
-                          >
-                            <ArrowRightOnRectangleIcon className="w-5 h-5" />
-                            Logout
-                          </button>
+                      {/* Header */}
+                      <div className="p-4 bg-gray-50 dark:bg-white/[0.02] rounded-[1.5rem] mb-2">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-2">Authenticated as</p>
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center text-white font-black">
+                                {(user.username || "U")[0].toUpperCase()}
+                            </div>
+                            <div className="overflow-hidden">
+                                <h4 className="text-sm font-black truncate text-gray-900 dark:text-white">{user.username}</h4>
+                                <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                            </div>
                         </div>
                       </div>
+
+                      {/* Menu Items */}
+                      <div className="p-1 space-y-1">
+                        {user.role === "ADMIN" && (
+                           <MenuButton onClick={() => navigate("/admin")} icon={<Squares2X2Icon className="w-4 h-4 text-blue-500" />} label="Admin Console" highlight />
+                        )}
+                        <MenuButton onClick={() => navigate("/profile")} icon={<UserCircleIcon className="w-4 h-4" />} label="Account Settings" />
+                        <MenuButton onClick={() => navigate("/my-jobs")} icon={<BriefcaseIcon className="w-4 h-4" />} label="My Applications" />
+                        
+                        <div className="h-px bg-gray-100 dark:bg-white/5 my-2 mx-4" />
+                        
+                        <button
+                          onClick={() => { logout(); navigate("/login"); }}
+                          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 text-sm font-bold transition-all"
+                        >
+                          <ArrowRightOnRectangleIcon className="w-4 h-4" />
+                          Sign Out
+                        </button>
+                      </div>
                     </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            ) : (
-              <div className="flex items-center gap-3">
-                <button
-                  className="px-5 py-2.5 rounded-full text-sm font-bold text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition"
-                  onClick={() => navigate("/login")}
-                >
-                  Log in
-                </button>
-                <button
-                  className="px-6 py-2.5 rounded-full text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/30 transition-all transform hover:scale-105"
-                  onClick={() => navigate("/signup")}
-                >
-                  Join Now
-                </button>
-              </div>
-            )}
-          </div>
-        </nav>
-      </header>
-    </>
+                  </>
+                )}
+              </AnimatePresence>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <button
+                className="hidden sm:block px-5 py-2.5 text-sm font-bold text-gray-600 dark:text-gray-300 hover:text-blue-600 transition"
+                onClick={() => navigate("/login")}
+              >
+                Log in
+              </button>
+              <button
+                className="px-6 py-2.5 rounded-xl text-sm font-black bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/20 hover:shadow-blue-600/40 transition-all active:scale-95"
+                onClick={() => navigate("/signup")}
+              >
+                Join Free
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </nav>
   );
 };
+
+// Reusable Menu Button Component
+const MenuButton = ({ icon, label, onClick, highlight = false }) => (
+  <button
+    onClick={onClick}
+    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all
+      ${highlight 
+        ? "bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400" 
+        : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white"}
+    `}
+  >
+    {icon}
+    {label}
+  </button>
+);
 
 export default Nav;
