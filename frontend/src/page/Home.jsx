@@ -11,7 +11,6 @@ import { useEffect, useState, useRef } from "react";
 import instance from "../service/axios";
 import ApplyModal from "../components/ApplyModal";
 
-// --- Animation Variants ---
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
@@ -53,12 +52,10 @@ const Home = () => {
   return (
     <div className="bg-[#0b0f1a] text-slate-200 selection:bg-blue-500/30 font-sans">
       
-      {/* 1. HERO SECTION - Career Accelerator Style */}
       <section ref={targetRef} className="relative min-h-[90vh] flex items-center justify-center overflow-hidden px-6 pt-20">
         <div className="absolute inset-0 z-0">
           <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-blue-600/10 blur-[120px] rounded-full mix-blend-screen" />
           <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-indigo-600/10 blur-[100px] rounded-full mix-blend-screen" />
-          {/* Subtle Grid Pattern like JobSkillShare */}
           <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.03]" />
         </div>
 
@@ -102,17 +99,16 @@ const Home = () => {
             >
               Start Learning Free <ArrowRightIcon className="w-5 h-5" />
             </button>
-            <button
+            {/* <button
               onClick={() => navigate("/jobs")}
               className="px-10 py-5 bg-slate-800/50 backdrop-blur-md border border-slate-700 rounded-xl font-bold text-lg text-white hover:bg-slate-700 transition-all flex items-center gap-3"
             >
               Explore Careers
-            </button>
+            </button> */}
           </motion.div>
         </motion.div>
       </section>
 
-      {/* 2. CAREER PATHWAYS - Grid inspired by JobSkillShare */}
       <section className="py-32 px-6 max-w-7xl mx-auto">
         <div className="text-center mb-20">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">Standardized Career Roadmaps</h2>
@@ -126,7 +122,6 @@ const Home = () => {
           viewport={{ once: true }}
           className="grid grid-cols-1 md:grid-cols-3 gap-8"
         >
-          {/* Path 1 */}
           <motion.div variants={fadeInUp} className="group p-10 rounded-3xl bg-slate-900/40 border border-slate-800 hover:border-blue-500/50 transition-all duration-500">
             <div className="w-14 h-14 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-500 mb-8 group-hover:scale-110 transition-transform">
               <ComputerDesktopIcon className="w-8 h-8" />
@@ -142,7 +137,6 @@ const Home = () => {
             </button>
           </motion.div>
 
-          {/* Path 2 */}
           <motion.div variants={fadeInUp} className="group p-10 rounded-3xl bg-slate-900/40 border border-slate-800 hover:border-indigo-500/50 transition-all duration-500">
             <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-500 mb-8 group-hover:scale-110 transition-transform">
               <ChartBarIcon className="w-8 h-8" />
@@ -158,7 +152,6 @@ const Home = () => {
             </button>
           </motion.div>
 
-          {/* Path 3 */}
           <motion.div variants={fadeInUp} className="group p-10 rounded-3xl bg-slate-900/40 border border-slate-800 hover:border-purple-500/50 transition-all duration-500">
             <div className="w-14 h-14 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-500 mb-8 group-hover:scale-110 transition-transform">
               <RocketLaunchIcon className="w-8 h-8" />
@@ -176,7 +169,6 @@ const Home = () => {
         </motion.div>
       </section>
 
-      {/* 3. OPPORTUNITIES - Professional Listing */}
       <section className="py-32 px-6 bg-[#0e1322]">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row items-end justify-between mb-16 gap-6">
@@ -238,7 +230,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* 4. STATISTICS - Trust Building */}
       <section className="py-24 px-6 border-y border-slate-800 bg-[#0b0f1a]">
         <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
            <div>
