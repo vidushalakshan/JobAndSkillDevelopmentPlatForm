@@ -11,7 +11,6 @@ const JobCategoryView = ({ title }) => {
     const fetchJobs = async () => {
       try {
         const response = await instance.get("job/approved");
-        // Filter by category if needed, assuming title is used as category filter
         const filtered = response.data.filter(j => 
           title === "All Jobs" || j.title.toLowerCase().includes(title.toLowerCase().split(' ')[0])
         );

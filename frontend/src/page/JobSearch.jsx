@@ -61,7 +61,7 @@ const JobSearch = () => {
       <main className="flex-1 flex overflow-hidden relative z-10 p-4 gap-4">
         
         {/* --- LEFT PANEL: NAVIGATION & LIST --- */}
-        <div className="w-full md:w-[400px] lg:w-[450px] flex flex-col bg-[#0a0a0a] border border-white/5 rounded-[2rem] overflow-hidden shadow-2xl">
+        <div className="w-full md:w-[400px] lg:w-[450px] flex flex-col bg-[#0a0a0a] border border-white/5 rounded-[2rem] overflow-hidden shadow-2xl mt-[100px]">
           
           {/* Header Area */}
           <div className="p-6 space-y-6 border-b border-white/5">
