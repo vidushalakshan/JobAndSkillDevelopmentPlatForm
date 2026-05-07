@@ -1,14 +1,14 @@
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL: "http://localhost:8080", 
+  baseURL: "http://localhost:8080",
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
   },
 });
 
-// Add a request interceptor to include the JWT token
+
 instance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");

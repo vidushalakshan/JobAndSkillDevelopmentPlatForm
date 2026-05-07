@@ -1,10 +1,10 @@
-import { useState, useEffect, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useMemo, useRef } from "react";
+import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import instance from "../service/axios";
 import ApplyModal from "../components/ApplyModal";
 import { 
   FiSearch, FiMapPin, FiBriefcase, FiFilter, 
-  FiClock, FiDollarSign, FiChevronRight, FiCheckCircle
+  FiClock, FiDollarSign, FiChevronRight, FiCheckCircle, FiCompass, FiZap
 } from "react-icons/fi";
 
 const JOB_CATEGORIES = [
@@ -19,6 +19,7 @@ const JobSearch = () => {
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [selectedJob, setSelectedJob] = useState(null);
   const [applyingJob, setApplyingJob] = useState(null);
+  const scrollParentRef = useRef(null);
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -38,178 +39,205 @@ const JobSearch = () => {
   const filteredJobs = useMemo(() => {
     return jobs.filter(job => {
       const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                            job.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            job.description.toLowerCase().includes(searchTerm.toLowerCase());
+                            job.location.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = selectedCategory === "All Categories" || job.type === selectedCategory;
       return matchesSearch && matchesCategory;
     });
   }, [jobs, searchTerm, selectedCategory]);
 
   return (
-    <div className="flex-1 flex flex-col w-full max-w-[1600px] mx-auto bg-[#f8fafc] dark:bg-[#0a0a14]">
-      {/* Decorative Elements */}
-      <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-blue-50/50 to-transparent dark:from-blue-900/10 pointer-events-none"></div>
+    <div className="h-screen bg-[#050505] text-slate-200 overflow-hidden flex flex-col font-sans">
+      
+      {/* Background Ambient Glows */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full" />
+        <div className="absolute top-[20%] right-[-5%] w-[30%] h-[30%] bg-indigo-600/10 blur-[100px] rounded-full" />
+      </div>
 
       <AnimatePresence>
         {applyingJob && <ApplyModal job={applyingJob} onClose={() => setApplyingJob(null)} />}
       </AnimatePresence>
 
-      <div className="flex-1 flex flex-col md:flex-row h-[calc(100vh-80px)] overflow-hidden relative z-10 p-4 gap-6">
+      <main className="flex-1 flex overflow-hidden relative z-10 p-4 gap-4">
         
-        {/* Left Pane: Search & List */}
-        <div className="w-full md:w-[45%] lg:w-[40%] xl:w-[35%] flex flex-col h-full bg-white dark:bg-[#111127] rounded-[2.5rem] border border-gray-200 dark:border-white/5 shadow-2xl shadow-black/[0.03] overflow-hidden">
+        {/* --- LEFT PANEL: NAVIGATION & LIST --- */}
+        <div className="w-full md:w-[400px] lg:w-[450px] flex flex-col bg-[#0a0a0a] border border-white/5 rounded-[2rem] overflow-hidden shadow-2xl">
           
-          {/* Search Header */}
-          <div className="p-8 pb-6 border-b border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.02]">
-            <h1 className="text-3xl font-black tracking-tight mb-6">Find Your Next Role</h1>
-            
-            <div className="space-y-4">
-              <div className="relative group">
-                <FiSearch className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors w-5 h-5" />
+          {/* Header Area */}
+          <div className="p-6 space-y-6 border-b border-white/5">
+            <div className="flex items-center justify-between">
+              <h1 className="text-2xl font-black tracking-tighter text-white flex items-center gap-2">
+                <FiCompass className="text-blue-500" /> Discover
+              </h1>
+              <span className="text-[10px] font-black bg-blue-500/10 text-blue-400 px-2 py-1 rounded-md uppercase tracking-tighter">
+                {filteredJobs.length} Roles Found
+              </span>
+            </div>
+
+            <div className="space-y-3">
+              <div className="relative">
+                <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
                 <input 
                   type="text" 
-                  placeholder="Search by title, skill, or location..." 
+                  placeholder="Role, skill or company..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-14 pr-6 py-4 rounded-2xl bg-white dark:bg-[#0a0a14] border border-gray-200 dark:border-white/10 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-sm"
+                  className="w-full bg-white/5 border border-white/5 rounded-xl pl-11 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-all placeholder:text-slate-600 font-medium"
                 />
               </div>
-              
-              <div className="relative group">
-                <FiFilter className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <select 
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full pl-14 pr-6 py-4 rounded-2xl bg-white dark:bg-[#0a0a14] border border-gray-200 dark:border-white/10 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm appearance-none cursor-pointer"
-                >
-                  {JOB_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
+
+              <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+                {JOB_CATEGORIES.slice(0, 5).map(cat => (
+                  <button
+                    key={cat}
+                    onClick={() => setSelectedCategory(cat)}
+                    className={`whitespace-nowrap px-4 py-1.5 rounded-full text-[11px] font-bold transition-all border ${
+                      selectedCategory === cat 
+                      ? "bg-white text-black border-white" 
+                      : "bg-white/5 text-slate-400 border-white/5 hover:border-white/20"
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
               </div>
             </div>
           </div>
 
-          {/* Job List Scroll Area */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
-            {loading ? (
-              [1, 2, 3, 4].map(i => (
-                <div key={i} className="h-32 bg-gray-100 dark:bg-white/5 rounded-2xl animate-pulse"></div>
-              ))
-            ) : filteredJobs.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-gray-400 text-center px-8">
-                <div className="w-16 h-16 bg-gray-100 dark:bg-white/5 rounded-full flex items-center justify-center mb-4">
-                  <FiSearch className="w-6 h-6 text-gray-300 dark:text-gray-600" />
+          {/* Scrolling List Area */}
+          <div className="flex-1 overflow-y-auto p-3 space-y-2 custom-scrollbar" ref={scrollParentRef}>
+            <LayoutGroup>
+              {loading ? (
+                Array(5).fill(0).map((_, i) => (
+                  <div key={i} className="h-28 bg-white/5 rounded-2xl animate-pulse" />
+                ))
+              ) : (
+                filteredJobs.map((job) => (
+                  <motion.div
+                    layout
+                    key={job.id}
+                    onClick={() => setSelectedJob(job)}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    whileHover={{ x: 4 }}
+                    className={`relative cursor-pointer p-5 rounded-2xl transition-all border ${
+                      selectedJob?.id === job.id 
+                      ? "bg-white/[0.07] border-white/20 shadow-lg shadow-black" 
+                      : "bg-transparent border-transparent hover:bg-white/[0.03]"
+                    }`}
+                  >
+                    {selectedJob?.id === job.id && (
+                      <motion.div 
+                        layoutId="active-pill"
+                        className="absolute left-0 top-1/4 w-1 h-1/2 bg-blue-500 rounded-full" 
+                      />
+                    )}
+                    <h3 className={`font-bold text-base mb-1 ${selectedJob?.id === job.id ? "text-white" : "text-slate-300"}`}>
+                      {job.title}
+                    </h3>
+                    <p className="text-xs text-slate-500 line-clamp-1 mb-4 font-medium">{job.location} • {job.type}</p>
+                    <div className="flex items-center justify-between">
+                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                        {job.salary || 'Executive'}
+                       </span>
+                       <FiChevronRight className={`transition-transform ${selectedJob?.id === job.id ? "translate-x-1 text-blue-500" : "text-slate-700"}`} />
+                    </div>
+                  </motion.div>
+                ))
+              )}
+            </LayoutGroup>
+          </div>
+        </div>
+
+        {/* --- RIGHT PANEL: DETAILED VIEW --- */}
+        <div className="hidden md:flex flex-1 flex-col bg-[#0a0a0a] border border-white/5 rounded-[2rem] overflow-hidden relative shadow-2xl">
+          <AnimatePresence mode="wait">
+            {selectedJob ? (
+              <motion.div
+                key={selectedJob.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+                className="flex flex-col h-full"
+              >
+                {/* Visual Header */}
+                <div className="h-32 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 relative">
+                  <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10" />
+                  <div className="absolute -bottom-10 left-10 p-4 bg-[#111] border border-white/10 rounded-2xl shadow-2xl">
+                    <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center text-white">
+                      <FiZap size={24} />
+                    </div>
+                  </div>
                 </div>
-                <p className="font-bold text-lg text-gray-900 dark:text-white mb-1">No matches found</p>
-                <p className="text-sm">Try adjusting your search terms or filters to find what you're looking for.</p>
-              </div>
+
+                <div className="pt-16 px-10 pb-10 flex-1 overflow-y-auto custom-scrollbar">
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-10">
+                    <div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-tighter text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded border border-emerald-400/20">
+                          <FiCheckCircle /> Verified Listing
+                        </span>
+                        <span className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">{selectedJob.type}</span>
+                      </div>
+                      <h2 className="text-4xl font-black text-white tracking-tighter">{selectedJob.title}</h2>
+                    </div>
+                    
+                    <button 
+                      onClick={() => setApplyingJob(selectedJob)}
+                      className="px-8 py-4 bg-white text-black rounded-xl font-bold hover:bg-blue-500 hover:text-white transition-all transform active:scale-95 shadow-xl shadow-white/5"
+                    >
+                      Apply for this role
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+                    {[
+                      { icon: <FiMapPin />, label: "Location", val: selectedJob.location },
+                      { icon: <FiDollarSign />, label: "Compensation", val: selectedJob.salary || 'Market Rate' },
+                      { icon: <FiBriefcase />, label: "Category", val: selectedJob.type },
+                      { icon: <FiClock />, label: "Posted", val: "2 days ago" },
+                    ].map((stat, i) => (
+                      <div key={i} className="p-4 bg-white/[0.02] border border-white/5 rounded-2xl">
+                        <div className="text-slate-500 mb-1 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest">
+                          {stat.icon} {stat.label}
+                        </div>
+                        <div className="text-sm font-bold text-slate-200">{stat.val}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="space-y-8 max-w-3xl">
+                    <section>
+                      <h4 className="text-sm font-black uppercase tracking-[0.2em] text-blue-500 mb-4">Job Description</h4>
+                      <p className="text-slate-400 leading-relaxed font-medium text-base whitespace-pre-wrap">
+                        {selectedJob.description}
+                      </p>
+                    </section>
+
+                    <section className="p-8 bg-blue-500/5 border border-blue-500/10 rounded-[2rem]">
+                      <h4 className="text-sm font-black uppercase tracking-[0.2em] text-blue-400 mb-3">Application Requirements</h4>
+                      <ul className="space-y-2 text-sm text-slate-400 font-medium list-disc list-inside">
+                        <li>Relevant professional experience in the field</li>
+                        <li>Updated portfolio or CV matching the role description</li>
+                        <li>Ability to work within the specified location/timezone</li>
+                      </ul>
+                    </section>
+                  </div>
+                </div>
+              </motion.div>
             ) : (
-              filteredJobs.map((job) => (
-                <div 
-                  key={job.id} 
-                  onClick={() => setSelectedJob(job)}
-                  className={`cursor-pointer p-6 rounded-[2rem] border transition-all duration-300 group ${
-                    selectedJob?.id === job.id 
-                      ? "bg-blue-600 text-white border-blue-600 shadow-xl shadow-blue-500/20 transform scale-[1.02]" 
-                      : "bg-white dark:bg-[#0a0a14] border-gray-100 dark:border-white/5 hover:border-blue-500/50 hover:shadow-lg text-gray-900 dark:text-white"
-                  }`}
-                >
-                  <div className="flex justify-between items-start mb-3">
-                    <h3 className="font-black text-lg leading-tight w-4/5">{job.title}</h3>
-                    {selectedJob?.id === job.id && <div className="w-2 h-2 rounded-full bg-white animate-pulse"></div>}
-                  </div>
-                  <div className={`text-sm mb-4 line-clamp-2 font-medium ${selectedJob?.id === job.id ? "text-blue-100" : "text-gray-500 dark:text-gray-400"}`}>
-                    {job.description}
-                  </div>
-                  <div className={`flex flex-wrap gap-2 text-[10px] font-black uppercase tracking-wider ${selectedJob?.id === job.id ? "text-blue-200" : "text-gray-500 dark:text-gray-400"}`}>
-                    <span className="flex items-center gap-1"><FiMapPin /> {job.location}</span>
-                    <span className="flex items-center gap-1"><FiBriefcase /> {job.type}</span>
-                    {job.salary && <span className="flex items-center gap-1"><FiDollarSign /> {job.salary}</span>}
-                  </div>
+              <div className="flex flex-col items-center justify-center h-full text-center opacity-50">
+                <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-6">
+                  <FiBriefcase size={32} />
                 </div>
-              ))
+                <h2 className="text-xl font-bold">Select a role to preview</h2>
+                <p className="text-sm max-w-[200px] mx-auto mt-2 text-slate-500">Pick a position from the left panel to see full details.</p>
+              </div>
             )}
-          </div>
+          </AnimatePresence>
         </div>
-
-        {/* Right Pane: Job Details */}
-        <div className="hidden md:flex flex-col flex-1 h-full bg-white dark:bg-[#111127] rounded-[2.5rem] border border-gray-200 dark:border-white/5 shadow-2xl shadow-black/[0.03] overflow-hidden relative">
-          {selectedJob ? (
-            <motion.div 
-              key={selectedJob.id}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="flex flex-col h-full absolute inset-0"
-            >
-              {/* Job Detail Header */}
-              <div className="p-10 border-b border-gray-100 dark:border-white/5 bg-gradient-to-br from-gray-50 to-white dark:from-[#0a0a14] dark:to-[#111127] relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-[80px] rounded-full pointer-events-none"></div>
-                
-                <div className="flex items-center gap-3 mb-6">
-                  <span className="px-3 py-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-widest rounded-full flex items-center gap-1.5 border border-emerald-500/20">
-                    <FiCheckCircle /> Actively Hiring
-                  </span>
-                  <span className="px-3 py-1 bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[10px] font-black uppercase tracking-widest rounded-full border border-blue-500/20">
-                    {selectedJob.type}
-                  </span>
-                </div>
-                
-                <h2 className="text-4xl lg:text-5xl font-black tracking-tight mb-6">{selectedJob.title}</h2>
-                
-                <div className="flex flex-wrap gap-6 text-sm font-bold text-gray-500 dark:text-gray-400">
-                  <div className="flex items-center gap-2"><FiMapPin className="w-5 h-5 text-gray-400" /> {selectedJob.location}</div>
-                  {selectedJob.salary && <div className="flex items-center gap-2"><FiDollarSign className="w-5 h-5 text-gray-400" /> {selectedJob.salary}</div>}
-                  {selectedJob.deadline && <div className="flex items-center gap-2"><FiClock className="w-5 h-5 text-gray-400" /> Applies until: {selectedJob.deadline}</div>}
-                </div>
-              </div>
-
-              {/* Job Detail Body Scroll */}
-              <div className="flex-1 overflow-y-auto p-10 custom-scrollbar">
-                <h3 className="text-xl font-black mb-4 flex items-center gap-2">
-                  <div className="w-1.5 h-6 bg-blue-500 rounded-full"></div> About the Role
-                </h3>
-                <div className="prose dark:prose-invert max-w-none">
-                  <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed font-medium whitespace-pre-wrap">
-                    {selectedJob.description}
-                  </p>
-                </div>
-                
-                {/* Simulated Extra Details for realism */}
-                <div className="mt-12 grid grid-cols-2 gap-6">
-                  <div className="p-6 rounded-[2rem] bg-blue-50 dark:bg-blue-500/5 border border-blue-100 dark:border-blue-500/10">
-                    <h4 className="font-black text-blue-900 dark:text-blue-400 mb-2 text-sm uppercase tracking-widest">Why Join Us?</h4>
-                    <p className="text-sm font-medium text-blue-800/70 dark:text-blue-300/70 leading-relaxed">Work with cutting-edge tech in a collaborative environment that values continuous learning and innovation.</p>
-                  </div>
-                  <div className="p-6 rounded-[2rem] bg-purple-50 dark:bg-purple-500/5 border border-purple-100 dark:border-purple-500/10">
-                    <h4 className="font-black text-purple-900 dark:text-purple-400 mb-2 text-sm uppercase tracking-widest">Great Benefits</h4>
-                    <p className="text-sm font-medium text-purple-800/70 dark:text-purple-300/70 leading-relaxed">Competitive salary, comprehensive health coverage, flexible working hours, and generous PTO.</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Application Footer */}
-              <div className="p-6 border-t border-gray-100 dark:border-white/5 bg-white dark:bg-[#111127] flex justify-end shadow-[0_-10px_30px_rgba(0,0,0,0.02)] z-10">
-                <button 
-                  onClick={() => setApplyingJob(selectedJob)}
-                  className="px-12 py-5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black text-lg rounded-2xl shadow-xl shadow-blue-500/20 transition-all transform hover:scale-[1.02] active:scale-95 flex items-center gap-3 group"
-                >
-                  Apply for this position <FiChevronRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-                </button>
-              </div>
-            </motion.div>
-          ) : (
-            <div className="flex flex-col items-center justify-center h-full text-center p-10 relative overflow-hidden">
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/5 blur-[100px] rounded-full"></div>
-              <div className="w-24 h-24 bg-gray-50 dark:bg-white/5 rounded-full flex items-center justify-center mb-8 relative z-10 border border-gray-100 dark:border-white/10">
-                <FiBriefcase className="w-10 h-10 text-gray-300 dark:text-gray-600" />
-              </div>
-              <h2 className="text-3xl font-black text-gray-900 dark:text-white mb-4 relative z-10">Select a position</h2>
-              <p className="text-gray-500 dark:text-gray-400 max-w-sm relative z-10 font-medium">
-                Click on any job card from the list on the left to view the full details and apply.
-              </p>
-            </div>
-          )}
-        </div>
-      </div>
+      </main>
     </div>
   );
 };

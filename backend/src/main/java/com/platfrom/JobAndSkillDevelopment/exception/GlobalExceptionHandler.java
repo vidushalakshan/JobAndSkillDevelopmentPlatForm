@@ -14,7 +14,19 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleException(Exception e) {
         Map<String, String> error = new HashMap<>();
         error.put("message", e.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        error.put("type", e.getClass().getSimpleName());
+        
+        // Log the exception for debugging
+        e.printStackTrace();
+
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        if (e instanceof RuntimeException && e.getMessage().contains("User not found")) {
+            status = HttpStatus.NOT_FOUND;
+        } else if (e instanceof IllegalArgumentException) {
+            status = HttpStatus.BAD_REQUEST;
+        }
+        
+        return ResponseEntity.status(status).body(error);
     }
 }
 
