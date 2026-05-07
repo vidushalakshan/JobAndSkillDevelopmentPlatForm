@@ -1,14 +1,29 @@
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { motion, useScroll, useTransform, AnimatePresence, useInView } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { 
   BriefcaseIcon, AcademicCapIcon, RocketLaunchIcon, 
   ArrowRightIcon, MapPinIcon, SparklesIcon,
-  MagnifyingGlassIcon, GlobeAltIcon, UserGroupIcon
+  MagnifyingGlassIcon, GlobeAltIcon, UserGroupIcon,
+  CheckBadgeIcon, ChartBarIcon, ComputerDesktopIcon
 } from "@heroicons/react/24/outline";
 import { useUser } from "../context/context";
 import { useEffect, useState, useRef } from "react";
 import instance from "../service/axios";
 import ApplyModal from "../components/ApplyModal";
+
+// --- Animation Variants ---
+const fadeInUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 }
+  }
+};
 
 const Home = () => {
   const navigate = useNavigate();
@@ -22,8 +37,8 @@ const Home = () => {
     offset: ["start start", "end start"],
   });
 
-  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
-  const scale = useTransform(scrollYProgress, [0, 0.5], [1, 0.9]);
+  const opacity = useTransform(scrollYProgress, [0, 0.4], [1, 0]);
+  const scale = useTransform(scrollYProgress, [0, 0.4], [1, 0.95]);
 
   useEffect(() => {
     const fetchApproved = async () => {
@@ -36,145 +51,147 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="bg-[#020617] text-slate-200 selection:bg-blue-500/30 font-sans">
+    <div className="bg-[#0b0f1a] text-slate-200 selection:bg-blue-500/30 font-sans">
       
-      <section ref={targetRef} className="relative min-h-screen flex items-center justify-center overflow-hidden px-6">
-  
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full">
-          <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-600/20 blur-[120px] rounded-full animate-pulse" />
-          <div className="absolute bottom-[10%] right-[-10%] w-[40%] h-[40%] bg-indigo-600/15 blur-[100px] rounded-full animate-pulse delay-1000" />
+      {/* 1. HERO SECTION - Career Accelerator Style */}
+      <section ref={targetRef} className="relative min-h-[90vh] flex items-center justify-center overflow-hidden px-6 pt-20">
+        <div className="absolute inset-0 z-0">
+          <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-blue-600/10 blur-[120px] rounded-full mix-blend-screen" />
+          <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-indigo-600/10 blur-[100px] rounded-full mix-blend-screen" />
+          {/* Subtle Grid Pattern like JobSkillShare */}
+          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.03]" />
         </div>
 
-        <motion.div style={{ opacity, scale }} className="relative z-10 max-w-6xl w-full text-center">
+        <motion.div style={{ opacity, scale }} className="relative z-10 max-w-5xl w-full text-center">
           <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-widest mb-8"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-blue-500/10 to-indigo-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-[0.2em] mb-10 shadow-lg"
           >
-            <SparklesIcon className="w-4 h-4" /> Trusted by 500+ Companies
+            <CheckBadgeIcon className="w-4 h-4" /> Global IT & Career Excellence
           </motion.div>
 
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-6xl md:text-[5.5rem] font-black tracking-tight leading-[1.1] mb-8 text-white"
+            className="text-5xl md:text-[5rem] font-extrabold tracking-tight leading-[1.05] mb-8 text-white"
           >
-            Forge Your <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-indigo-400 to-cyan-400">Professional Identity</span>
+            Real-World <span className="text-blue-500">Skills</span> for the <br />
+            Next Generation of IT.
           </motion.h1>
 
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-lg md:text-xl text-slate-400 max-w-3xl mx-auto mb-12 font-medium"
+            className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-12 leading-relaxed"
           >
-            The ecosystem for the modern workforce. Master in-demand skills, connect with industry giants, and secure your legacy in the digital age.
+            Stop just learning. Start performing. We bridge the gap between academic theory and high-level corporate expectations with industry-led pathways.
           </motion.p>
 
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="flex flex-wrap justify-center gap-5"
+            className="flex flex-wrap justify-center gap-6"
           >
             <button
-              onClick={() => navigate(user ? "/my-jobs" : "/signup")}
-              className="px-8 py-4 bg-white text-slate-950 rounded-2xl font-bold text-lg hover:bg-blue-500 hover:text-white transition-all duration-300 shadow-xl shadow-blue-500/10 flex items-center gap-3"
+              onClick={() => navigate(user ? "/courses" : "/signup")}
+              className="px-8 py-4 md:px-10 md:py-5 bg-blue-600 text-white rounded-xl font-bold text-lg hover:bg-blue-500 transition-all shadow-xl shadow-blue-600/20 flex items-center gap-3"
             >
-              Get Started <ArrowRightIcon className="w-5 h-5" />
+              Start Learning Free <ArrowRightIcon className="w-5 h-5" />
             </button>
-            <div className="p-[1px] rounded-2xl bg-gradient-to-r from-slate-700 to-slate-800 hover:from-blue-500 hover:to-indigo-500 transition-all duration-500">
-              <button
-                onClick={() => navigate("/jobs")}
-                className="px-8 py-4 bg-slate-950 rounded-2xl font-bold text-lg text-white w-full h-full flex items-center gap-3"
-              >
-                Browse Careers <MagnifyingGlassIcon className="w-5 h-5" />
-              </button>
-            </div>
+            <button
+              onClick={() => navigate("/jobs")}
+              className="px-10 py-5 bg-slate-800/50 backdrop-blur-md border border-slate-700 rounded-xl font-bold text-lg text-white hover:bg-slate-700 transition-all flex items-center gap-3"
+            >
+              Explore Careers
+            </button>
           </motion.div>
         </motion.div>
-
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none" />
       </section>
 
-      <section className="py-24 px-6 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-       
-          <motion.div 
-            whileHover={{ y: -5 }}
-            className="md:col-span-2 p-10 rounded-[2.5rem] bg-slate-900/50 border border-slate-800 relative overflow-hidden group"
-          >
-            <div className="relative z-10">
-              <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400 mb-6">
-                <GlobeAltIcon className="w-6 h-6" />
-              </div>
-              <h3 className="text-3xl font-bold text-white mb-4">Skill Intelligence Platform</h3>
-              <p className="text-slate-400 text-lg max-w-md">Our AI matches your unique DNA with the most prestigious roles globally. Not just a job board, but a career architect.</p>
-            </div>
-            <div className="absolute right-[-10%] bottom-[-10%] w-64 h-64 bg-blue-600/10 blur-3xl rounded-full transition-all group-hover:bg-blue-600/20" />
-          </motion.div>
-
-          <motion.div 
-            whileHover={{ y: -5 }}
-            className="p-10 rounded-[2.5rem] bg-indigo-950/30 border border-indigo-900/50 flex flex-col justify-between"
-          >
-             <div className="w-12 h-12 rounded-xl bg-indigo-500/20 flex items-center justify-center text-indigo-400 mb-6">
-                <UserGroupIcon className="w-6 h-6" />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-white mb-2">Mentor Network</h3>
-                <p className="text-slate-400 text-sm">Direct access to 1:1 sessions with industry leaders from FAANG and Fortune 500.</p>
-              </div>
-          </motion.div>
-
-          <motion.div 
-             whileHover={{ y: -5 }}
-             className="p-10 rounded-[2.5rem] bg-emerald-950/20 border border-emerald-900/30 flex flex-col justify-between"
-          >
-             <div className="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400 mb-6">
-                <AcademicCapIcon className="w-6 h-6" />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-white mb-2">Verified Credentials</h3>
-                <p className="text-slate-400 text-sm">Earn blockchain-backed certificates that are recognized by top HR departments.</p>
-              </div>
-          </motion.div>
-
-          <motion.div 
-            whileHover={{ y: -5 }}
-            className="md:col-span-2 p-10 rounded-[2.5rem] bg-gradient-to-br from-blue-600 to-indigo-700 text-white relative overflow-hidden shadow-2xl shadow-blue-600/20"
-          >
-            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 h-full">
-              <div className="text-center md:text-left">
-                <h3 className="text-4xl font-black mb-2">92%</h3>
-                <p className="text-blue-100 font-bold uppercase tracking-wider text-xs">Placement Success Rate</p>
-              </div>
-              <div className="h-px w-full md:h-12 md:w-px bg-white/20" />
-              <div className="text-center md:text-left">
-                <h3 className="text-4xl font-black mb-2">140K+</h3>
-                <p className="text-blue-100 font-bold uppercase tracking-wider text-xs">Active Learners</p>
-              </div>
-              <div className="h-px w-full md:h-12 md:w-px bg-white/20" />
-              <div className="text-center md:text-left">
-                <h3 className="text-4xl font-black mb-2">$85k</h3>
-                <p className="text-blue-100 font-bold uppercase tracking-wider text-xs">Avg. Starting Salary</p>
-              </div>
-            </div>
-          </motion.div>
+      {/* 2. CAREER PATHWAYS - Grid inspired by JobSkillShare */}
+      <section className="py-32 px-6 max-w-7xl mx-auto">
+        <div className="text-center mb-20">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">Standardized Career Roadmaps</h2>
+          <p className="text-slate-400 max-w-2xl mx-auto">Transition from no-experience to a specialist role using our proven framework.</p>
         </div>
+
+        <motion.div 
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-8"
+        >
+          {/* Path 1 */}
+          <motion.div variants={fadeInUp} className="group p-10 rounded-3xl bg-slate-900/40 border border-slate-800 hover:border-blue-500/50 transition-all duration-500">
+            <div className="w-14 h-14 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-500 mb-8 group-hover:scale-110 transition-transform">
+              <ComputerDesktopIcon className="w-8 h-8" />
+            </div>
+            <h3 className="text-2xl font-bold text-white mb-4">IT Support Professional</h3>
+            <p className="text-slate-400 mb-8 leading-relaxed">The foundational step. Learn ticketing systems, AD management, and hardware troubleshooting.</p>
+            <ul className="space-y-3 mb-10">
+              <li className="flex items-center gap-2 text-sm text-slate-300"><CheckBadgeIcon className="w-4 h-4 text-emerald-500"/> Help Desk L1-L2</li>
+              <li className="flex items-center gap-2 text-sm text-slate-300"><CheckBadgeIcon className="w-4 h-4 text-emerald-500"/> Office 365 Admin</li>
+            </ul>
+            <button className="text-blue-400 font-bold flex items-center gap-2 group-hover:gap-4 transition-all">
+              View Path <ArrowRightIcon className="w-4 h-4" />
+            </button>
+          </motion.div>
+
+          {/* Path 2 */}
+          <motion.div variants={fadeInUp} className="group p-10 rounded-3xl bg-slate-900/40 border border-slate-800 hover:border-indigo-500/50 transition-all duration-500">
+            <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-500 mb-8 group-hover:scale-110 transition-transform">
+              <ChartBarIcon className="w-8 h-8" />
+            </div>
+            <h3 className="text-2xl font-bold text-white mb-4">Systems Administrator</h3>
+            <p className="text-slate-400 mb-8 leading-relaxed">Advance into infrastructure. Learn server virtualization, Azure cloud, and networking.</p>
+            <ul className="space-y-3 mb-10">
+              <li className="flex items-center gap-2 text-sm text-slate-300"><CheckBadgeIcon className="w-4 h-4 text-emerald-500"/> VMware / Hyper-V</li>
+              <li className="flex items-center gap-2 text-sm text-slate-300"><CheckBadgeIcon className="w-4 h-4 text-emerald-500"/> Cloud Infrastructure</li>
+            </ul>
+            <button className="text-indigo-400 font-bold flex items-center gap-2 group-hover:gap-4 transition-all">
+              View Path <ArrowRightIcon className="w-4 h-4" />
+            </button>
+          </motion.div>
+
+          {/* Path 3 */}
+          <motion.div variants={fadeInUp} className="group p-10 rounded-3xl bg-slate-900/40 border border-slate-800 hover:border-purple-500/50 transition-all duration-500">
+            <div className="w-14 h-14 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-500 mb-8 group-hover:scale-110 transition-transform">
+              <RocketLaunchIcon className="w-8 h-8" />
+            </div>
+            <h3 className="text-2xl font-bold text-white mb-4">Network Engineer</h3>
+            <p className="text-slate-400 mb-8 leading-relaxed">Master the connectivity. Focus on Cisco systems, security protocols, and firewalls.</p>
+            <ul className="space-y-3 mb-10">
+              <li className="flex items-center gap-2 text-sm text-slate-300"><CheckBadgeIcon className="w-4 h-4 text-emerald-500"/> Routing & Switching</li>
+              <li className="flex items-center gap-2 text-sm text-slate-300"><CheckBadgeIcon className="w-4 h-4 text-emerald-500"/> Cybersecurity Basics</li>
+            </ul>
+            <button className="text-purple-400 font-bold flex items-center gap-2 group-hover:gap-4 transition-all">
+              View Path <ArrowRightIcon className="w-4 h-4" />
+            </button>
+          </motion.div>
+        </motion.div>
       </section>
 
-      <section className="py-24 px-6 bg-[#03081a]">
+      {/* 3. OPPORTUNITIES - Professional Listing */}
+      <section className="py-32 px-6 bg-[#0e1322]">
         <div className="max-w-7xl mx-auto">
-          <div className="flex items-end justify-between mb-16">
+          <div className="flex flex-col md:flex-row items-end justify-between mb-16 gap-6">
             <div>
-              <h2 className="text-4xl font-black text-white mb-4">Elite Opportunities</h2>
-              <p className="text-slate-400">Curated positions for high-performance talent.</p>
+              <span className="text-blue-500 font-bold uppercase tracking-widest text-xs">Live Market</span>
+              <h2 className="text-4xl font-bold text-white mt-2">Active Career Openings</h2>
             </div>
-            <button onClick={() => navigate("/jobs")} className="hidden md:flex items-center gap-2 text-blue-400 font-bold hover:text-white transition-colors">
-              View All <ArrowRightIcon className="w-4 h-4" />
-            </button>
+            <div className="flex gap-4">
+               <button onClick={() => navigate("/jobs")} className="px-6 py-3 bg-white/5 border border-white/10 rounded-xl text-sm font-bold hover:bg-white/10 transition-colors">
+                Advanced Filter
+               </button>
+               <button onClick={() => navigate("/jobs")} className="px-6 py-3 bg-blue-600 rounded-xl text-sm font-bold flex items-center gap-2">
+                 View All Careers <ArrowRightIcon className="w-4 h-4" />
+               </button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -185,74 +202,63 @@ const Home = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
                 viewport={{ once: true }}
-                className="group p-8 rounded-[2.5rem] bg-slate-900/40 border border-slate-800/60 hover:border-blue-500/50 transition-all duration-500 backdrop-blur-sm"
+                className="group relative p-8 rounded-3xl bg-slate-900 border border-slate-800 hover:border-blue-500/40 transition-all shadow-xl"
               >
-                <div className="flex justify-between items-start mb-10">
-                  <div className="p-3 bg-slate-800 rounded-2xl text-blue-400 group-hover:scale-110 transition-transform duration-500">
+                <div className="flex justify-between items-start mb-6">
+                  <div className="p-3 bg-slate-800 rounded-xl text-blue-400">
                     <BriefcaseIcon className="w-6 h-6" />
                   </div>
-                  <div className="px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-[10px] font-black uppercase tracking-tighter">Verified</div>
+                  <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase">Full Time</span>
                 </div>
 
-                <h3 className="text-xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors">{job.title}</h3>
+                <h3 className="text-xl font-bold text-white mb-2 line-clamp-1">{job.title}</h3>
                 <div className="flex items-center gap-2 text-slate-500 text-sm mb-10">
                   <MapPinIcon className="w-4 h-4" /> {job.location}
                 </div>
 
                 <div className="flex justify-between items-center pt-6 border-t border-slate-800/60">
-                  <div className="font-bold text-white text-lg">{job.salary || 'Executive'}</div>
+                  <div>
+                    <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Starting at</p>
+                    <p className="font-bold text-white">{job.salary || '$55k - $80k'}</p>
+                  </div>
                   <button 
                     onClick={() => setSelectedJob(job)}
-                    className="px-6 py-2.5 bg-blue-600 text-white rounded-xl text-xs font-bold hover:bg-blue-500 transition-colors"
+                    className="px-5 py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-500 transition-colors"
                   >
                     Details
                   </button>
                 </div>
               </motion.div>
             )) : (
-              <div className="col-span-full py-20 text-center text-slate-600 animate-pulse uppercase tracking-[0.3em] text-xs font-black">
-                Syncing Market Data...
-              </div>
+              [1, 2, 3].map(n => (
+                <div key={n} className="h-64 rounded-3xl bg-slate-900/50 animate-pulse border border-slate-800" />
+              ))
             )}
           </div>
         </div>
       </section>
 
-      <footer className="py-20 border-t border-slate-900 bg-[#020617]">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
-            <div className="md:col-span-2">
-              <div className="text-2xl font-black text-white mb-6">JOB<span className="text-blue-500">SKILL</span></div>
-              <p className="text-slate-400 max-w-sm mb-6">The future of talent is decentralized and skill-first. We are building the infrastructure for the next billion careers.</p>
-              <div className="flex gap-4">
-                <div className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800" />
-                <div className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800" />
-                <div className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800" />
-              </div>
-            </div>
-            <div>
-              <h4 className="text-white font-bold mb-6 uppercase tracking-widest text-xs">Resources</h4>
-              <ul className="space-y-4 text-slate-400 text-sm font-medium">
-                <li><a href="#" className="hover:text-blue-400 transition">Job Board</a></li>
-                <li><a href="#" className="hover:text-blue-400 transition">Skill Courses</a></li>
-                <li><a href="#" className="hover:text-blue-400 transition">Career Roadmaps</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-bold mb-6 uppercase tracking-widest text-xs">Company</h4>
-              <ul className="space-y-4 text-slate-400 text-sm font-medium">
-                <li><a href="#" className="hover:text-blue-400 transition">About Us</a></li>
-                <li><a href="#" className="hover:text-blue-400 transition">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-blue-400 transition">Terms of Service</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="pt-8 border-t border-slate-900 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">© 2026 JobSkill Platform. All rights reserved.</p>
-            <p className="text-slate-500 text-xs font-bold uppercase tracking-widest flex items-center gap-2">Built with <motion.span animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity }} className="text-red-500">❤</motion.span> for the future.</p>
-          </div>
+      {/* 4. STATISTICS - Trust Building */}
+      <section className="py-24 px-6 border-y border-slate-800 bg-[#0b0f1a]">
+        <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
+           <div>
+              <h4 className="text-4xl font-black text-white mb-2">15k+</h4>
+              <p className="text-slate-500 font-bold uppercase text-[10px] tracking-[0.2em]">Success Stories</p>
+           </div>
+           <div>
+              <h4 className="text-4xl font-black text-blue-500 mb-2">500+</h4>
+              <p className="text-slate-500 font-bold uppercase text-[10px] tracking-[0.2em]">IT Courses</p>
+           </div>
+           <div>
+              <h4 className="text-4xl font-black text-white mb-2">94%</h4>
+              <p className="text-slate-500 font-bold uppercase text-[10px] tracking-[0.2em]">Hire Rate</p>
+           </div>
+           <div>
+              <h4 className="text-4xl font-black text-blue-500 mb-2">24/7</h4>
+              <p className="text-slate-500 font-bold uppercase text-[10px] tracking-[0.2em]">Lab Access</p>
+           </div>
         </div>
-      </footer>
+      </section>
 
       <AnimatePresence>
         {selectedJob && <ApplyModal job={selectedJob} onClose={() => setSelectedJob(null)} />}
