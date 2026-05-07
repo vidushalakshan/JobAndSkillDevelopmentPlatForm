@@ -26,7 +26,7 @@ const EmailVerification = ({ onClose }) => {
       newCode[index] = value;
       setVerificationCode(newCode);
 
-      // Auto-focus to next input
+ 
       if (value && index < 5) {
         document.getElementById(`code-input-${index + 1}`)?.focus();
       }

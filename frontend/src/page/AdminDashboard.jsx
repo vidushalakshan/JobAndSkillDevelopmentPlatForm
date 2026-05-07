@@ -344,7 +344,7 @@ const AdminDashboard = () => {
         ) : (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
             
-            {/* INSIGHTS (Overview) */}
+            
             {activeTab === "overview" && (
               <div className="space-y-10">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -402,7 +402,7 @@ const AdminDashboard = () => {
               </div>
             )}
 
-            {/* QUEUE & JOBS TABLES */}
+          
             {(activeTab === "approvals" || activeTab === "all-jobs") && (
               <div className="bg-white dark:bg-[#111127] rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-2xl shadow-black/[0.02] overflow-hidden">
                 <div className="p-8 border-b border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.02] flex items-center justify-between">
@@ -461,7 +461,7 @@ const AdminDashboard = () => {
               </div>
             )}
 
-            {/* CANDIDATES TABLE */}
+          
             {activeTab === "applications" && (
               <div className="bg-white dark:bg-[#111127] rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-2xl shadow-black/[0.02] overflow-hidden">
                 <div className="p-8 border-b border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.02] flex items-center justify-between">
@@ -512,7 +512,7 @@ const AdminDashboard = () => {
               </div>
             )}
 
-            {/* COURSES TABLE */}
+          
             {activeTab === "courses" && (
               <div className="bg-white dark:bg-[#111127] rounded-[2.5rem] border border-gray-100 dark:border-white/5 overflow-hidden shadow-2xl shadow-black/[0.02]">
                 <div className="flex items-center justify-between px-10 py-8 border-b border-gray-100 dark:border-white/5">

@@ -38,9 +38,8 @@ const Home = () => {
   return (
     <div className="bg-[#020617] text-slate-200 selection:bg-blue-500/30 font-sans">
       
-      {/* --- HERO SECTION: Dynamic Glass & Glow --- */}
       <section ref={targetRef} className="relative min-h-screen flex items-center justify-center overflow-hidden px-6">
-        {/* Animated Background Elements */}
+  
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full">
           <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-600/20 blur-[120px] rounded-full animate-pulse" />
           <div className="absolute bottom-[10%] right-[-10%] w-[40%] h-[40%] bg-indigo-600/15 blur-[100px] rounded-full animate-pulse delay-1000" />
@@ -96,14 +95,12 @@ const Home = () => {
           </motion.div>
         </motion.div>
 
-        {/* Floating Decorative Grid */}
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none" />
       </section>
 
-      {/* --- BENTO GRID: Features Section --- */}
       <section className="py-24 px-6 max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Main Large Card */}
+       
           <motion.div 
             whileHover={{ y: -5 }}
             className="md:col-span-2 p-10 rounded-[2.5rem] bg-slate-900/50 border border-slate-800 relative overflow-hidden group"
@@ -118,7 +115,6 @@ const Home = () => {
             <div className="absolute right-[-10%] bottom-[-10%] w-64 h-64 bg-blue-600/10 blur-3xl rounded-full transition-all group-hover:bg-blue-600/20" />
           </motion.div>
 
-          {/* Small Card 1 */}
           <motion.div 
             whileHover={{ y: -5 }}
             className="p-10 rounded-[2.5rem] bg-indigo-950/30 border border-indigo-900/50 flex flex-col justify-between"
@@ -132,7 +128,6 @@ const Home = () => {
               </div>
           </motion.div>
 
-          {/* Small Card 2 */}
           <motion.div 
              whileHover={{ y: -5 }}
              className="p-10 rounded-[2.5rem] bg-emerald-950/20 border border-emerald-900/30 flex flex-col justify-between"
@@ -146,7 +141,6 @@ const Home = () => {
               </div>
           </motion.div>
 
-          {/* Stat Box Card */}
           <motion.div 
             whileHover={{ y: -5 }}
             className="md:col-span-2 p-10 rounded-[2.5rem] bg-gradient-to-br from-blue-600 to-indigo-700 text-white relative overflow-hidden shadow-2xl shadow-blue-600/20"
@@ -171,7 +165,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* --- FEATURED JOBS: Dark Mode Glass Cards --- */}
       <section className="py-24 px-6 bg-[#03081a]">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-end justify-between mb-16">
@@ -225,7 +218,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* --- FOOTER: Sleek Minimalist --- */}
       <footer className="py-20 border-t border-slate-900 bg-[#020617]">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">

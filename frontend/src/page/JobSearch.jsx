@@ -47,8 +47,7 @@ const JobSearch = () => {
 
   return (
     <div className="h-screen bg-[#050505] text-slate-200 overflow-hidden flex flex-col font-sans">
-      
-      {/* Background Ambient Glows */}
+  
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full" />
         <div className="absolute top-[20%] right-[-5%] w-[30%] h-[30%] bg-indigo-600/10 blur-[100px] rounded-full" />
@@ -60,10 +59,8 @@ const JobSearch = () => {
 
       <main className="flex-1 flex overflow-hidden relative z-10 p-4 gap-4">
         
-        {/* --- LEFT PANEL: NAVIGATION & LIST --- */}
         <div className="w-full md:w-[400px] lg:w-[450px] flex flex-col bg-[#0a0a0a] border border-white/5 rounded-[2rem] overflow-hidden shadow-2xl mt-[100px]">
-          
-          {/* Header Area */}
+
           <div className="p-6 space-y-6 border-b border-white/5">
             <div className="flex items-center justify-between">
               <h1 className="text-2xl font-black tracking-tighter text-white flex items-center gap-2">
@@ -104,7 +101,6 @@ const JobSearch = () => {
             </div>
           </div>
 
-          {/* Scrolling List Area */}
           <div className="flex-1 overflow-y-auto p-3 space-y-2 custom-scrollbar" ref={scrollParentRef}>
             <LayoutGroup>
               {loading ? (
@@ -149,7 +145,6 @@ const JobSearch = () => {
           </div>
         </div>
 
-        {/* --- RIGHT PANEL: DETAILED VIEW --- */}
         <div className="hidden md:flex flex-1 flex-col bg-[#0a0a0a] border border-white/5 rounded-[2rem] overflow-hidden relative shadow-2xl">
           <AnimatePresence mode="wait">
             {selectedJob ? (
@@ -161,7 +156,7 @@ const JobSearch = () => {
                 transition={{ duration: 0.3, ease: "easeOut" }}
                 className="flex flex-col h-full"
               >
-                {/* Visual Header */}
+
                 <div className="h-32 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 relative">
                   <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10" />
                   <div className="absolute -bottom-10 left-10 p-4 bg-[#111] border border-white/10 rounded-2xl shadow-2xl">

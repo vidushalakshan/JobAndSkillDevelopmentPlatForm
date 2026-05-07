@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import instance from "../service/axios";
 import { toast } from "react-toastify";
 import {
-  FiSearch, FiFilter, FiMapPin, FiBriefcase,
-  FiAward, FiStar, FiChevronRight, FiUsers
+  FiSearch, FiFilter, FiMapPin, FiAward, 
+  FiChevronRight, FiUsers, FiCpu, FiTrendingUp
 } from "react-icons/fi";
 
 const TalentSearch = () => {
@@ -20,7 +20,7 @@ const TalentSearch = () => {
         const res = await instance.get("/profile/talents");
         setTalents(res.data);
       } catch (err) {
-        toast.error("Failed to load talent pool.");
+        toast.error("Failed to sync talent repository.");
       } finally {
         setLoading(false);
       }
@@ -38,101 +38,137 @@ const TalentSearch = () => {
     );
   });
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1, delayChildren: 0.2 }
+    }
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 30, scale: 0.95 },
+    visible: { 
+      opacity: 1, 
+      y: 0, 
+      scale: 1,
+      transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] } 
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0a0a14]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-      {/* Background Orbs */}
-      <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none -z-10">
-        <div className="absolute top-[20%] -left-[10%] w-[40%] h-[40%] bg-blue-500/5 blur-[120px] rounded-full"></div>
-        <div className="absolute bottom-[10%] -right-[5%] w-[30%] h-[30%] bg-emerald-500/5 blur-[120px] rounded-full"></div>
+    <div className="min-h-screen bg-[#050505] text-white selection:bg-blue-500/30 overflow-x-hidden">
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-600/10 blur-[150px] rounded-full animate-pulse" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-600/10 blur-[150px] rounded-full" />
+        <div className="absolute inset-0 opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
       </div>
 
-      <div className="max-w-7xl mx-auto px-8 pt-16 pb-24">
-        {/* Header */}
-        <div className="mb-16">
-          <p className="text-xs font-black uppercase tracking-[0.2em] text-blue-500 mb-3">Employer Portal</p>
-          <h1 className="text-5xl md:text-6xl font-black tracking-tight mb-4">Discover Top Talent</h1>
-          <p className="text-xl text-gray-500 dark:text-gray-400 font-medium max-w-2xl">
-            Browse through our curated pool of professionals. Find the perfect fit for your next big project.
-          </p>
-        </div>
-
-        {/* Search & Filters */}
-        <div className="flex flex-col md:flex-row gap-4 mb-12">
+      <div className="relative z-10 max-w-7xl mx-auto px-8 pt-24 pb-32">
+        <header className="mb-20">
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }} 
+            animate={{ opacity: 1, x: 0 }} 
+            transition={{ duration: 0.8 }}
+          >
+            <p className="text-[10px] font-black uppercase tracking-[0.5em] text-blue-500 mb-4">Elite Professional Network</p>
+            <h1 className="text-6xl md:text-8xl font-black tracking-tighter mb-8 bg-clip-text text-transparent bg-gradient-to-b from-white to-gray-500 leading-[0.9]">
+              The Talent <br /> Ecosystem.
+            </h1>
+            <p className="text-lg text-gray-400 font-medium max-w-xl leading-relaxed">
+              Precision-curated experts for the world's most ambitious enterprises. 
+              Search the repository of specialized brilliance.
+            </p>
+          </motion.div>
+        </header>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }} 
+          animate={{ opacity: 1, y: 0 }} 
+          transition={{ delay: 0.3 }}
+          className="flex flex-col md:flex-row gap-4 mb-16"
+        >
           <div className="relative flex-1 group">
-            <FiSearch className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors w-5 h-5" />
-            <input type="text" placeholder="Search by name, role, skills, or location..." value={search} onChange={e => setSearch(e.target.value)}
-              className="w-full pl-16 pr-6 py-5 rounded-[2rem] bg-white dark:bg-[#111127] border border-gray-200 dark:border-white/10 text-base font-bold focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-xl shadow-black/[0.02]" />
+            <FiSearch className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-blue-400 transition-colors w-5 h-5" />
+            <input 
+              type="text" 
+              placeholder="Query by name, specialized skill, or global location..." 
+              value={search} 
+              onChange={e => setSearch(e.target.value)}
+              className="w-full pl-16 pr-8 py-6 rounded-3xl bg-white/[0.03] border border-white/10 text-base font-medium focus:outline-none focus:border-blue-500 focus:bg-white/[0.05] transition-all placeholder:text-gray-600" 
+            />
           </div>
-          <button className="px-8 py-5 bg-white dark:bg-[#111127] border border-gray-200 dark:border-white/10 rounded-[2rem] text-gray-600 dark:text-gray-300 font-bold flex items-center justify-center gap-3 hover:bg-gray-50 dark:hover:bg-white/5 transition-all shadow-xl shadow-black/[0.02]">
-            <FiFilter /> Filters
+          <button className="px-10 py-6 bg-white text-black rounded-3xl font-black flex items-center justify-center gap-3 hover:bg-gray-200 active:scale-95 transition-all shadow-2xl shadow-white/5 uppercase text-xs tracking-widest">
+            <FiFilter /> Filter Search
           </button>
-        </div>
+        </motion.div>
 
-        {/* Talent Grid */}
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3, 4, 5, 6].map(i => <div key={i} className="h-80 bg-white dark:bg-[#111127] rounded-[2.5rem] animate-pulse" />)}
-          </div>
-        ) : filteredTalents.length === 0 ? (
-          <div className="py-32 text-center">
-            <div className="w-24 h-24 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
-              <FiUsers className="w-10 h-10 text-blue-500" />
-            </div>
-            <h3 className="text-2xl font-black mb-2">No talent found</h3>
-            <p className="text-gray-500 max-w-sm mx-auto font-medium">Try adjusting your search criteria to find what you're looking for.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredTalents.map((talent, i) => (
-              <motion.div key={talent.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-                className="group bg-white dark:bg-[#111127] rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-xl hover:shadow-2xl hover:shadow-blue-500/5 transition-all flex flex-col overflow-hidden relative">
-                
-                {/* Header Gradient */}
-                <div className="h-24 bg-gradient-to-br from-blue-500 to-indigo-600 relative">
-                  <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLW9wYWNpdHk9IjAuMSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIiAvPjwvc3ZnPg==')] opacity-20"></div>
-                </div>
-
-                <div className="p-8 flex flex-col flex-1 relative -mt-12">
-                  <div className="w-20 h-20 rounded-2xl bg-white dark:bg-[#111127] p-1.5 mb-4 shadow-xl">
-                    <div className="w-full h-full rounded-xl bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-500/20 dark:to-indigo-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400 font-black text-2xl overflow-hidden">
-                      {talent.pictureUrl ? (
-                        <img src={talent.pictureUrl} alt={talent.username} className="w-full h-full object-cover" />
-                      ) : (
-                        (talent.username || "U")[0].toUpperCase()
-                      )}
-                    </div>
-                  </div>
-
-                  <h3 className="text-xl font-black mb-1 text-gray-900 dark:text-white group-hover:text-blue-500 transition-colors">{talent.username}</h3>
-                  <p className="text-sm font-bold text-blue-600 dark:text-blue-400 mb-4 line-clamp-1">{talent.headline || "Professional"}</p>
-
-                  <div className="flex items-center gap-4 text-xs font-bold text-gray-400 mb-6">
-                    {talent.location && <span className="flex items-center gap-1.5"><FiMapPin />{talent.location}</span>}
-                    {talent.educations?.length > 0 && <span className="flex items-center gap-1.5"><FiAward />{talent.educations[0].degree}</span>}
-                  </div>
-
-                  <div className="flex flex-wrap gap-2 mb-8">
-                    {(talent.skills ? talent.skills.split(",").map(s => s.trim()).filter(Boolean) : []).slice(0, 3).map(skill => (
-                      <span key={skill} className="px-3 py-1 bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-300 text-[10px] font-black uppercase tracking-wider rounded-lg border border-gray-200 dark:border-white/5">
-                        {skill}
-                      </span>
-                    ))}
-                    {talent.skills && talent.skills.split(",").length > 3 && (
-                      <span className="px-3 py-1 bg-gray-50 dark:bg-transparent text-gray-400 text-[10px] font-black rounded-lg">
-                        +{talent.skills.split(",").length - 3}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="mt-auto pt-6 border-t border-gray-50 dark:border-white/5">
-                    <button className="w-full py-4 rounded-2xl bg-blue-50 dark:bg-blue-500/10 hover:bg-blue-600 hover:text-white text-blue-600 dark:text-blue-400 font-black text-sm flex items-center justify-center gap-2 transition-all">
-                      View Full Profile <FiChevronRight />
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="h-96 bg-white/[0.03] rounded-[3rem] animate-pulse border border-white/5" />
             ))}
           </div>
+        ) : (
+          <motion.div 
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          >
+            <AnimatePresence>
+              {filteredTalents.map((talent) => (
+                <motion.div 
+                  key={talent.id} 
+                  variants={cardVariants}
+                  whileHover={{ y: -10 }}
+                  className="group relative bg-[#0a0a0a] rounded-[3rem] border border-white/5 overflow-hidden transition-all flex flex-col h-full"
+                >
+                  <div className="h-32 bg-gradient-to-tr from-blue-900/40 via-indigo-950/20 to-black relative">
+                    <div className="absolute inset-0 opacity-[0.05] bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
+                  </div>
+
+                  <div className="px-8 pb-10 flex flex-col flex-1 relative -mt-16">
+                    <div className="w-24 h-24 rounded-[2rem] bg-black border-[6px] border-[#0a0a0a] mb-6 overflow-hidden shadow-2xl">
+                      <div className="w-full h-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-3xl font-black text-white">
+                        {talent.pictureUrl ? (
+                          <img src={talent.pictureUrl} alt={talent.username} className="w-full h-full object-cover" />
+                        ) : (
+                          (talent.username || "U")[0].toUpperCase()
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex-1">
+                      <h3 className="text-2xl font-black mb-1 group-hover:text-blue-400 transition-colors tracking-tight">
+                        {talent.username}
+                      </h3>
+                      <p className="text-sm font-bold text-blue-500 uppercase tracking-widest mb-6">
+                        {talent.headline || "Unclassified Professional"}
+                      </p>
+
+                      <div className="flex flex-col gap-3 text-xs font-bold text-gray-500 mb-8">
+                        <span className="flex items-center gap-3"><FiMapPin className="text-blue-500"/> {talent.location || "Remote Origin"}</span>
+                        <span className="flex items-center gap-3"><FiAward className="text-blue-500"/> {talent.educations?.[0]?.degree || "Expert Certificated"}</span>
+                      </div>
+                      <div className="flex flex-wrap gap-2 mb-10">
+                        {(talent.skills ? talent.skills.split(",").slice(0, 3) : []).map(skill => (
+                          <span key={skill} className="px-4 py-1.5 bg-white/[0.03] border border-white/5 text-[9px] font-black uppercase tracking-[0.1em] rounded-xl text-gray-400">
+                            {skill.trim()}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="pt-8 border-t border-white/5">
+                      <button className="w-full py-5 rounded-[2rem] bg-white/[0.03] border border-white/5 text-white font-black text-xs uppercase tracking-widest hover:bg-white hover:text-black transition-all flex items-center justify-center gap-2">
+                        Inspect Profile <FiChevronRight />
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </motion.div>
         )}
       </div>
     </div>

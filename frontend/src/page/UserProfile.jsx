@@ -14,7 +14,6 @@ const SKILL_SUGGESTIONS = [
   "JavaScript", "React", "Node.js", "Python", "AWS", "Docker", "TypeScript", "Figma"
 ];
 
-// Animation Variants
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
   animate: { opacity: 1, y: 0 },
@@ -91,14 +90,12 @@ const UserProfile = () => {
 
   return (
     <div className="min-h-screen bg-[#050505] text-white selection:bg-blue-500/30 font-sans antialiased overflow-x-hidden mt-[90px]">
-      {/* Cinematic Background */}
       <div className="fixed inset-0 z-0">
         <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-600/10 blur-[150px] rounded-full animate-pulse" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-600/10 blur-[150px] rounded-full" />
       </div>
 
       <div className="relative z-10 max-w-5xl mx-auto px-6 py-12">
-        {/* Navigation */}
         <header className="flex justify-between items-center mb-12">
           <button onClick={() => navigate(-1)} className="group flex items-center gap-3 text-sm font-medium text-gray-400 hover:text-white transition-all">
             <FiArrowLeft className="group-hover:-translate-x-1 transition-transform" /> Back to Feed
@@ -127,7 +124,6 @@ const UserProfile = () => {
         ) : (
           <motion.div variants={staggerContainer} initial="initial" animate="animate" className="space-y-8">
             
-            {/* Header Hero */}
             <motion.section variants={fadeInUp} className="relative group">
               <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-[3rem] blur-3xl opacity-20 group-hover:opacity-30 transition-opacity" />
               <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-[3rem] p-10 overflow-hidden">
@@ -165,9 +161,7 @@ const UserProfile = () => {
               </div>
             </motion.section>
 
-            {/* Content Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {/* Left Column: Bio & Skills */}
               <div className="md:col-span-2 space-y-8">
                 <motion.section variants={fadeInUp} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-[2.5rem] p-8">
                   <h3 className="text-lg font-bold mb-6 flex items-center gap-3">
@@ -209,7 +203,6 @@ const UserProfile = () => {
                 </motion.section>
               </div>
 
-              {/* Right Column: Skills & Education */}
               <div className="space-y-8">
                 <motion.section variants={fadeInUp} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-[2.5rem] p-8">
                   <h3 className="text-lg font-bold mb-6 flex items-center gap-3">
@@ -257,7 +250,6 @@ const UserProfile = () => {
         )}
       </div>
 
-      {/* Luxury Modal Component Placeholder */}
       <AnimatePresence>
         {(showEduModal || showExpModal) && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">

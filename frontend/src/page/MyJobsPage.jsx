@@ -56,14 +56,12 @@ const MyJobsPage = () => {
         {showModal && <PostJobModal onClose={() => setShowModal(false)} onCreated={fetchData} />}
       </AnimatePresence>
 
-      {/* Decorative Background Orbs */}
       <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none -z-10">
         <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-blue-500/5 blur-[120px] rounded-full animate-blob"></div>
         <div className="absolute top-[20%] -right-[10%] w-[30%] h-[30%] bg-purple-500/5 blur-[120px] rounded-full animate-blob animation-delay-2000"></div>
       </div>
 
       <div className="max-w-6xl mx-auto px-8 pt-16">
-        {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div>
             <button onClick={() => navigate("/")} className="group flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-blue-500 transition-all mb-4">
@@ -79,7 +77,6 @@ const MyJobsPage = () => {
           </button>
         </div>
 
-        {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           {[
             { label: "Active Postings", value: jobs.length, icon: FiLayers, color: "text-blue-500" },
@@ -97,7 +94,6 @@ const MyJobsPage = () => {
           ))}
         </div>
 
-        {/* Custom Tab Navigation */}
         <div className="flex gap-2 p-1.5 bg-gray-200/50 dark:bg-white/5 backdrop-blur-md rounded-[1.5rem] mb-8 w-fit border border-gray-200 dark:border-white/5">
           {[
             { id: "my-jobs", label: "My Job Postings", icon: FiBriefcase },
