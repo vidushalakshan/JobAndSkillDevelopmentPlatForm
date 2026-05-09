@@ -39,14 +39,6 @@ public class Course {
 
     boolean published = false;
 
-    @ManyToMany
-    @JoinTable(
-        name = "course_enrollments",
-        joinColumns = @JoinColumn(name = "course_id"),
-        inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    private List<User> enrolledUsers = new ArrayList<>();
-
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     @com.fasterxml.jackson.annotation.JsonIgnore

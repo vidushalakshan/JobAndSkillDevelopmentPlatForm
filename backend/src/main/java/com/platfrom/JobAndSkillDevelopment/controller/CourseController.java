@@ -53,6 +53,11 @@ public class CourseController {
         return ResponseEntity.ok(courseService.enrollInCourse(id));
     }
 
+    @PostMapping("/{id}/progress")
+    public ResponseEntity<com.platfrom.JobAndSkillDevelopment.entity.CourseEnrollment> updateProgress(@PathVariable Long id, @RequestParam int progress) {
+        return ResponseEntity.ok(courseService.updateProgress(id, progress));
+    }
+
     // Admin only endpoints
     @GetMapping("/all")
     @PreAuthorize("hasRole('ADMIN')")

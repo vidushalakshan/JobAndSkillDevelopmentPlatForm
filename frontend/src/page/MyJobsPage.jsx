@@ -136,7 +136,7 @@ const MyJobsPage = () => {
                 {enrolledCourses.length === 0 ? (
                   <EmptyState onAction={() => navigate("/courses")} title="No Projects Initialized" actionText="EXPLORE MATRIX" icon={FiLayers} />
                 ) : (
-                  enrolledCourses.map((course, i) => <LearningCard key={course.id} course={course} i={i} />)
+                  enrolledCourses.map((enrollment, i) => <LearningCard key={enrollment.id} enrollment={enrollment} i={i} />)
                 )}
               </motion.div>
             )}
@@ -186,39 +186,46 @@ const JobCard = ({ job, i, viewMode }) => {
   );
 };
 
-const LearningCard = ({ course, i }) => (
-  <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.05 }}
-    className="group relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-[2.5rem] p-10 overflow-hidden hover:bg-white/[0.08] transition-all"
-  >
-    <div className="flex justify-between items-start mb-10">
-      <div className="p-4 rounded-2xl bg-emerald-500/10 text-emerald-400 shadow-2xl">
-        <FiActivity size={28} />
+const LearningCard = ({ enrollment, i }) => {
+  const navigate = useNavigate();
+  const { course, progress } = enrollment;
+
+  return (
+    <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.05 }}
+      className="group relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-[2.5rem] p-10 overflow-hidden hover:bg-white/[0.08] transition-all"
+    >
+      <div className="flex justify-between items-start mb-10">
+        <div className="p-4 rounded-2xl bg-emerald-500/10 text-emerald-400 shadow-2xl">
+          <FiActivity size={28} />
+        </div>
+        <span className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-500 px-3 py-1 rounded-full border border-white/5">
+          {enrollment.status === "COMPLETED" ? "Certified" : "Enrolled"}
+        </span>
       </div>
-      <span className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-500 px-3 py-1 rounded-full border border-white/5">Enrolled</span>
-    </div>
-    <h3 className="text-2xl font-black text-white mb-4 group-hover:text-emerald-400 transition-colors tracking-tight">{course.title}</h3>
-    <p className="text-slate-500 text-sm mb-8 line-clamp-2 font-medium">{course.description}</p>
-    
-    <div className="space-y-6 pt-6 border-t border-white/5">
-      <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-600">
-        <span>Project Roadmap</span>
-        <span className="text-emerald-500 italic">Phase 01</span>
+      <h3 className="text-2xl font-black text-white mb-4 group-hover:text-emerald-400 transition-colors tracking-tight">{course.title}</h3>
+      <p className="text-slate-500 text-sm mb-8 line-clamp-2 font-medium">{course.description}</p>
+      
+      <div className="space-y-6 pt-6 border-t border-white/5">
+        <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-600">
+          <span>Project Roadmap</span>
+          <span className="text-emerald-500 italic">{progress}% Mastery</span>
+        </div>
+        <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+          <motion.div initial={{ width: 0 }} animate={{ width: `${progress}%` }} className="h-full bg-emerald-500" />
+        </div>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-xs font-bold text-slate-400"><FiMapPin className="text-emerald-500" /> Remote</div>
+          <button 
+            onClick={() => navigate(`/course/${course.id}/viewer`)}
+            className="flex items-center gap-2 text-[10px] font-black text-white uppercase tracking-widest hover:text-emerald-400 transition-colors"
+          >
+            Open Console <FiChevronRight />
+          </button>
+        </div>
       </div>
-      <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-        <motion.div initial={{ width: 0 }} animate={{ width: "35%" }} className="h-full bg-emerald-500" />
-      </div>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-xs font-bold text-slate-400"><FiMapPin className="text-emerald-500" /> Remote</div>
-        <button 
-          onClick={() => navigate(`/course/${course.id}/viewer`)}
-          className="flex items-center gap-2 text-[10px] font-black text-white uppercase tracking-widest hover:text-emerald-400 transition-colors"
-        >
-          Open Console <FiChevronRight />
-        </button>
-      </div>
-    </div>
-  </motion.div>
-);
+    </motion.div>
+  );
+};
 
 const SkeletonCard = () => <div className="h-64 rounded-[2.5rem] bg-white/5 animate-pulse border border-white/10" />;
 

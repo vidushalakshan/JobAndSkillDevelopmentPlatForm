@@ -127,7 +127,7 @@ const Nav = () => {
                         <MenuButton 
                           onClick={() => {navigate("/my-jobs"); setShowProfile(false)}} 
                           icon={<BriefcaseIcon className="w-4 h-4" />} 
-                          label="My Jobs & Postings" 
+                          label="Activity Hub" 
                         />
 
                         {user.role === "ADMIN" && (

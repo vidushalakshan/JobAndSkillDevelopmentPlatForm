@@ -48,7 +48,7 @@ const CoursesPage = () => {
         
         if (res.status === "fulfilled") setCourses(res.value.data);
         if (enrolledRes.status === "fulfilled") {
-          setEnrolledIds(new Set(enrolledRes.value.data.map(c => c.id)));
+          setEnrolledIds(new Set(enrolledRes.value.data.map(e => e.course.id)));
         }
       } catch (err) {
         toast.error("Network synchronization failed.");
@@ -66,8 +66,9 @@ const CoursesPage = () => {
     setEnrolling(id);
     try {
       await instance.post(`/courses/${id}/enroll`);
-      toast.success("Program access granted.");
       setEnrolledIds(prev => new Set([...prev, id]));
+      // Direct jump to Viewer for immediate access
+      navigate(`/course/${id}/viewer`);
     } catch (err) {
       toast.error(err.response?.data?.message || "Protocol error.");
     } finally {
@@ -107,7 +108,6 @@ const CoursesPage = () => {
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[60vw] h-[60vw] bg-blue-600/5 blur-[180px] rounded-full animate-pulse" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] bg-indigo-600/5 blur-[180px] rounded-full" />
-        <div className="absolute inset-0 opacity-[0.02] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
       </div>
 
       <AnimatePresence>
@@ -280,50 +280,70 @@ const GlobalStat = ({ label, value, icon: Icon, color }) => (
 const CourseCard = ({ course, i, onEnroll, isEnrolling, enrolledIds }) => (
   <motion.div
     layout
-    initial={{ opacity: 0, scale: 0.9 }}
-    animate={{ opacity: 1, scale: 1 }}
-    exit={{ opacity: 0, scale: 0.9 }}
-    transition={{ delay: i * 0.05 }}
-    whileHover={{ y: -12 }}
-    className="group relative bg-white/[0.02] backdrop-blur-3xl rounded-[3.5rem] border border-white/5 overflow-hidden transition-all hover:bg-white/[0.06] hover:border-white/20 shadow-2xl"
+    initial={{ opacity: 0, y: 30 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, scale: 0.95 }}
+    transition={{ delay: i * 0.05, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+    className="group relative bg-[#0a0a0a] rounded-[3.5rem] border border-white/5 overflow-hidden transition-all hover:border-blue-500/30 shadow-2xl flex flex-col h-full"
   >
-    <div className="p-12 flex flex-col h-full">
-      <div className="flex justify-between items-center mb-10">
-        <span className={`text-[9px] font-black uppercase tracking-[0.2em] px-5 py-2 rounded-full border border-white/10 ${LEVEL_COLORS[course.level] || "text-blue-400 bg-blue-400/10"}`}>
-          {course.level || "Beginner"}
+    <div className="relative aspect-video overflow-hidden">
+      <img 
+        src={course.thumbnail || `https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2070&auto=format&fit=crop`} 
+        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 grayscale-[0.3] group-hover:grayscale-0"
+        alt={course.title}
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent opacity-60" />
+      <div className="absolute top-8 left-8">
+        <span className="px-5 py-2 rounded-xl bg-black/60 backdrop-blur-xl border border-white/10 text-[9px] font-black uppercase tracking-[0.2em] text-blue-400">
+          {course.category}
         </span>
-        <div className="flex items-center gap-2 text-xs font-black text-white italic">
-          <FiZap className="text-blue-500" /> {course.price || "FREE"}
+      </div>
+    </div>
+
+    <div className="p-12 flex flex-col flex-1 relative">
+      {/* Background Decor */}
+      <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/5 blur-[80px] rounded-full pointer-events-none" />
+      
+      <div className="flex items-center gap-6 mb-8">
+        <div className={`px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest ${LEVEL_COLORS[course.level] || "text-blue-400 bg-blue-400/10"}`}>
+          {course.level}
+        </div>
+        <div className="flex items-center gap-2 text-slate-500">
+           <FiUsers className="w-3.5 h-3.5" />
+           <span className="text-[10px] font-black uppercase tracking-widest">{course.enrollmentCount || 0} Operators</span>
         </div>
       </div>
 
-      <div className="mb-10">
-        <h3 className="text-3xl font-black text-white mb-6 leading-[1.1] tracking-tighter group-hover:text-blue-400 transition-colors">
-          {course.title}
-        </h3>
-        <p className="text-slate-400 text-sm line-clamp-3 leading-relaxed font-medium">
-          {course.description}
-        </p>
-      </div>
+      <h3 className="text-3xl font-black text-white mb-6 leading-[1.1] tracking-tighter group-hover:text-blue-400 transition-colors">
+        {course.title}
+      </h3>
+      
+      <p className="text-slate-400 text-sm line-clamp-2 leading-relaxed font-medium mb-10 flex-1">
+        {course.description}
+      </p>
 
-      <div className="mt-auto pt-10 border-t border-white/5 flex flex-col gap-8">
-        <div className="grid grid-cols-2 gap-6">
+      <div className="pt-10 border-t border-white/5 space-y-10">
+        <div className="flex items-center justify-between">
           <div className="flex flex-col gap-1">
-            <span className="text-[8px] font-black uppercase tracking-widest text-slate-600">Architect</span>
-            <span className="text-[10px] font-bold text-slate-300 truncate">{course.instructor || "Nexus Expert"}</span>
+            <span className="text-[9px] font-black uppercase tracking-widest text-slate-600">Lead Architect</span>
+            <span className="text-xs font-bold text-slate-300">{course.instructor || "Nexus System"}</span>
           </div>
-          <div className="flex flex-col gap-1">
-            <span className="text-[8px] font-black uppercase tracking-widest text-slate-600">Timeline</span>
-            <span className="text-[10px] font-bold text-slate-300">{course.duration || "Self-Paced"}</span>
+          <div className="text-right">
+            <span className="text-[9px] font-black uppercase tracking-widest text-slate-600 block mb-1">Session Intensity</span>
+            <span className="text-xs font-bold text-white italic">{course.duration}</span>
           </div>
         </div>
         
         <button
           onClick={onEnroll}
-          className="w-full py-6 rounded-[2rem] bg-white text-black font-black text-[10px] uppercase tracking-[0.3em] group-hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 shadow-2xl"
+          className={`w-full py-6 rounded-[2rem] font-black text-[10px] uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-3 shadow-2xl ${
+            enrolledIds.has(course.id) 
+            ? 'bg-blue-600 text-white hover:bg-blue-500' 
+            : 'bg-white text-black hover:bg-blue-400 hover:text-white'
+          }`}
         >
-          {isEnrolling ? "SYNCHRONIZING..." : enrolledIds.has(course.id) ? "LAUNCH CONSOLE" : "ACCESS PROJECT"}
-          <FiChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+          {isEnrolling ? "SYNCHRONIZING..." : enrolledIds.has(course.id) ? "WATCH NOW" : "ACCESS PROJECT"}
+          <FiChevronRight className={`w-4 h-4 transition-transform ${enrolledIds.has(course.id) ? 'group-hover:translate-x-1' : ''}`} />
         </button>
       </div>
     </div>

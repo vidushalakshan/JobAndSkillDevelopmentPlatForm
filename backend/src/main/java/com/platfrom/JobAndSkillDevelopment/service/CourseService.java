@@ -16,10 +16,12 @@ public class CourseService {
 
     private final CourseRepo courseRepo;
     private final UserRepo userRepo;
+    private final com.platfrom.JobAndSkillDevelopment.repository.CourseEnrollmentRepository enrollmentRepo;
 
-    public CourseService(CourseRepo courseRepo, UserRepo userRepo) {
+    public CourseService(CourseRepo courseRepo, UserRepo userRepo, com.platfrom.JobAndSkillDevelopment.repository.CourseEnrollmentRepository enrollmentRepo) {
         this.courseRepo = courseRepo;
         this.userRepo = userRepo;
+        this.enrollmentRepo = enrollmentRepo;
     }
 
     private User getCurrentUser() {
@@ -44,11 +46,8 @@ public class CourseService {
         return courseRepo.findByUser(getCurrentUser());
     }
 
-    public List<Course> getEnrolledCourses() {
-        User user = getCurrentUser();
-        return courseRepo.findAll().stream()
-                .filter(c -> c.getEnrolledUsers().contains(user))
-                .toList();
+    public List<com.platfrom.JobAndSkillDevelopment.entity.CourseEnrollment> getEnrolledCourses() {
+        return enrollmentRepo.findByUser(getCurrentUser());
     }
 
     public Course createCourse(CourseRequest req) {
@@ -92,11 +91,31 @@ public class CourseService {
                 .orElseThrow(() -> new RuntimeException("Course not found"));
         User user = getCurrentUser();
         
-        if (!course.getEnrolledUsers().contains(user)) {
-            course.getEnrolledUsers().add(user);
+        java.util.Optional<com.platfrom.JobAndSkillDevelopment.entity.CourseEnrollment> existing = enrollmentRepo.findByUserAndCourse(user, course);
+        if (existing.isEmpty()) {
+            com.platfrom.JobAndSkillDevelopment.entity.CourseEnrollment enrollment = new com.platfrom.JobAndSkillDevelopment.entity.CourseEnrollment();
+            enrollment.setUser(user);
+            enrollment.setCourse(course);
+            enrollmentRepo.save(enrollment);
+            
             course.setEnrollmentCount(course.getEnrollmentCount() + 1);
+            courseRepo.save(course);
         }
         
-        return courseRepo.save(course);
+        return course;
+    }
+
+    public com.platfrom.JobAndSkillDevelopment.entity.CourseEnrollment updateProgress(Long courseId, int progress) {
+        User user = getCurrentUser();
+        Course course = courseRepo.findById(courseId).orElseThrow();
+        com.platfrom.JobAndSkillDevelopment.entity.CourseEnrollment enrollment = enrollmentRepo.findByUserAndCourse(user, course)
+                .orElseThrow(() -> new RuntimeException("Enrollment not found"));
+        
+        enrollment.setProgress(progress);
+        if (progress >= 100) {
+            enrollment.setStatus("COMPLETED");
+            enrollment.setCompletedAt(java.time.LocalDateTime.now());
+        }
+        return enrollmentRepo.save(enrollment);
     }
 }
