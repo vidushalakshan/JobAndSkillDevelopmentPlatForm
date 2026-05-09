@@ -32,6 +32,7 @@ public class JobController {
         job.setType(jobRequest.getType());
         job.setSalary(jobRequest.getSalary());
         job.setDeadline(jobRequest.getDeadline());
+        job.setContactEmail(jobRequest.getContactEmail());
         return ResponseEntity.ok(jobService.createJob(job, user));
     }
 
@@ -46,6 +47,7 @@ public class JobController {
         job.setType(jobRequest.getType());
         job.setSalary(jobRequest.getSalary());
         job.setDeadline(jobRequest.getDeadline());
+        job.setContactEmail(jobRequest.getContactEmail());
         return ResponseEntity.ok(jobService.createJobAsAdmin(job, user));
     }
 

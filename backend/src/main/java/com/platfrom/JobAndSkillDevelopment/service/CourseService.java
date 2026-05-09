@@ -40,6 +40,13 @@ public class CourseService {
         return courseRepo.findByUser(getCurrentUser());
     }
 
+    public List<Course> getEnrolledCourses() {
+        User user = getCurrentUser();
+        return courseRepo.findAll().stream()
+                .filter(c -> c.getEnrolledUsers().contains(user))
+                .toList();
+    }
+
     public Course createCourse(CourseRequest req) {
         User user = getCurrentUser();
         Course course = new Course();
@@ -52,6 +59,7 @@ public class CourseService {
         course.setPrice(req.getPrice());
         course.setThumbnail(req.getThumbnail());
         course.setSyllabus(req.getSyllabus());
+        course.setVideoUrl(req.getVideoUrl());
         course.setUser(user);
         course.setPublished(false); // Needs admin approval
         return courseRepo.save(course);
@@ -78,7 +86,13 @@ public class CourseService {
     public Course enrollInCourse(Long id) {
         Course course = courseRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Course not found"));
-        course.setEnrollmentCount(course.getEnrollmentCount() + 1);
+        User user = getCurrentUser();
+        
+        if (!course.getEnrolledUsers().contains(user)) {
+            course.getEnrolledUsers().add(user);
+            course.setEnrollmentCount(course.getEnrollmentCount() + 1);
+        }
+        
         return courseRepo.save(course);
     }
 }

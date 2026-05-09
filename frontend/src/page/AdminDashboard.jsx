@@ -37,7 +37,7 @@ const StatusBadge = ({ status, small }) => {
 };
 
 const PostJobModal = ({ onClose, onCreated, isAdmin }) => {
-  const [form, setForm] = useState({ title: "", description: "", location: "", type: "IT Software", salary: "", deadline: "" });
+  const [form, setForm] = useState({ title: "", description: "", location: "", type: "IT Software", salary: "", deadline: "", contactEmail: "" });
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -98,6 +98,9 @@ const PostJobModal = ({ onClose, onCreated, isAdmin }) => {
               <input type="date" required value={form.deadline} onChange={e => setForm({ ...form, deadline: e.target.value })}
                 className="w-full px-6 py-4 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/5 outline-none" />
             </div>
+
+            <input required type="email" placeholder="Contact Email" value={form.contactEmail} onChange={e => setForm({ ...form, contactEmail: e.target.value })}
+              className="w-full px-6 py-4 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/5 focus:ring-2 focus:ring-blue-500/50 outline-none" />
           </div>
           
           <div className="flex gap-4 pt-4">
@@ -121,6 +124,93 @@ const SkeletonCard = () => (
   </div>
 );
 
+const CreateCourseModal = ({ onClose, onCreated }) => {
+  const [form, setForm] = useState({ 
+    title: "", description: "", category: "IT Software", 
+    level: "Beginner", duration: "", price: "Free", instructor: "",
+    videoUrl: "" 
+  });
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const res = await instance.post("/courses", form);
+      // Auto-publish if created by admin
+      await instance.put(`/courses/${res.data.id}/publish`);
+      toast.success("Global project initialized & published!");
+      onCreated();
+      onClose();
+    } catch (err) {
+      toast.error("Failed to initialize project.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[150] flex items-center justify-center p-4">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        onClick={onClose} className="absolute inset-0 bg-black/80 backdrop-blur-xl" />
+      
+      <motion.div initial={{ opacity: 0, scale: 0.9, y: 40 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 40 }}
+        className="relative z-10 bg-[#0d0d1a] border border-white/10 rounded-[3rem] shadow-2xl w-full max-w-2xl p-12 overflow-hidden"
+      >
+        <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-emerald-500 via-teal-400 to-blue-500"></div>
+        <h2 className="text-4xl font-black text-white mb-2 tracking-tighter">Initialize Global Project</h2>
+        <p className="text-gray-500 mb-10 text-sm font-medium">Create a high-impact learning experience for the ecosystem.</p>
+        
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4 md:col-span-2">
+              <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500 ml-1">Project Designation</label>
+              <input required placeholder="e.g. Advanced Cloud Orchestration" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })}
+                className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/5 focus:border-emerald-500/50 outline-none transition-all" />
+            </div>
+            
+            <div className="space-y-4 md:col-span-2">
+              <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500 ml-1">Abstract & Scope</label>
+              <textarea required placeholder="Detailed roadmap and objectives..." rows={3} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
+                className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/5 focus:border-emerald-500/50 outline-none resize-none transition-all" />
+            </div>
+
+            <div className="space-y-4">
+              <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500 ml-1">Industry Vertical</label>
+              <select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}
+                className="w-full px-6 py-4 rounded-2xl bg-[#1a1a35] border border-white/5 outline-none">
+                {["IT Software", "Design", "Business", "Accounting", "HR & Training"].map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+
+            <div className="space-y-4">
+              <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500 ml-1">Complexity Level</label>
+              <select value={form.level} onChange={e => setForm({ ...form, level: e.target.value })}
+                className="w-full px-6 py-4 rounded-2xl bg-[#1a1a35] border border-white/5 outline-none">
+                {["Beginner", "Intermediate", "Advanced"].map(l => <option key={l} value={l}>{l}</option>)}
+              </select>
+            </div>
+
+            <div className="space-y-4 md:col-span-2">
+              <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500 ml-1">Content Source (Video URL)</label>
+              <input placeholder="e.g. https://www.youtube.com/embed/..." value={form.videoUrl} onChange={e => setForm({ ...form, videoUrl: e.target.value })}
+                className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/5 focus:border-emerald-500/50 outline-none transition-all" />
+            </div>
+          </div>
+
+          <div className="flex gap-4 pt-6">
+            <button type="button" onClick={onClose} className="flex-1 py-5 rounded-2xl text-gray-500 font-bold hover:bg-white/5 transition-all uppercase tracking-widest text-[10px]">Cancel</button>
+            <button type="submit" disabled={loading}
+              className="flex-1 py-5 rounded-2xl bg-white text-black font-black shadow-xl hover:bg-emerald-50 active:scale-95 transition-all uppercase tracking-widest text-[10px]">
+              {loading ? "Initializing..." : "Launch Project"}
+            </button>
+          </div>
+        </form>
+      </motion.div>
+    </div>
+  );
+};
+
 // --- Main Dashboard ---
 
 const AdminDashboard = () => {
@@ -129,11 +219,11 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [jobs, setJobs] = useState([]);
   const [pendingJobs, setPendingJobs] = useState([]);
-  const [applications, setApplications] = useState([]);
   const [users, setUsers] = useState([]);
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showPostModal, setShowPostModal] = useState(false);
+  const [showCourseModal, setShowCourseModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
@@ -147,15 +237,13 @@ const AdminDashboard = () => {
       const responses = await Promise.allSettled([
         instance.get("/job/all"),
         instance.get("/job/pending"),
-        instance.get("/apply/all"),
         instance.get("/users/"),
         instance.get("/courses/all"),
       ]);
       if (responses[0].status === "fulfilled") setJobs(responses[0].value.data);
       if (responses[1].status === "fulfilled") setPendingJobs(responses[1].value.data);
-      if (responses[2].status === "fulfilled") setApplications(responses[2].value.data);
-      if (responses[3].status === "fulfilled") setUsers(responses[3].value.data);
-      if (responses[4].status === "fulfilled") setCourses(responses[4].value.data);
+      if (responses[2].status === "fulfilled") setUsers(responses[2].value.data);
+      if (responses[3].status === "fulfilled") setCourses(responses[3].value.data);
 
       if (responses.some(r => r.status === "rejected")) {
         toast.warn("Some data could not be loaded.");
@@ -208,7 +296,6 @@ const AdminDashboard = () => {
     { id: "overview", label: "Insights", icon: FiActivity },
     { id: "approvals", label: "Queue", icon: FiClock, badge: pendingJobs.length },
     { id: "all-jobs", label: "All Jobs", icon: FiBriefcase },
-    { id: "applications", label: "Candidates", icon: FiFileText },
     { id: "courses", label: "Courses", icon: FiBook, badge: courses.filter(c => !c.published).length || null },
     { id: "users", label: "Users", icon: FiUsers },
   ];
@@ -217,6 +304,7 @@ const AdminDashboard = () => {
     <div className="min-h-screen bg-[#05050a] text-gray-200 selection:bg-blue-500/30 font-['Plus_Jakarta_Sans',sans-serif]">
       <AnimatePresence>
         {showPostModal && <PostJobModal isAdmin onClose={() => setShowPostModal(false)} onCreated={fetchAll} />}
+        {showCourseModal && <CreateCourseModal onClose={() => setShowCourseModal(false)} onCreated={fetchAll} />}
       </AnimatePresence>
 
       {/* Modern Sidebar */}
@@ -249,10 +337,14 @@ const AdminDashboard = () => {
           </nav>
         </div>
 
-        <div className="mt-auto px-10">
+        <div className="mt-auto px-10 space-y-3">
           <button onClick={() => setShowPostModal(true)}
-            className="w-full py-4 rounded-2xl bg-white text-[#05050a] font-black text-sm shadow-xl transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2">
-            <FiPlus className="w-5 h-5" /> Quick Post
+            className="w-full py-4 rounded-2xl bg-blue-600 text-white font-black text-xs shadow-xl transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2 uppercase tracking-widest">
+            <FiPlus className="w-4 h-4" /> Global Job
+          </button>
+          <button onClick={() => setShowCourseModal(true)}
+            className="w-full py-4 rounded-2xl bg-emerald-600 text-white font-black text-xs shadow-xl transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2 uppercase tracking-widest">
+            <FiPlus className="w-4 h-4" /> Global Project
           </button>
           
           <div className="p-6 rounded-[2.5rem] bg-white/5 border border-white/5">
@@ -308,7 +400,6 @@ const AdminDashboard = () => {
                   {[
                     { label: "Total Openings", value: jobs.length, icon: FiBriefcase, color: "from-blue-600 to-indigo-600" },
                     { label: "Approval Queue", value: pendingJobs.length, icon: FiClock, color: "from-amber-500 to-orange-600" },
-                    { label: "Candidate Pool", value: applications.length, icon: FiFileText, color: "from-purple-600 to-pink-700" },
                     { label: "Active Users", value: users.length, icon: FiUsers, color: "from-emerald-500 to-teal-700" },
                   ].map(({ label, value, icon: Icon, color }, i) => (
                     <motion.div key={label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}
@@ -327,8 +418,7 @@ const AdminDashboard = () => {
                     <h3 className="text-2xl font-black mb-12 text-white">Core Metrics</h3>
                     <div className="space-y-10">
                       {[
-                        { label: "Approval Rate", pct: Math.round((jobs.filter(j => j.status === "APPROVED").length / jobs.length) * 100) || 0, color: "bg-emerald-500" },
-                        { label: "Application Conversion", pct: Math.round((applications.filter(a => a.status === "ACCEPTED").length / applications.length) * 100) || 0, color: "bg-blue-500" },
+                        { label: "Approval Rate", pct: Math.round((jobs.filter(j => j.status === "APPROVED").length / (jobs.length || 1)) * 100) || 0, color: "bg-emerald-500" },
                         { label: "System Load", pct: 24, color: "bg-purple-500" },
                       ].map(bar => (
                         <div key={bar.label} className="space-y-4">
@@ -437,52 +527,64 @@ const AdminDashboard = () => {
                 ))}
               </div>
             )}
+            {activeTab === "courses" && (
+              <div className="bg-white/5 rounded-[3rem] border border-white/5 shadow-2xl overflow-hidden backdrop-blur-md">
+                <div className="p-10 border-b border-white/5 flex items-center justify-between">
+                  <h3 className="font-black text-xl text-white">Project Matrix</h3>
+                  <button onClick={() => setShowCourseModal(true)} className="px-6 py-3 rounded-xl bg-emerald-500 text-white font-black text-[10px] uppercase tracking-widest hover:bg-emerald-600 transition-all flex items-center gap-2">
+                    <FiPlus /> New Project
+                  </button>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left">
+                    <thead>
+                      <tr className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 border-b border-white/5">
+                        <th className="px-10 py-8">Project Designation</th>
+                        <th className="px-10 py-8">Vertical</th>
+                        <th className="px-10 py-8">Complexity</th>
+                        <th className="px-10 py-8">Status</th>
+                        <th className="px-10 py-8 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      {courses
+                        .filter(c => c.title.toLowerCase().includes(searchTerm.toLowerCase()))
+                        .map(course => (
+                        <tr key={course.id} className="group hover:bg-white/[0.02] transition-colors">
+                          <td className="px-10 py-8">
+                            <p className="font-bold text-white mb-1 group-hover:text-emerald-400 transition-colors">{course.title}</p>
+                            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter">By {course.instructor}</p>
+                          </td>
+                          <td className="px-10 py-8 text-[10px] font-black uppercase tracking-widest text-blue-400">{course.category}</td>
+                          <td className="px-10 py-8">
+                            <span className="text-[9px] font-black px-2 py-1 rounded-lg bg-white/5 border border-white/5 text-gray-400 uppercase tracking-widest">
+                              {course.level}
+                            </span>
+                          </td>
+                          <td className="px-10 py-8">
+                            <span className={`text-[9px] font-black px-3 py-1 rounded-full border ${course.published ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" : "bg-amber-500/10 text-amber-500 border-amber-500/20"}`}>
+                              {course.published ? "LIVE" : "DRAFT"}
+                            </span>
+                          </td>
+                          <td className="px-10 py-8 text-right">
+                            <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-all">
+                              {course.published ? (
+                                <button onClick={() => handleUnpublishCourse(course.id)} title="Unpublish" className="p-3 rounded-xl bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-white transition-all"><FiXCircle className="w-5 h-5" /></button>
+                              ) : (
+                                <button onClick={() => handlePublishCourse(course.id)} title="Publish" className="p-3 rounded-xl bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white transition-all"><FiCheckCircle className="w-5 h-5" /></button>
+                              )}
+                              <button onClick={() => handleDeleteCourse(course.id)} title="Delete" className="p-3 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all"><FiTrash2 className="w-5 h-5" /></button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
 
             {/* Adding Application & Course layout would mirror the Jobs Table for consistency */}
-            {activeTab === "applications" && (
-                <div className="bg-white/5 rounded-[3rem] border border-white/5 shadow-2xl overflow-hidden backdrop-blur-md">
-                    <div className="p-10 border-b border-white/5 flex items-center justify-between">
-                    <h3 className="font-black text-xl text-white">Active Talent Pipeline</h3>
-                    </div>
-                    <div className="overflow-x-auto">
-                    <table className="w-full text-left">
-                        <thead>
-                        <tr className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 border-b border-white/5">
-                            <th className="px-10 py-8">Applicant Info</th>
-                            <th className="px-10 py-8">Position</th>
-                            <th className="px-10 py-8">Status</th>
-                            <th className="px-10 py-8 text-right">Update</th>
-                        </tr>
-                        </thead>
-                        <tbody className="divide-y divide-white/5">
-                        {applications
-                            .filter(a => a.applicant?.email.toLowerCase().includes(searchTerm.toLowerCase()) || a.job?.title.toLowerCase().includes(searchTerm.toLowerCase()))
-                            .map(app => (
-                            <tr key={app.id} className="group hover:bg-white/[0.02] transition-colors">
-                            <td className="px-10 py-8">
-                                <div className="flex items-center gap-4">
-                                <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500 font-black text-xs border border-blue-500/20">{app.applicant?.username?.charAt(0).toUpperCase()}</div>
-                                <div>
-                                    <p className="font-bold text-white">{app.applicant?.username}</p>
-                                    <p className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter">{app.applicant?.email}</p>
-                                </div>
-                                </div>
-                            </td>
-                            <td className="px-10 py-8 font-bold text-gray-300 text-sm">{app.job?.title || "Deleted Job"}</td>
-                            <td className="px-10 py-8"><StatusBadge status={app.status} small /></td>
-                            <td className="px-10 py-8 text-right">
-                                <select value={app.status} onChange={e => handleAppStatus(app.id, e.target.value)}
-                                className="px-4 py-2.5 rounded-xl bg-white/5 border border-white/5 text-[10px] font-black uppercase tracking-widest text-white outline-none">
-                                {["PENDING", "REVIEWED", "ACCEPTED", "REJECTED"].map(s => <option key={s} value={s} className="bg-[#0d0d1a]">{s}</option>)}
-                                </select>
-                            </td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </table>
-                    </div>
-                </div>
-            )}
             
           </motion.div>
         )}

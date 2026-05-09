@@ -31,6 +31,11 @@ public class CourseController {
         return ResponseEntity.ok(courseService.getMyCourses());
     }
 
+    @GetMapping("/enrolled")
+    public ResponseEntity<List<Course>> getEnrolledCourses() {
+        return ResponseEntity.ok(courseService.getEnrolledCourses());
+    }
+
     // Authenticated - create a course (goes to admin for approval)
     @PostMapping
     public ResponseEntity<Course> createCourse(@RequestBody CourseRequest req) {

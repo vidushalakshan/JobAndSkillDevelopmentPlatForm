@@ -31,6 +31,8 @@ public class JobPost {
     String salary;
     @com.fasterxml.jackson.annotation.JsonFormat(pattern = "yyyy-MM-dd")
     LocalDate deadline;
+    @Column(nullable = true)
+    String contactEmail;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = true)

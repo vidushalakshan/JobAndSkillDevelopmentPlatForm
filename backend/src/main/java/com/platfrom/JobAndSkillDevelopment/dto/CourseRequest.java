@@ -13,4 +13,5 @@ public class CourseRequest {
     private String price;
     private String thumbnail;
     private String syllabus;
+    private String videoUrl;
 }

@@ -11,4 +11,5 @@ public class JobRequest {
     private String type;
     private String salary;
     private LocalDate deadline;
+    private String contactEmail;
 }

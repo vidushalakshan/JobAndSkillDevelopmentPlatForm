@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import instance from "../service/axios";
-import ApplyModal from "../components/ApplyModal";
 import { 
   FiSearch, FiMapPin, FiBriefcase, FiFilter, 
   FiClock, FiDollarSign, FiChevronRight, FiCheckCircle, FiCompass, FiZap
@@ -18,7 +17,6 @@ const JobSearch = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [selectedJob, setSelectedJob] = useState(null);
-  const [applyingJob, setApplyingJob] = useState(null);
   const scrollParentRef = useRef(null);
 
   useEffect(() => {
@@ -53,9 +51,6 @@ const JobSearch = () => {
         <div className="absolute top-[20%] right-[-5%] w-[30%] h-[30%] bg-indigo-600/10 blur-[100px] rounded-full" />
       </div>
 
-      <AnimatePresence>
-        {applyingJob && <ApplyModal job={applyingJob} onClose={() => setApplyingJob(null)} />}
-      </AnimatePresence>
 
       <main className="flex-1 flex overflow-hidden relative z-10 p-4 gap-4">
         
@@ -178,12 +173,18 @@ const JobSearch = () => {
                       <h2 className="text-4xl font-black text-white tracking-tighter">{selectedJob.title}</h2>
                     </div>
                     
-                    <button 
-                      onClick={() => setApplyingJob(selectedJob)}
-                      className="px-8 py-4 bg-white text-black rounded-xl font-bold hover:bg-blue-500 hover:text-white transition-all transform active:scale-95 shadow-xl shadow-white/5"
-                    >
-                      Apply for this role
-                    </button>
+                    {selectedJob.contactEmail ? (
+                      <a 
+                        href={`mailto:${selectedJob.contactEmail}?subject=Application for ${selectedJob.title}`}
+                        className="px-8 py-4 bg-white text-black rounded-xl font-bold hover:bg-blue-500 hover:text-white transition-all transform active:scale-95 shadow-xl shadow-white/5 flex items-center gap-2"
+                      >
+                        Contact Employer
+                      </a>
+                    ) : (
+                      <span className="text-slate-500 text-xs font-bold uppercase tracking-widest bg-white/5 px-4 py-2 rounded-lg">
+                        Contact Info Not Provided
+                      </span>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">

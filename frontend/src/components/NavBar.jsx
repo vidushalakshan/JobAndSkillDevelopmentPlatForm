@@ -123,6 +123,21 @@ const Nav = () => {
 
                       <div className="p-1 space-y-1">
                         <MenuButton onClick={() => {navigate("/profile"); setShowProfile(false)}} icon={<UserCircleIcon className="w-4 h-4" />} label="My Profile" />
+                        
+                        <MenuButton 
+                          onClick={() => {navigate("/my-jobs"); setShowProfile(false)}} 
+                          icon={<BriefcaseIcon className="w-4 h-4" />} 
+                          label="My Jobs & Postings" 
+                        />
+
+                        {user.role === "ADMIN" && (
+                          <MenuButton 
+                            onClick={() => {navigate("/admin"); setShowProfile(false)}} 
+                            icon={<Squares2X2Icon className="w-4 h-4" />} 
+                            label="Admin Dashboard" 
+                          />
+                        )}
+
                         <button
                           onClick={() => { logout(); navigate("/login"); }}
                           className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 text-sm font-bold transition-all"

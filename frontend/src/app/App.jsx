@@ -11,6 +11,7 @@ import JobSearch from '../page/JobSearch';
 import UserProfile from '../page/UserProfile';
 import CoursesPage from '../page/CoursesPage';
 import TalentSearch from '../page/TalentSearch';
+import CourseViewerPage from '../page/CourseViewerPage';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
       
       <Route path='/admin' element={<AdminDashboard />} />
       <Route path='/my-jobs' element={<MyJobsPage />} />
+      <Route path="/course/:id/viewer" element={<CourseViewerPage />} />
     </Routes>
   );
 }

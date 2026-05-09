@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
+import java.util.*;
 
 @Entity
 @Data
@@ -31,11 +32,20 @@ public class Course {
     String price;
     String thumbnail;
     String syllabus;
+    String videoUrl;
 
     @Column(name = "enrollment_count")
     int enrollmentCount = 0;
 
     boolean published = false;
+
+    @ManyToMany
+    @JoinTable(
+        name = "course_enrollments",
+        joinColumns = @JoinColumn(name = "course_id"),
+        inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private List<User> enrolledUsers = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

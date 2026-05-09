@@ -6,7 +6,7 @@ import { useUser } from "../context/context";
 import { toast } from "react-toastify";
 import {
   FiBook, FiSearch, FiClock, FiUsers,
-  FiStar, FiChevronRight, FiPlus, FiBarChart2, FiX, FiLayers
+  FiStar, FiChevronRight, FiPlus, FiBarChart2, FiX, FiLayers, FiZap, FiTarget
 } from "react-icons/fi";
 
 const LEVELS = ["All Levels", "Beginner", "Intermediate", "Advanced"];
@@ -15,28 +15,10 @@ const CATEGORIES = [
   "Banking & Finance", "Civil Engineering", "HR & Training", "Business", "Design", "Other"
 ];
 
-const LEVEL_THEME = {
-  Beginner: "from-emerald-400 to-teal-500",
-  Intermediate: "from-amber-400 to-orange-500",
-  Advanced: "from-rose-400 to-red-600",
-};
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1, delayChildren: 0.2 }
-  }
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 30, scale: 0.95 },
-  visible: { 
-    opacity: 1, 
-    y: 0, 
-    scale: 1,
-    transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] }
-  }
+const LEVEL_COLORS = {
+  Beginner: "text-emerald-400 bg-emerald-400/10",
+  Intermediate: "text-amber-400 bg-amber-400/10",
+  Advanced: "text-rose-400 bg-rose-400/10",
 };
 
 const CoursesPage = () => {
@@ -60,13 +42,26 @@ const CoursesPage = () => {
         const res = await instance.get("/courses/published");
         setCourses(res.data);
       } catch (err) {
-        toast.error("Failed to sync library.");
+        toast.error("Network synchronization failed.");
       } finally {
         setLoading(false);
       }
     };
     fetchCourses();
   }, []);
+
+  const handleEnroll = async (id) => {
+    if (!user) return navigate("/login");
+    setEnrolling(id);
+    try {
+      await instance.post(`/courses/${id}/enroll`);
+      toast.success("Program access granted.");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Protocol error.");
+    } finally {
+      setEnrolling(false);
+    }
+  };
 
   const filtered = useMemo(() => courses.filter(c => {
     const matchSearch = c.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -76,163 +71,238 @@ const CoursesPage = () => {
     return matchSearch && matchCat && matchLevel;
   }), [courses, search, selectedCategory, selectedLevel]);
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await instance.post("/courses", createForm);
+      toast.success("Project blueprint submitted for review.");
+      setShowCreateModal(false);
+      // Refresh list
+      const res = await instance.get("/courses/published");
+      setCourses(res.data);
+    } catch (err) {
+      toast.error("Protocol initialization failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#050505] text-white selection:bg-blue-500/30 overflow-x-hidden font-sans">
+    <div className="min-h-screen bg-[#050508] text-slate-200 selection:bg-blue-500/30 overflow-x-hidden font-sans">
       
-     
+      {/* Background Ambience */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-600/10 blur-[150px] rounded-full animate-pulse" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-600/10 blur-[150px] rounded-full" />
-        <div className="absolute inset-0 opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+        <div className="absolute top-[-10%] left-[-10%] w-[60vw] h-[60vw] bg-blue-600/5 blur-[180px] rounded-full animate-pulse" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] bg-indigo-600/5 blur-[180px] rounded-full" />
+        <div className="absolute inset-0 opacity-[0.02] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
       </div>
 
-     
       <AnimatePresence>
         {showCreateModal && (
           <div className="fixed inset-0 z-[200] flex items-center justify-center p-6">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={() => setShowCreateModal(false)} className="absolute inset-0 bg-black/90 backdrop-blur-xl" />
-            <motion.div initial={{ opacity: 0, y: 50, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}
-              className="relative bg-[#0a0a0a] border border-white/10 rounded-[3rem] shadow-2xl w-full max-w-3xl p-12 max-h-[85vh] overflow-y-auto no-scrollbar">
-              <button onClick={() => setShowCreateModal(false)} className="absolute top-8 right-8 p-2 hover:bg-white/5 rounded-full transition-colors">
-                <FiX size={24} className="text-gray-500 hover:text-white" />
+              onClick={() => setShowCreateModal(false)} className="absolute inset-0 bg-black/95 backdrop-blur-2xl" />
+            <motion.form 
+              onSubmit={handleSubmit}
+              initial={{ opacity: 0, y: 50, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, scale: 0.9, y: 50 }}
+              className="relative bg-[#0a0a0a] border border-white/10 rounded-[3rem] shadow-2xl w-full max-w-4xl p-16 max-h-[90vh] overflow-y-auto no-scrollbar">
+              
+              <button type="button" onClick={() => setShowCreateModal(false)} className="absolute top-10 right-10 p-3 hover:bg-white/5 rounded-full transition-colors group">
+                <FiX size={24} className="text-gray-500 group-hover:text-white" />
               </button>
               
-              <h2 className="text-4xl font-black mb-2 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-500">Curate Excellence</h2>
-              <p className="text-gray-500 mb-10 font-medium tracking-wide">Enter the details of your masterclass.</p>
+              <div className="mb-12">
+                <h2 className="text-5xl font-black mb-3 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-600 tracking-tighter">Architect Learning</h2>
+                <p className="text-gray-500 font-medium tracking-wide">Synthesize your expertise into a world-class educational experience.</p>
+              </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {[
-                  { key: "title", label: "Program Title", placeholder: "e.g. Architectural Design Systems" },
-                  { key: "instructor", label: "Curator Name", placeholder: "Your Name" },
-                  { key: "duration", label: "Timeline", placeholder: "e.g. 12 Weeks" },
-                  { key: "price", label: "Investment", placeholder: "e.g. Free or $99" },
+                  { key: "title", label: "Program Designation", placeholder: "e.g. Full-Stack Systems Design" },
+                  { key: "instructor", label: "Lead Architect", placeholder: "Your Name" },
+                  { key: "duration", label: "Project Timeline", placeholder: "e.g. 12 Weeks" },
+                  { key: "price", label: "Investment Protocol", placeholder: "e.g. Free / Premium" },
                 ].map(({ key, label, placeholder }) => (
-                  <div key={key}>
-                    <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 mb-2">{label}</label>
-                    <input value={createForm[key]} onChange={e => setCreateForm({ ...createForm, [key]: e.target.value })}
+                  <div key={key} className="group">
+                    <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-blue-500 mb-3 ml-1">{label}</label>
+                    <input required value={createForm[key]} onChange={e => setCreateForm({ ...createForm, [key]: e.target.value })}
                       placeholder={placeholder}
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-sm font-medium focus:border-blue-500 outline-none transition-all" />
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-5 text-sm font-medium focus:border-blue-500 outline-none transition-all placeholder:text-gray-700" />
                   </div>
                 ))}
               </div>
-              <button className="w-full mt-10 py-5 rounded-[2rem] bg-white text-black font-black text-lg hover:bg-gray-200 transition-all shadow-[0_0_30px_rgba(255,255,255,0.1)]">
-                Submit for Curation
+              
+              <div className="mt-8">
+                <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-blue-500 mb-3 ml-1">Curriculum Abstract</label>
+                <textarea 
+                  required
+                  rows={4}
+                  value={createForm.description}
+                  onChange={e => setCreateForm({ ...createForm, description: e.target.value })}
+                  className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-5 text-sm font-medium focus:border-blue-500 outline-none transition-all placeholder:text-gray-700 resize-none"
+                  placeholder="Summarize the core learning objectives..."
+                />
+              </div>
+
+              <button type="submit" disabled={loading} className="w-full mt-12 py-6 rounded-[2rem] bg-white text-black font-black text-lg hover:bg-gray-200 transition-all shadow-[0_0_50px_rgba(255,255,255,0.05)] uppercase tracking-widest">
+                {loading ? "SYNCHRONIZING..." : "Initialize Program"}
               </button>
-            </motion.div>
+            </motion.form>
           </div>
         )}
       </AnimatePresence>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-8 pt-20 pb-32">
+      <div className="relative z-10 max-w-7xl mx-auto px-8 pt-24 pb-32">
         
-        
-        <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-12 mb-20">
-          <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
-            <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-blue-500 mb-4">The Skill Repository</h4>
-            <h1 className="text-6xl md:text-7xl font-black tracking-tighter mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white to-gray-500">
-              Elevate Your <br /> Expertise.
+        <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-16 mb-24">
+          <motion.div initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 1, ease: "easeOut" }}>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="h-[2px] w-12 bg-blue-500" />
+              <h4 className="text-[10px] font-black uppercase tracking-[0.5em] text-blue-500">The Knowledge Matrix</h4>
+            </div>
+            <h1 className="text-7xl md:text-8xl font-black tracking-tighter mb-8 bg-clip-text text-transparent bg-gradient-to-b from-white to-gray-700 leading-tight">
+              Future-Proof <br /> Your Career.
             </h1>
-            <p className="text-lg text-gray-400 max-w-xl font-medium leading-relaxed">
-              Access an exclusive library of courses designed for the next generation of global leaders and innovators.
+            <p className="text-xl text-slate-400 max-w-2xl font-medium leading-relaxed">
+              Unlock industry-leading specializations curated by global experts. 
+              From deep-tech systems to executive leadership.
             </p>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
+          <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1 }}>
             {user && (
               <button onClick={() => setShowCreateModal(true)}
-                className="group flex items-center gap-4 px-10 py-5 bg-white text-black font-black rounded-full shadow-[0_20px_40px_rgba(255,255,255,0.1)] hover:scale-105 active:scale-95 transition-all">
-                <FiPlus className="w-6 h-6" /> Curate Program
+                className="group relative flex items-center gap-6 px-12 py-6 bg-white text-black font-black rounded-full overflow-hidden shadow-2xl transition-all hover:pr-14">
+                <span className="relative z-10">CURATE PROGRAM</span>
+                <FiPlus className="relative z-10 w-6 h-6 group-hover:rotate-90 transition-transform" />
+                <div className="absolute inset-0 bg-blue-500 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
               </button>
             )}
           </motion.div>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-          {[
-            { label: "Elite Courses", value: courses.length, icon: FiLayers, color: "text-blue-500" },
-            { label: "Active Learners", value: courses.reduce((a, c) => a + (c.enrollmentCount || 0), 0), icon: FiUsers, color: "text-purple-500" },
-            { label: "Specializations", value: CATEGORIES.length - 1, icon: FiBarChart2, color: "text-indigo-500" },
-          ].map((s, i) => (
-            <motion.div key={s.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 + i * 0.1 }}
-              className="group bg-white/[0.03] backdrop-blur-md rounded-[2.5rem] border border-white/5 p-8 hover:border-white/20 transition-all">
-              <s.icon className={`w-6 h-6 ${s.color} mb-6`} />
-              <div className="text-5xl font-black tracking-tighter mb-2">{s.value}</div>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">{s.label}</p>
-            </motion.div>
-          ))}
-        </div>
+        {/* Global Stats */}
+        <section className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-24">
+          <GlobalStat label="Curated Programs" value={courses.length} icon={FiZap} color="text-blue-400" />
+          <GlobalStat label="Active Nodes" value={courses.reduce((a, c) => a + (c.enrollmentCount || 0), 0)} icon={FiTarget} color="text-purple-400" />
+          <GlobalStat label="Global Reach" value="24/7" icon={FiLayers} color="text-emerald-400" />
+          <GlobalStat label="Mastery Rating" value="4.9/5" icon={FiStar} color="text-amber-400" />
+        </section>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
-          className="flex flex-col md:flex-row gap-4 mb-12">
+        {/* Discovery Interface */}
+        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
+          className="flex flex-col md:flex-row gap-6 mb-16">
           <div className="relative flex-1 group">
-            <FiSearch className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-500 transition-colors w-5 h-5" />
-            <input type="text" placeholder="Search Masterclasses..." value={search} onChange={e => setSearch(e.target.value)}
-              className="w-full pl-16 pr-8 py-5 rounded-3xl bg-white/[0.03] border border-white/10 text-sm font-bold focus:border-blue-500 outline-none transition-all placeholder:text-gray-600" />
+            <FiSearch className="absolute left-8 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-blue-500 transition-colors w-6 h-6" />
+            <input type="text" placeholder="Scan repositories..." value={search} onChange={e => setSearch(e.target.value)}
+              className="w-full pl-20 pr-8 py-6 rounded-[2.5rem] bg-white/[0.02] border border-white/5 text-sm font-bold focus:border-blue-500 outline-none transition-all placeholder:text-slate-700" />
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-4">
             <select value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)}
-              className="px-8 py-5 rounded-3xl bg-white/[0.03] border border-white/10 text-xs font-black uppercase tracking-widest outline-none cursor-pointer hover:bg-white/5 transition-all">
-              {CATEGORIES.map(c => <option key={c} className="bg-[#0a0a0a]">{c}</option>)}
+              className="px-10 py-6 rounded-[2.5rem] bg-white/[0.02] border border-white/5 text-[10px] font-black uppercase tracking-[0.2em] outline-none cursor-pointer hover:bg-white/5 hover:border-white/20 transition-all">
+              {CATEGORIES.map(c => <option key={c} className="bg-[#050508]">{c}</option>)}
             </select>
             <select value={selectedLevel} onChange={e => setSelectedLevel(e.target.value)}
-              className="px-8 py-5 rounded-3xl bg-white/[0.03] border border-white/10 text-xs font-black uppercase tracking-widest outline-none cursor-pointer hover:bg-white/5 transition-all">
-              {LEVELS.map(l => <option key={l} className="bg-[#0a0a0a]">{l}</option>)}
+              className="px-10 py-6 rounded-[2.5rem] bg-white/[0.02] border border-white/5 text-[10px] font-black uppercase tracking-[0.2em] outline-none cursor-pointer hover:bg-white/5 hover:border-white/20 transition-all">
+              {LEVELS.map(l => <option key={l} className="bg-[#050508]">{l}</option>)}
             </select>
           </div>
         </motion.div>
 
-        <motion.div variants={containerVariants} initial="hidden" animate="visible"
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filtered.map((course) => (
-            <motion.div key={course.id} variants={itemVariants}
-              className="group relative bg-white/[0.03] backdrop-blur-xl rounded-[3rem] border border-white/5 overflow-hidden hover:border-white/20 transition-all">
-              
-              <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${LEVEL_THEME[course.level] || LEVEL_THEME.Beginner} opacity-0 group-hover:opacity-100 transition-opacity`} />
-              
-              <div className="p-10 flex flex-col h-full">
-                <div className="flex justify-between items-center mb-8">
-                  <span className={`text-[9px] font-black uppercase tracking-[0.2em] px-4 py-1.5 rounded-full border border-white/10 bg-white/5`}>
-                    {course.level || "Beginner"}
-                  </span>
-                  <span className="text-xs font-bold text-blue-400">
-                    {course.price || "Free"}
-                  </span>
-                </div>
-
-                <h3 className="text-2xl font-black mb-4 leading-tight group-hover:text-blue-400 transition-colors">{course.title}</h3>
-                <p className="text-sm text-gray-500 mb-8 line-clamp-3 leading-relaxed font-medium">
-                  {course.description}
-                </p>
-
-                <div className="mt-auto pt-8 border-t border-white/5 flex flex-col gap-6">
-                  <div className="flex justify-between items-center text-[10px] font-bold text-gray-500 uppercase tracking-widest">
-                    <span className="flex items-center gap-2"><FiStar className="text-yellow-500"/> {course.instructor || "Expert"}</span>
-                    <span className="flex items-center gap-2"><FiClock/> {course.duration || "Self-paced"}</span>
-                  </div>
-                  
-                  <button
-                    onClick={() => handleEnroll(course.id)}
-                    className="w-full py-5 rounded-[2rem] bg-white/5 border border-white/10 text-white font-black text-xs uppercase tracking-[0.2em] group-hover:bg-white group-hover:text-black transition-all flex items-center justify-center gap-2"
-                  >
-                    {enrolling === course.id ? "Syncing..." : "Access Program"}
-                    <FiChevronRight className="transition-transform group-hover:translate-x-1" />
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
+        {/* Cinematic Grid */}
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            {[1, 2, 3].map(i => <div key={i} className="h-[500px] rounded-[3.5rem] bg-white/5 animate-pulse border border-white/5" />)}
+          </div>
+        ) : (
+          <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            <AnimatePresence>
+              {filtered.map((course, i) => (
+                <CourseCard 
+                  key={course.id} 
+                  course={course} 
+                  i={i} 
+                  onEnroll={() => handleEnroll(course.id)}
+                  isEnrolling={enrolling === course.id}
+                />
+              ))}
+            </AnimatePresence>
+          </motion.div>
+        )}
 
         {!loading && filtered.length === 0 && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="py-40 text-center">
-            <FiBook className="w-16 h-16 text-gray-800 mx-auto mb-6" />
-            <h3 className="text-3xl font-black text-gray-600">No programs found</h3>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="py-48 text-center">
+            <FiBook size={64} className="text-slate-800 mx-auto mb-8" />
+            <h3 className="text-4xl font-black text-slate-700 italic tracking-tight">No Entities Found In This Registry</h3>
           </motion.div>
         )}
       </div>
     </div>
   );
 };
+
+const GlobalStat = ({ label, value, icon: Icon, color }) => (
+  <motion.div whileHover={{ y: -8 }} className="bg-white/[0.02] backdrop-blur-xl rounded-[2.5rem] p-10 border border-white/5 hover:bg-white/[0.04] transition-all">
+    <div className={`p-4 rounded-2xl bg-white/5 ${color} mb-8 w-fit`}>
+      <Icon size={28} />
+    </div>
+    <div className="text-5xl font-black text-white tracking-tighter mb-2">{value}</div>
+    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600">{label}</p>
+  </motion.div>
+);
+
+const CourseCard = ({ course, i, onEnroll, isEnrolling }) => (
+  <motion.div
+    layout
+    initial={{ opacity: 0, scale: 0.9 }}
+    animate={{ opacity: 1, scale: 1 }}
+    exit={{ opacity: 0, scale: 0.9 }}
+    transition={{ delay: i * 0.05 }}
+    whileHover={{ y: -12 }}
+    className="group relative bg-white/[0.02] backdrop-blur-3xl rounded-[3.5rem] border border-white/5 overflow-hidden transition-all hover:bg-white/[0.06] hover:border-white/20 shadow-2xl"
+  >
+    <div className="p-12 flex flex-col h-full">
+      <div className="flex justify-between items-center mb-10">
+        <span className={`text-[9px] font-black uppercase tracking-[0.2em] px-5 py-2 rounded-full border border-white/10 ${LEVEL_COLORS[course.level] || "text-blue-400 bg-blue-400/10"}`}>
+          {course.level || "Beginner"}
+        </span>
+        <div className="flex items-center gap-2 text-xs font-black text-white italic">
+          <FiZap className="text-blue-500" /> {course.price || "FREE"}
+        </div>
+      </div>
+
+      <div className="mb-10">
+        <h3 className="text-3xl font-black text-white mb-6 leading-[1.1] tracking-tighter group-hover:text-blue-400 transition-colors">
+          {course.title}
+        </h3>
+        <p className="text-slate-400 text-sm line-clamp-3 leading-relaxed font-medium">
+          {course.description}
+        </p>
+      </div>
+
+      <div className="mt-auto pt-10 border-t border-white/5 flex flex-col gap-8">
+        <div className="grid grid-cols-2 gap-6">
+          <div className="flex flex-col gap-1">
+            <span className="text-[8px] font-black uppercase tracking-widest text-slate-600">Architect</span>
+            <span className="text-[10px] font-bold text-slate-300 truncate">{course.instructor || "Nexus Expert"}</span>
+          </div>
+          <div className="flex flex-col gap-1">
+            <span className="text-[8px] font-black uppercase tracking-widest text-slate-600">Timeline</span>
+            <span className="text-[10px] font-bold text-slate-300">{course.duration || "Self-Paced"}</span>
+          </div>
+        </div>
+        
+        <button
+          onClick={onEnroll}
+          className="w-full py-6 rounded-[2rem] bg-white text-black font-black text-[10px] uppercase tracking-[0.3em] group-hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 shadow-2xl"
+        >
+          {isEnrolling ? "SYNCHRONIZING..." : "ACCESS PROJECT"}
+          <FiChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+        </button>
+      </div>
+    </div>
+  </motion.div>
+);
 
 export default CoursesPage;
