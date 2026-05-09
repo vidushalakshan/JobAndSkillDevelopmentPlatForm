@@ -14,15 +14,11 @@ const CourseViewerPage = () => {
   useEffect(() => {
     const fetchCourse = async () => {
       try {
-        // We'll use the public endpoint if they are enrolled, 
-        // the backend logic ensures they can see it.
-        const res = await instance.get(`/courses/all`); // Simplification for demo
-        const found = res.data.find(c => c.id === parseInt(id));
-        if (found) setCourse(found);
-        else throw new Error("Not found");
+        const res = await instance.get(`/courses/${id}`);
+        setCourse(res.data);
       } catch (err) {
         toast.error("Failed to load project content.");
-        navigate("/activity");
+        navigate("/my-jobs");
       } finally {
         setLoading(false);
       }
@@ -38,14 +34,21 @@ const CourseViewerPage = () => {
 
   if (!course) return null;
 
-  // Use the videoUrl if available, otherwise a high-end placeholder
-  const videoSrc = course.videoUrl || "https://www.youtube.com/embed/dQw4w9WgXcQ"; // Placeholder
+  // Helper to convert standard YouTube URLs to Embed URLs
+  const getEmbedUrl = (url) => {
+    if (!url) return "https://www.youtube.com/embed/dQw4w9WgXcQ"; // Default placeholder
+    if (url.includes("youtube.com/embed/")) return url;
+    const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+    return match ? `https://www.youtube.com/embed/${match[1]}` : url;
+  };
+
+  const videoSrc = getEmbedUrl(course.videoUrl);
 
   return (
     <div className="min-h-screen bg-[#050508] text-slate-200">
       {/* Top Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-[#050508]/80 backdrop-blur-xl border-b border-white/5 px-8 py-6 flex items-center justify-between">
-        <button onClick={() => navigate("/activity")} className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 hover:text-white transition-all">
+        <button onClick={() => navigate("/my-jobs")} className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 hover:text-white transition-all">
           <FiArrowLeft className="w-4 h-4" /> Exit Console
         </button>
         <div className="flex flex-col items-center">

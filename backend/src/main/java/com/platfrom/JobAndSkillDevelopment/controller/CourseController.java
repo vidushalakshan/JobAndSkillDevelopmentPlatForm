@@ -25,6 +25,11 @@ public class CourseController {
         return ResponseEntity.ok(courseService.getPublishedCourses());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Course> getCourseById(@PathVariable Long id) {
+        return ResponseEntity.ok(courseService.getCourseById(id));
+    }
+
     // Authenticated - get own courses
     @GetMapping("/my")
     public ResponseEntity<List<Course>> getMyCourses() {

@@ -32,6 +32,10 @@ public class CourseService {
         return courseRepo.findByPublishedTrue();
     }
 
+    public Course getCourseById(Long id) {
+        return courseRepo.findById(id).orElseThrow(() -> new RuntimeException("Course not found"));
+    }
+
     public List<Course> getAllCourses() {
         return courseRepo.findAll();
     }

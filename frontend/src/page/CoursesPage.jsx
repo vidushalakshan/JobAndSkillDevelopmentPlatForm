@@ -33,14 +33,23 @@ const CoursesPage = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [createForm, setCreateForm] = useState({ 
     title: "", description: "", category: "IT Software", 
-    level: "Beginner", duration: "", price: "Free", instructor: "", syllabus: "" 
+    level: "Beginner", duration: "", price: "Free", instructor: "", syllabus: "",
+    videoUrl: "" 
   });
+  const [enrolledIds, setEnrolledIds] = useState(new Set());
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const res = await instance.get("/courses/published");
-        setCourses(res.data);
+        const [res, enrolledRes] = await Promise.allSettled([
+          instance.get("/courses/published"),
+          user ? instance.get("/courses/enrolled") : Promise.resolve({ data: [] })
+        ]);
+        
+        if (res.status === "fulfilled") setCourses(res.value.data);
+        if (enrolledRes.status === "fulfilled") {
+          setEnrolledIds(new Set(enrolledRes.value.data.map(c => c.id)));
+        }
       } catch (err) {
         toast.error("Network synchronization failed.");
       } finally {
@@ -48,14 +57,17 @@ const CoursesPage = () => {
       }
     };
     fetchCourses();
-  }, []);
+  }, [user]);
 
   const handleEnroll = async (id) => {
     if (!user) return navigate("/login");
+    if (enrolledIds.has(id)) return navigate(`/course/${id}/viewer`);
+    
     setEnrolling(id);
     try {
       await instance.post(`/courses/${id}/enroll`);
       toast.success("Program access granted.");
+      setEnrolledIds(prev => new Set([...prev, id]));
     } catch (err) {
       toast.error(err.response?.data?.message || "Protocol error.");
     } finally {
@@ -133,16 +145,28 @@ const CoursesPage = () => {
                 ))}
               </div>
               
-              <div className="mt-8">
-                <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-blue-500 mb-3 ml-1">Curriculum Abstract</label>
-                <textarea 
-                  required
-                  rows={4}
-                  value={createForm.description}
-                  onChange={e => setCreateForm({ ...createForm, description: e.target.value })}
-                  className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-5 text-sm font-medium focus:border-blue-500 outline-none transition-all placeholder:text-gray-700 resize-none"
-                  placeholder="Summarize the core learning objectives..."
-                />
+              <div className="mt-8 space-y-8">
+                <div>
+                  <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-blue-500 mb-3 ml-1">Curriculum Abstract</label>
+                  <textarea 
+                    required
+                    rows={4}
+                    value={createForm.description}
+                    onChange={e => setCreateForm({ ...createForm, description: e.target.value })}
+                    className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-5 text-sm font-medium focus:border-blue-500 outline-none transition-all placeholder:text-gray-700 resize-none"
+                    placeholder="Summarize the core learning objectives..."
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-blue-500 mb-3 ml-1">Content Repository (YouTube URL)</label>
+                  <input 
+                    value={createForm.videoUrl}
+                    onChange={e => setCreateForm({ ...createForm, videoUrl: e.target.value })}
+                    placeholder="e.g. https://www.youtube.com/watch?v=..."
+                    className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-5 text-sm font-medium focus:border-blue-500 outline-none transition-all placeholder:text-gray-700"
+                  />
+                </div>
               </div>
 
               <button type="submit" disabled={loading} className="w-full mt-12 py-6 rounded-[2rem] bg-white text-black font-black text-lg hover:bg-gray-200 transition-all shadow-[0_0_50px_rgba(255,255,255,0.05)] uppercase tracking-widest">
@@ -225,6 +249,7 @@ const CoursesPage = () => {
                   i={i} 
                   onEnroll={() => handleEnroll(course.id)}
                   isEnrolling={enrolling === course.id}
+                  enrolledIds={enrolledIds}
                 />
               ))}
             </AnimatePresence>
@@ -252,7 +277,7 @@ const GlobalStat = ({ label, value, icon: Icon, color }) => (
   </motion.div>
 );
 
-const CourseCard = ({ course, i, onEnroll, isEnrolling }) => (
+const CourseCard = ({ course, i, onEnroll, isEnrolling, enrolledIds }) => (
   <motion.div
     layout
     initial={{ opacity: 0, scale: 0.9 }}
@@ -297,7 +322,7 @@ const CourseCard = ({ course, i, onEnroll, isEnrolling }) => (
           onClick={onEnroll}
           className="w-full py-6 rounded-[2rem] bg-white text-black font-black text-[10px] uppercase tracking-[0.3em] group-hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 shadow-2xl"
         >
-          {isEnrolling ? "SYNCHRONIZING..." : "ACCESS PROJECT"}
+          {isEnrolling ? "SYNCHRONIZING..." : enrolledIds.has(course.id) ? "LAUNCH CONSOLE" : "ACCESS PROJECT"}
           <FiChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
         </button>
       </div>
