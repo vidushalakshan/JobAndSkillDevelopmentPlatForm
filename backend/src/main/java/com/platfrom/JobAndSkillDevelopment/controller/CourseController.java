@@ -37,7 +37,7 @@ public class CourseController {
     }
 
     @GetMapping("/enrolled")
-    public ResponseEntity<List<Course>> getEnrolledCourses() {
+    public ResponseEntity<List<com.platfrom.JobAndSkillDevelopment.entity.CourseEnrollment>> getEnrolledCourses() {
         return ResponseEntity.ok(courseService.getEnrolledCourses());
     }
 
