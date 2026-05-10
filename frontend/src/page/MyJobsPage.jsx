@@ -109,7 +109,7 @@ const MyJobsPage = () => {
                   CREATE COURSE <FiPlus className="w-4 h-4 text-blue-500" />
                 </Button>
               )}
-              <Button onClick={() => setShowModal(true)} variant="primary" size="small">
+              <Button onClick={() => setShowModal(true)} variant="primary" size="small" className="px-5">
                 POST JOB <FiPlus className="w-4 h-4" />
               </Button>
             </div>
