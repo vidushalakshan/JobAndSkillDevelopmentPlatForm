@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { GoogleLogin } from "@react-oauth/google";
+import { useGoogleLogin } from "@react-oauth/google";
 import instance from "../service/axios";
 
 import { useUser } from "../context/context";
@@ -14,6 +14,32 @@ import { Button } from "../common/Button";
 const SignUp = () => {
   const navigate = useNavigate();
   const { login } = useUser();
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        // Fetch user info using the access token
+        const userInfo = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo", {
+          headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+        });
+
+        const response = await instance.post("auth/google-custom", {
+          email: userInfo.data.email,
+          username: userInfo.data.name,
+          pictureUrl: userInfo.data.picture,
+        });
+
+        if (response.data.token) {
+          login(response.data);
+          toast.success("Google Login Successful!");
+          navigate("/");
+        }
+      } catch (error) {
+        console.error("Google Login Error:", error);
+        toast.error("Google Login failed.");
+      }
+    },
+  });
 
   const [formData, setFormData] = useState({
     username: "",
@@ -71,36 +97,13 @@ const SignUp = () => {
     }
   };
 
-  const handleGoogleSuccess = async (credentialResponse) => {
-    try {
-      const response = await instance.post("auth/google", {
-        idToken: credentialResponse.credential,
-      });
-
-      if (response.data.token) {
-        login({
-          token: response.data.token,
-          username: response.data.username,
-          email: response.data.email,
-          pictureUrl: response.data.pictureUrl,
-          role: response.data.role
-        });
-        toast.success("Google Sign Up Successful!");
-        setTimeout(() => navigate("/"), 1500);
-      }
-    } catch (error) {
-      console.error("Google Login Error:", error);
-      toast.error("Google Login failed.");
-    }
-  };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-[#0f172a] relative overflow-hidden px-4">
       <div className="absolute top-0 -left-4 w-72 h-72 bg-purple-300 dark:bg-purple-900 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
       <div className="absolute top-0 -right-4 w-72 h-72 bg-yellow-300 dark:bg-yellow-900 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
       <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 dark:bg-pink-900 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
 
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="bg-white dark:bg-white/5 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-3xl shadow-2xl w-full max-w-md p-8 relative z-10"
@@ -116,7 +119,7 @@ const SignUp = () => {
             <input
               type="text"
               name="username"
-              placeholder="John Doe"
+              placeholder="Vidusha Lakshan"
               value={formData.username}
               onChange={handleChange}
               required
@@ -128,7 +131,7 @@ const SignUp = () => {
             <input
               type="email"
               name="email"
-              placeholder="john@example.com"
+              placeholder="vidusha@gmail.com"
               value={formData.email}
               onChange={handleChange}
               required
@@ -151,7 +154,7 @@ const SignUp = () => {
           <Button
             type="submit"
             disabled={loading}
-            variant="bgBlack"
+            variant="primary"
             className="w-full"
             size="medium"
           >
@@ -169,13 +172,15 @@ const SignUp = () => {
         </div>
 
         <div className="flex justify-center mb-8">
-          <GoogleLogin
-            onSuccess={handleGoogleSuccess}
-            onError={() => toast.error("Google Login Failed")}
-            shape="pill"
-            theme="filled_blue"
-            width="320"
-          />
+          <Button
+            variant="bgBlack"
+            size="medium"
+            className="w-full border border-white/10 gap-3 bg-blue-600"
+            onClick={() => googleLogin()}
+          >
+            <FcGoogle className="text-xl" />
+            <span className="text-[14px]">Continue with Google</span>
+          </Button>
         </div>
 
         <div className="text-center text-sm text-gray-500 dark:text-gray-400">

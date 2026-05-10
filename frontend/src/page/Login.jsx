@@ -3,8 +3,9 @@ import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { GoogleLogin } from "@react-oauth/google";
+import { useGoogleLogin } from "@react-oauth/google";
 import instance from "../service/axios";
+import axios from "axios";
 import { useUser } from "../context/context";
 import { motion } from "framer-motion";
 import { Button } from "../common/Button";
@@ -12,6 +13,31 @@ import { Button } from "../common/Button";
 const Login = () => {
   const navigate = useNavigate();
   const { login } = useUser();
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        const userInfo = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo", {
+          headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+        });
+
+        const response = await instance.post("auth/google-custom", {
+          email: userInfo.data.email,
+          username: userInfo.data.name,
+          pictureUrl: userInfo.data.picture,
+        });
+
+        if (response.data.token) {
+          login(response.data);
+          toast.success("Google Login Successful!");
+          navigate("/");
+        }
+      } catch (error) {
+        console.error("Google Login Error:", error);
+        toast.error("Google Login failed.");
+      }
+    },
+  });
 
   const handleNavigateToSignup = () => {
     navigate("/signup");
@@ -78,28 +104,7 @@ const Login = () => {
     }
   };
 
-  const handleGoogleSuccess = async (credentialResponse) => {
-    try {
-      const response = await instance.post("auth/google", {
-        idToken: credentialResponse.credential,
-      });
 
-      if (response.data.token) {
-        login({
-          token: response.data.token,
-          username: response.data.username,
-          email: response.data.email,
-          pictureUrl: response.data.pictureUrl,
-          role: response.data.role
-        });
-        toast.success("Google Login Successful!");
-        setTimeout(() => navigate("/"), 1500);
-      }
-    } catch (error) {
-      console.error("Google Login Error:", error);
-      toast.error("Google Login failed.");
-    }
-  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-[#0f172a] relative overflow-hidden px-4">
@@ -168,13 +173,15 @@ const Login = () => {
         </div>
 
         <div className="flex justify-center mb-8">
-          <GoogleLogin
-            onSuccess={handleGoogleSuccess}
-            onError={() => toast.error("Google Login Failed")}
-            shape="pill"
-            theme="filled_blue"
-            width="320"
-          />
+          <Button
+            variant="bgBlack"
+            size="medium"
+            className="w-full border border-white/10 gap-3"
+            onClick={() => googleLogin()}
+          >
+            <FcGoogle className="text-xl" />
+            <span className="text-[14px]">Continue with Google</span>
+          </Button>
         </div>
 
         <div className="text-center text-sm text-gray-500 dark:text-gray-400">

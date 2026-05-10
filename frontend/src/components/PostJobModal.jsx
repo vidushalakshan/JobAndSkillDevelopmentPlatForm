@@ -7,6 +7,7 @@ import {
   FiCalendar, FiMail, FiLayers, FiChevronRight,
   FiChevronLeft, FiCheckCircle
 } from "react-icons/fi";
+import { Button } from "../common/Button";
 
 const JOB_CATEGORIES = [
   "IT Software", "IT Hardware", "IT Telecom", "Accounting",
@@ -56,7 +57,7 @@ const PostJobModal = ({ onClose, onCreated }) => {
   };
 
   return (
-    <div className="fixed inset-0-z-[200] flex items-center justify-center p-4 sm:p-6">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6">
       {/* Ultra-Dark Backdrop */}
       <motion.div
         initial={{ opacity: 0 }}
@@ -133,13 +134,14 @@ const PostJobModal = ({ onClose, onCreated }) => {
                     </div>
                   </div>
 
-                  <button
+                  <Button
                     type="button"
                     onClick={() => setStep(2)}
-                    className="w-full py-6 rounded-[2rem] bg-blue-600 text-white font-black text-sm hover:bg-blue-500 transition-all uppercase tracking-widest flex items-center justify-center gap-3 group"
+                    variant="primary"
+                    className="w-full py-8 text-[12px]"
                   >
                     Proceed to Details <FiChevronRight className="group-hover:translate-x-1 transition-transform" />
-                  </button>
+                  </Button>
                 </motion.div>
               ) : (
                 <motion.div
@@ -183,18 +185,19 @@ const PostJobModal = ({ onClose, onCreated }) => {
                     <button
                       type="button"
                       onClick={() => setStep(1)}
-                      className="p-6 rounded-[2rem] bg-white/5 text-slate-400 hover:text-white transition-all"
+                      className="p-6 rounded-[2.5rem] bg-white/5 text-slate-400 hover:text-white transition-all border border-white/5"
                     >
                       <FiChevronLeft size={24} />
                     </button>
-                    <button
+                    <Button
                       type="submit"
                       disabled={loading}
-                      className="flex-1 py-6 rounded-[2rem] bg-white text-black font-black text-sm hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] transition-all uppercase tracking-widest flex items-center justify-center gap-3"
+                      variant="primary"
+                      className="flex-1 py-8 text-[12px]"
                     >
                       {loading ? "Processing..." : "Finalize Posting"}
                       <FiCheckCircle />
-                    </button>
+                    </Button>
                   </div>
                 </motion.div>
               )}

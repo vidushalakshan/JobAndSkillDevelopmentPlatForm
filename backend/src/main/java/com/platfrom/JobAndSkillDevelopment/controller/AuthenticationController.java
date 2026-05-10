@@ -87,4 +87,27 @@ public class AuthenticationController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @PostMapping("/google-custom")
+    public ResponseEntity<?> googleLoginCustom(@RequestBody Map<String, String> payload) {
+        try {
+            String email = payload.get("email");
+            String username = payload.get("username");
+            String pictureUrl = payload.get("pictureUrl");
+            
+            User authenticatedUser = authenticationService.loginWithGoogleCustom(email, username, pictureUrl);
+            String jwtToken = jwtService.generateToken(authenticatedUser);
+            LoginResponse loginResponse = new LoginResponse(
+                jwtToken, 
+                jwtService.getExpirationTime(),
+                authenticatedUser.getUsername(),
+                authenticatedUser.getEmail(),
+                authenticatedUser.getPictureUrl(),
+                authenticatedUser.getRole().name()
+            );
+            return ResponseEntity.ok(loginResponse);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

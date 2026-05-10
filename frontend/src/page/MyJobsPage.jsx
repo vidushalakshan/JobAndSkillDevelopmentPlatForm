@@ -86,21 +86,33 @@ const MyJobsPage = () => {
             </p>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-4">
-            <div className="flex bg-white/5 p-1.5 rounded-2xl border border-white/10">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col sm:flex-row items-center gap-6">
+            <div className="flex bg-white/5 p-1.5 rounded-2xl border border-white/10 backdrop-blur-xl">
               <button onClick={() => setActiveTab("postings")}
-                className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'postings' ? 'bg-white text-black shadow-xl' : 'text-slate-500 hover:text-white'}`}>
+                className={`px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${activeTab === 'postings' ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.2)] scale-105' : 'text-slate-500 hover:text-white'}`}>
                 Postings
               </button>
               <button onClick={() => setActiveTab("learning")}
-                className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'learning' ? 'bg-white text-black shadow-xl' : 'text-slate-500 hover:text-white'}`}>
+                className={`px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${activeTab === 'learning' ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.2)] scale-105' : 'text-slate-500 hover:text-white'}`}>
                 Learning
               </button>
             </div>
             
-            <Button onClick={() => setShowModal(true)} variant="primary" size="small">
-              POST JOB <FiPlus className="w-4 h-4" />
-            </Button>
+            <div className="flex items-center gap-3">
+              {user?.role === "ADMIN" && (
+                <Button 
+                  onClick={() => navigate("/courses")} 
+                  variant="bgBlack" 
+                  size="small"
+                  className="border border-white/10"
+                >
+                  CREATE COURSE <FiPlus className="w-4 h-4 text-blue-500" />
+                </Button>
+              )}
+              <Button onClick={() => setShowModal(true)} variant="primary" size="small">
+                POST JOB <FiPlus className="w-4 h-4" />
+              </Button>
+            </div>
           </motion.div>
         </header>
 

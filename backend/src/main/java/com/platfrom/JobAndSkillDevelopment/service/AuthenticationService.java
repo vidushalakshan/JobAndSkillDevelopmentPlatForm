@@ -211,4 +211,22 @@ public class AuthenticationService {
         }
     }
 
+    public User loginWithGoogleCustom(String email, String name, String pictureUrl) {
+        return userRepository.findByEmail(email).map(user -> {
+            if (user.getPictureUrl() == null) {
+                user.setPictureUrl(pictureUrl);
+                return userRepository.save(user);
+            }
+            return user;
+        }).orElseGet(() -> {
+            User newUser = new User();
+            newUser.setEmail(email);
+            newUser.setUsername(name);
+            newUser.setPictureUrl(pictureUrl);
+            newUser.setPassword(passwordEncoder.encode(java.util.UUID.randomUUID().toString()));
+            newUser.setRole(Role.USER);
+            newUser.setEnabled(true);
+            return userRepository.save(newUser);
+        });
+    }
 }
