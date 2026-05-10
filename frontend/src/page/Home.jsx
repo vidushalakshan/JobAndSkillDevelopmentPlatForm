@@ -10,6 +10,7 @@ import { useUser } from "../context/context";
 import { useEffect, useState, useRef } from "react";
 import instance from "../service/axios";
 import ApplyModal from "../components/ApplyModal";
+import { Button } from "../common/Button";
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
@@ -93,12 +94,13 @@ const Home = () => {
             transition={{ delay: 0.3 }}
             className="flex flex-wrap justify-center gap-6"
           >
-            <button
+            <Button
               onClick={() => navigate(user ? "/courses" : "/signup")}
-              className="px-8 py-4 md:px-10 md:py-5 bg-blue-600 text-white rounded-xl font-bold text-lg hover:bg-blue-500 transition-all shadow-xl shadow-blue-600/20 flex items-center gap-3"
+              variant="primary"
+              size="large"
             >
               Start Learning Free <ArrowRightIcon className="w-5 h-5" />
-            </button>
+            </Button>
             {/* <button
               onClick={() => navigate("/jobs")}
               className="px-10 py-5 bg-slate-800/50 backdrop-blur-md border border-slate-700 rounded-xl font-bold text-lg text-white hover:bg-slate-700 transition-all flex items-center gap-3"
@@ -177,12 +179,12 @@ const Home = () => {
               <h2 className="text-4xl font-bold text-white mt-2">Active Career Openings</h2>
             </div>
             <div className="flex gap-4">
-               <button onClick={() => navigate("/jobs")} className="px-6 py-3 bg-white/5 border border-white/10 rounded-xl text-sm font-bold hover:bg-white/10 transition-colors">
+               <Button onClick={() => navigate("/jobs")} variant="secondary" size="small">
                 Advanced Filter
-               </button>
-               <button onClick={() => navigate("/jobs")} className="px-6 py-3 bg-blue-600 rounded-xl text-sm font-bold flex items-center gap-2">
+               </Button>
+               <Button onClick={() => navigate("/jobs")} variant="primary" size="small">
                  View All Careers <ArrowRightIcon className="w-4 h-4" />
-               </button>
+               </Button>
             </div>
           </div>
 
@@ -213,12 +215,13 @@ const Home = () => {
                     <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Starting at</p>
                     <p className="font-bold text-white">{job.salary || '$55k - $80k'}</p>
                   </div>
-                  <button 
+                  <Button 
                     onClick={() => setSelectedJob(job)}
-                    className="px-5 py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-500 transition-colors"
+                    variant="primary"
+                    size="small"
                   >
                     Details
-                  </button>
+                  </Button>
                 </div>
               </motion.div>
             )) : (

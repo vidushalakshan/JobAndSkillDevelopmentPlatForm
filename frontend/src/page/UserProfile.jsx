@@ -86,6 +86,50 @@ const UserProfile = () => {
     setSkillInput("");
   };
 
+  const handleSaveEdu = async () => {
+    try {
+      const res = await instance.post("/profile/education", eduForm);
+      setEducation([...education, res.data]);
+      setShowEduModal(false);
+      setEduForm({ institution: "", degree: "", fieldOfStudy: "", startYear: "", endYear: "", current: false });
+      toast.success("Education added.");
+    } catch (err) {
+      toast.error("Failed to add education.");
+    }
+  };
+
+  const handleDeleteEdu = async (id) => {
+    try {
+      await instance.delete(`/profile/education/${id}`);
+      setEducation(education.filter(e => e.id !== id));
+      toast.success("Education removed.");
+    } catch (err) {
+      toast.error("Failed to remove education.");
+    }
+  };
+
+  const handleSaveExp = async () => {
+    try {
+      const res = await instance.post("/profile/experience", expForm);
+      setExperience([...experience, res.data]);
+      setShowExpModal(false);
+      setExpForm({ company: "", role: "", description: "", startDate: "", endDate: "", current: false, location: "" });
+      toast.success("Experience added.");
+    } catch (err) {
+      toast.error("Failed to add experience.");
+    }
+  };
+
+  const handleDeleteExp = async (id) => {
+    try {
+      await instance.delete(`/profile/experience/${id}`);
+      setExperience(experience.filter(e => e.id !== id));
+      toast.success("Experience removed.");
+    } catch (err) {
+      toast.error("Failed to remove experience.");
+    }
+  };
+
   if (!user) return null;
 
   return (
@@ -254,14 +298,62 @@ const UserProfile = () => {
         {(showEduModal || showExpModal) && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => {setShowEduModal(false); setShowExpModal(false)}} className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
-            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="relative bg-[#111] border border-white/10 p-8 rounded-[3rem] w-full max-w-md shadow-2xl">
+            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="relative bg-[#111] border border-white/10 p-8 rounded-[3rem] w-full max-w-md shadow-2xl overflow-y-auto max-h-[90vh] no-scrollbar">
               <h2 className="text-2xl font-bold mb-6">{showEduModal ? "Academic Background" : "Work History"}</h2>
               <div className="space-y-4">
+                {showEduModal ? (
+                  <>
+                    <div>
+                      <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2 ml-1">Institution</label>
+                      <input value={eduForm.institution} onChange={e => setEduForm({...eduForm, institution: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-blue-500 outline-none transition-all placeholder:text-gray-600" placeholder="e.g. Stanford University" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2 ml-1">Degree</label>
+                      <input value={eduForm.degree} onChange={e => setEduForm({...eduForm, degree: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-blue-500 outline-none transition-all placeholder:text-gray-600" placeholder="e.g. B.S. Computer Science" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2 ml-1">Start Year</label>
+                        <input value={eduForm.startYear} onChange={e => setEduForm({...eduForm, startYear: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-blue-500 outline-none transition-all" placeholder="2018" />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2 ml-1">End Year</label>
+                        <input value={eduForm.endYear} onChange={e => setEduForm({...eduForm, endYear: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-blue-500 outline-none transition-all" placeholder="2022" />
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div>
+                      <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2 ml-1">Role / Title</label>
+                      <input value={expForm.role} onChange={e => setExpForm({...expForm, role: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-blue-500 outline-none transition-all placeholder:text-gray-600" placeholder="e.g. Senior Developer" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2 ml-1">Company</label>
+                      <input value={expForm.company} onChange={e => setExpForm({...expForm, company: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-blue-500 outline-none transition-all placeholder:text-gray-600" placeholder="e.g. Google" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2 ml-1">Description</label>
+                      <textarea rows="3" value={expForm.description} onChange={e => setExpForm({...expForm, description: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-blue-500 outline-none transition-all placeholder:text-gray-600 resize-none" placeholder="Key responsibilities and achievements..." />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2 ml-1">Start Date</label>
+                        <input type="date" value={expForm.startDate} onChange={e => setExpForm({...expForm, startDate: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-blue-500 outline-none transition-all [color-scheme:dark]" />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2 ml-1">End Date</label>
+                        <input type="date" value={expForm.endDate} onChange={e => setExpForm({...expForm, endDate: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-blue-500 outline-none transition-all [color-scheme:dark]" />
+                      </div>
+                    </div>
+                  </>
+                )}
+                
                  <button 
                   onClick={() => {
                     showEduModal ? handleSaveEdu() : handleSaveExp();
                   }}
-                  className="w-full py-4 rounded-2xl bg-blue-600 text-white font-bold hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20"
+                  className="w-full mt-4 py-4 rounded-2xl bg-blue-600 text-white font-bold hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20 uppercase tracking-widest text-sm"
                  >
                   Confirm Entry
                  </button>

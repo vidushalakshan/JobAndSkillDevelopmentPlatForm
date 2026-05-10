@@ -4,9 +4,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import instance from "../service/axios";
 import { useUser } from "../context/context";
 import { toast } from "react-toastify";
+import { Button } from "../common/Button";
 import {
   FiBook, FiSearch, FiClock, FiUsers,
-  FiStar, FiChevronRight, FiPlus, FiBarChart2, FiX, FiLayers, FiZap, FiTarget
+  FiStar, FiChevronRight, FiPlus, FiBarChart2, FiX, FiLayers, FiZap, FiTarget,
+  FiEdit3, FiUser, FiDollarSign, FiYoutube, FiFileText, FiAward
 } from "react-icons/fi";
 
 const LEVELS = ["All Levels", "Beginner", "Intermediate", "Advanced"];
@@ -102,7 +104,7 @@ const CoursesPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#050508] text-slate-200 selection:bg-blue-500/30 overflow-x-hidden font-sans">
+    <div className="h-screen bg-[#050508] text-slate-200 selection:bg-blue-500/30 overflow-hidden font-sans flex flex-col">
       
       {/* Background Ambience */}
       <div className="fixed inset-0 z-0 pointer-events-none">
@@ -112,13 +114,13 @@ const CoursesPage = () => {
 
       <AnimatePresence>
         {showCreateModal && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-6">
+          <div className="fixed inset-0 z-[200] flex items-center justify-center sm:p-6">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               onClick={() => setShowCreateModal(false)} className="absolute inset-0 bg-black/95 backdrop-blur-2xl" />
             <motion.form 
               onSubmit={handleSubmit}
               initial={{ opacity: 0, y: 50, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, scale: 0.9, y: 50 }}
-              className="relative bg-[#0a0a0a] border border-white/10 rounded-[3rem] shadow-2xl w-full max-w-4xl p-16 max-h-[90vh] overflow-y-auto no-scrollbar">
+              className="relative bg-white/[0.02] backdrop-blur-3xl border border-white/10 sm:rounded-[3rem] shadow-[0_0_100px_rgba(0,0,0,0.8)] w-full max-w-4xl p-10 sm:p-16 h-[100vh] sm:h-[95vh] overflow-y-auto no-scrollbar">
               
               <button type="button" onClick={() => setShowCreateModal(false)} className="absolute top-10 right-10 p-3 hover:bg-white/5 rounded-full transition-colors group">
                 <FiX size={24} className="text-gray-500 group-hover:text-white" />
@@ -140,7 +142,7 @@ const CoursesPage = () => {
                     <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-blue-500 mb-3 ml-1">{label}</label>
                     <input required value={createForm[key]} onChange={e => setCreateForm({ ...createForm, [key]: e.target.value })}
                       placeholder={placeholder}
-                      className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-5 text-sm font-medium focus:border-blue-500 outline-none transition-all placeholder:text-gray-700" />
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-5 text-sm font-medium focus:border-blue-500/50 focus:bg-blue-500/5 focus:shadow-[0_0_30px_rgba(59,130,246,0.1)] outline-none transition-all placeholder:text-gray-700" />
                   </div>
                 ))}
               </div>
@@ -153,7 +155,7 @@ const CoursesPage = () => {
                     rows={4}
                     value={createForm.description}
                     onChange={e => setCreateForm({ ...createForm, description: e.target.value })}
-                    className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-5 text-sm font-medium focus:border-blue-500 outline-none transition-all placeholder:text-gray-700 resize-none"
+                    className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-5 text-sm font-medium focus:border-blue-500/50 focus:bg-blue-500/5 focus:shadow-[0_0_30px_rgba(59,130,246,0.1)] outline-none transition-all placeholder:text-gray-700 resize-none"
                     placeholder="Summarize the core learning objectives..."
                   />
                 </div>
@@ -164,20 +166,20 @@ const CoursesPage = () => {
                     value={createForm.videoUrl}
                     onChange={e => setCreateForm({ ...createForm, videoUrl: e.target.value })}
                     placeholder="e.g. https://www.youtube.com/watch?v=..."
-                    className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-5 text-sm font-medium focus:border-blue-500 outline-none transition-all placeholder:text-gray-700"
+                    className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-5 text-sm font-medium focus:border-blue-500/50 focus:bg-blue-500/5 focus:shadow-[0_0_30px_rgba(59,130,246,0.1)] outline-none transition-all placeholder:text-gray-700"
                   />
                 </div>
               </div>
 
-              <button type="submit" disabled={loading} className="w-full mt-12 py-6 rounded-[2rem] bg-white text-black font-black text-lg hover:bg-gray-200 transition-all shadow-[0_0_50px_rgba(255,255,255,0.05)] uppercase tracking-widest">
+              <Button type="submit" disabled={loading} variant="primary" size="large" className="w-full mt-12 uppercase tracking-widest">
                 {loading ? "SYNCHRONIZING..." : "Initialize Program"}
-              </button>
+              </Button>
             </motion.form>
           </div>
         )}
       </AnimatePresence>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-8 pt-24 pb-32">
+      <div className="relative z-10 max-w-7xl mx-auto px-8 pt-24 pb-32 flex-1 overflow-y-auto w-full no-scrollbar">
         
         <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-16 mb-24">
           <motion.div initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 1, ease: "easeOut" }}>
@@ -195,14 +197,9 @@ const CoursesPage = () => {
           </motion.div>
 
           <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1 }}>
-            {user && (
-              <button onClick={() => setShowCreateModal(true)}
-                className="group relative flex items-center gap-6 px-12 py-6 bg-white text-black font-black rounded-full overflow-hidden shadow-2xl transition-all hover:pr-14">
-                <span className="relative z-10">CURATE PROGRAM</span>
-                <FiPlus className="relative z-10 w-6 h-6 group-hover:rotate-90 transition-transform" />
-                <div className="absolute inset-0 bg-blue-500 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
-              </button>
-            )}
+              <Button onClick={() => setShowCreateModal(true)} variant="primary" size="large">
+                CURATE PROGRAM <FiPlus className="w-6 h-6" />
+              </Button>
           </motion.div>
         </header>
 
@@ -334,17 +331,15 @@ const CourseCard = ({ course, i, onEnroll, isEnrolling, enrolledIds }) => (
           </div>
         </div>
         
-        <button
+        <Button
           onClick={onEnroll}
-          className={`w-full py-6 rounded-[2rem] font-black text-[10px] uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-3 shadow-2xl ${
-            enrolledIds.has(course.id) 
-            ? 'bg-blue-600 text-white hover:bg-blue-500' 
-            : 'bg-white text-black hover:bg-blue-400 hover:text-white'
-          }`}
+          variant={enrolledIds.has(course.id) ? "primary" : "bgBlack"}
+          size="medium"
+          className="w-full"
         >
           {isEnrolling ? "SYNCHRONIZING..." : enrolledIds.has(course.id) ? "WATCH NOW" : "ACCESS PROJECT"}
-          <FiChevronRight className={`w-4 h-4 transition-transform ${enrolledIds.has(course.id) ? 'group-hover:translate-x-1' : ''}`} />
-        </button>
+          <FiChevronRight className="w-4 h-4" />
+        </Button>
       </div>
     </div>
   </motion.div>

@@ -5,6 +5,7 @@ import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import { toast } from "react-toastify";
 import instance from "../service/axios";
 import PostJobModal from "../components/PostJobModal";
+import { Button } from "../common/Button";
 import {
   FiBriefcase, FiClock, FiCheckCircle, FiXCircle,
   FiPlus, FiArrowLeft, FiMapPin, FiActivity,
@@ -97,12 +98,9 @@ const MyJobsPage = () => {
               </button>
             </div>
             
-            <button onClick={() => setShowModal(true)}
-              className="group relative flex items-center gap-3 px-8 py-4 bg-blue-600 text-white font-black text-[10px] uppercase tracking-widest rounded-2xl overflow-hidden transition-all"
-            >
-              <span className="relative z-10">POST JOB</span>
-              <FiPlus className="relative z-10 w-4 h-4 group-hover:rotate-90 transition-transform" />
-            </button>
+            <Button onClick={() => setShowModal(true)} variant="primary" size="small">
+              POST JOB <FiPlus className="w-4 h-4" />
+            </Button>
           </motion.div>
         </header>
 
@@ -235,9 +233,9 @@ const EmptyState = ({ onAction, title, actionText, icon: Icon = FiBriefcase }) =
       <Icon size={40} className="text-slate-700" />
     </div>
     <h3 className="text-3xl font-black text-white mb-6 italic tracking-tight">{title}</h3>
-    <button onClick={onAction} className="px-10 py-4 bg-white text-black font-black text-[10px] uppercase tracking-widest rounded-2xl shadow-2xl hover:bg-gray-100 transition-all">
+    <Button onClick={onAction} variant="primary" size="medium">
       {actionText}
-    </button>
+    </Button>
   </motion.div>
 );
 

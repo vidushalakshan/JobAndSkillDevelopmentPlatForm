@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import instance from "../service/axios";
 import { toast } from "react-toastify";
+import { Button } from "../common/Button";
 import {
   FiSearch, FiFilter, FiMapPin, FiAward, 
   FiChevronRight, FiUsers, FiCpu, FiTrendingUp
@@ -96,9 +97,9 @@ const TalentSearch = () => {
               className="w-full pl-16 pr-8 py-6 rounded-3xl bg-white/[0.03] border border-white/10 text-base font-medium focus:outline-none focus:border-blue-500 focus:bg-white/[0.05] transition-all placeholder:text-gray-600" 
             />
           </div>
-          <button className="px-10 py-6 bg-white text-black rounded-3xl font-black flex items-center justify-center gap-3 hover:bg-gray-200 active:scale-95 transition-all shadow-2xl shadow-white/5 uppercase text-xs tracking-widest">
+          <Button variant="primary" size="medium">
             <FiFilter /> Filter Search
-          </button>
+          </Button>
         </motion.div>
 
         {loading ? (
@@ -159,9 +160,9 @@ const TalentSearch = () => {
                     </div>
 
                     <div className="pt-8 border-t border-white/5">
-                      <button className="w-full py-5 rounded-[2rem] bg-white/[0.03] border border-white/5 text-white font-black text-xs uppercase tracking-widest hover:bg-white hover:text-black transition-all flex items-center justify-center gap-2">
+                      <Button variant="bgBlack" size="medium" className="w-full">
                         Inspect Profile <FiChevronRight />
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 </motion.div>

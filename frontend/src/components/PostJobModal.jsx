@@ -2,7 +2,11 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import instance from "../service/axios";
 import { toast } from "react-toastify";
-import { FiX, FiBriefcase, FiMapPin, FiDollarSign, FiCalendar, FiMail, FiLayers } from "react-icons/fi";
+import {
+  FiX, FiBriefcase, FiMapPin, FiDollarSign,
+  FiCalendar, FiMail, FiLayers, FiChevronRight,
+  FiChevronLeft, FiCheckCircle
+} from "react-icons/fi";
 
 const JOB_CATEGORIES = [
   "IT Software", "IT Hardware", "IT Telecom", "Accounting",
@@ -10,6 +14,7 @@ const JOB_CATEGORIES = [
 ];
 
 const PostJobModal = ({ onClose, onCreated }) => {
+  const [step, setStep] = useState(1);
   const [form, setForm] = useState({
     title: "", description: "", location: "",
     type: "IT Software", salary: "", deadline: "",
@@ -22,11 +27,11 @@ const PostJobModal = ({ onClose, onCreated }) => {
     setLoading(true);
     try {
       await instance.post("/job/create", form);
-      toast.success("Engagement request submitted successfully.");
+      toast.success("Opportunity broadcasted to the network.");
       if (onCreated) onCreated();
       onClose();
     } catch (err) {
-      toast.error(err.response?.data?.message || "Internal submission error.");
+      toast.error(err.response?.data?.message || "Submission failed.");
     } finally {
       setLoading(false);
     }
@@ -34,166 +39,188 @@ const PostJobModal = ({ onClose, onCreated }) => {
 
   const handleChange = (field) => (e) => setForm({ ...form, [field]: e.target.value });
 
-  return (
-    <AnimatePresence>
-      <div className="fixed inset-0 z-[200] flex items-center justify-center p-6">
-        <motion.div 
-          initial={{ opacity: 0 }} 
-          animate={{ opacity: 1 }} 
-          exit={{ opacity: 0 }}
-          onClick={onClose} 
-          className="absolute inset-0 bg-black/90 backdrop-blur-xl" 
-        />
+  // Animation Variants
+  const containerVariants = {
+    hidden: { opacity: 0, scale: 0.9, y: 40 },
+    visible: {
+      opacity: 1, scale: 1, y: 0,
+      transition: { type: "spring", damping: 20, stiffness: 300 }
+    },
+    exit: { opacity: 0, scale: 0.95, y: 20 }
+  };
 
-        <motion.div 
-          initial={{ opacity: 0, y: 50, scale: 0.9 }} 
-          animate={{ opacity: 1, y: 0, scale: 1 }} 
-          exit={{ opacity: 0, scale: 0.9, y: 50 }}
-          className="relative bg-[#0a0a0a] border border-white/10 rounded-[3rem] shadow-2xl w-full max-w-2xl p-12 overflow-hidden"
+  const stepVariants = {
+    initial: (dir) => ({ x: dir > 0 ? 50 : -50, opacity: 0 }),
+    animate: { x: 0, opacity: 1 },
+    exit: (dir) => ({ x: dir > 0 ? -50 : 50, opacity: 0 })
+  };
+
+  return (
+    <div className="fixed inset-0-z-[200] flex items-center justify-center p-4 sm:p-6">
+      {/* Ultra-Dark Backdrop */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="fixed inset-0 bg-[#020205]/95 backdrop-blur-2xl"
+      />
+
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+        className="relative bg-[#08080a] border border-white/10 rounded-[3.5rem] shadow-[0_0_100px_rgba(0,0,0,0.8)] w-full max-w-3xl overflow-y-auto max-h-[90vh] no-scrollbar"
+      >
+        {/* Animated Gradient Border Top */}
+        <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-blue-600 via-indigo-400 to-purple-600 animate-pulse" />
+
+        <button
+          onClick={onClose}
+          className="absolute top-10 right-10 p-3 bg-white/5 hover:bg-white/10 rounded-full transition-all group z-50"
         >
-          {/* Decorative Glow */}
-          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-600" />
-          
-          <button 
-            onClick={onClose} 
-            className="absolute top-8 right-8 p-2 hover:bg-white/5 rounded-full transition-colors group"
-          >
-            <FiX size={24} className="text-gray-500 group-hover:text-white" />
-          </button>
-          
-          <div className="mb-10">
-            <h2 className="text-4xl font-black mb-2 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-500 tracking-tighter">
-              Define Requirement
-            </h2>
-            <p className="text-gray-500 font-medium tracking-wide text-sm">
-              Publish your professional opportunity to our elite talent pool.
-            </p>
+          <FiX size={20} className="text-slate-400 group-hover:text-white group-hover:rotate-90 transition-transform" />
+        </button>
+
+        <div className="p-10 sm:p-16">
+          {/* Progress Indicator */}
+          <div className="flex items-center gap-3 mb-12">
+            {[1, 2].map((i) => (
+              <div
+                key={i}
+                className={`h-1 rounded-full transition-all duration-500 ${step >= i ? 'w-12 bg-blue-500' : 'w-6 bg-white/10'}`}
+              />
+            ))}
+            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] ml-2">Phase 0{step}</span>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-8">
-            <div className="space-y-6">
-              {/* Title Input */}
-              <div className="relative group">
-                <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 mb-3 ml-1">Opportunity Title</label>
-                <div className="relative">
-                  <FiBriefcase className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-500 transition-colors" />
-                  <input 
-                    required 
-                    value={form.title} 
-                    onChange={handleChange("title")} 
-                    placeholder="e.g. Lead System Architect"
-                    className="w-full bg-white/[0.03] border border-white/10 rounded-2xl pl-14 pr-6 py-4 text-sm font-medium focus:border-blue-500 outline-none transition-all placeholder:text-gray-700" 
-                  />
-                </div>
-              </div>
+          <form onSubmit={handleSubmit}>
+            <AnimatePresence mode="wait" custom={step}>
+              {step === 1 ? (
+                <motion.div
+                  key="step1"
+                  custom={1}
+                  variants={stepVariants}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  className="space-y-10"
+                >
+                  <header>
+                    <h2 className="text-5xl font-black text-white tracking-tighter mb-4">Core <span className="text-blue-500 italic">Identity.</span></h2>
+                    <p className="text-slate-500 font-medium">Define the primary parameters of this professional engagement.</p>
+                  </header>
 
-              {/* Description Textarea */}
-              <div className="group">
-                <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 mb-3 ml-1">Scope & Responsibilities</label>
-                <textarea 
-                  required 
-                  rows={4} 
-                  value={form.description} 
-                  onChange={handleChange("description")} 
-                  placeholder="Describe the technical requirements and project goals..."
-                  className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-4 text-sm font-medium focus:border-blue-500 outline-none transition-all placeholder:text-gray-700 resize-none" 
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="group">
-                  <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 mb-3 ml-1">Location</label>
-                  <div className="relative">
-                    <FiMapPin className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-500 transition-colors" />
-                    <input 
-                      required 
-                      value={form.location} 
-                      onChange={handleChange("location")} 
-                      placeholder="e.g. Remote / Colombo"
-                      className="w-full bg-white/[0.03] border border-white/10 rounded-2xl pl-14 pr-6 py-4 text-sm font-medium focus:border-blue-500 outline-none transition-all placeholder:text-gray-700" 
+                  <div className="space-y-8">
+                    <InputField
+                      label="Requirement Title"
+                      icon={FiBriefcase}
+                      value={form.title}
+                      onChange={handleChange("title")}
+                      placeholder="e.g. Senior Cloud Architect"
                     />
+                    <div className="group">
+                      <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-4 ml-1">Context & Scope</label>
+                      <textarea
+                        required
+                        rows={5}
+                        value={form.description}
+                        onChange={handleChange("description")}
+                        placeholder="Detail the technical stack and expectations..."
+                        className="w-full bg-white/[0.03] border border-white/5 rounded-3xl px-8 py-6 text-sm font-medium focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/5 outline-none transition-all placeholder:text-slate-700 resize-none text-white"
+                      />
+                    </div>
                   </div>
-                </div>
-                <div className="group">
-                  <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 mb-3 ml-1">Compensation Range</label>
-                  <div className="relative">
-                    <FiDollarSign className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-500 transition-colors" />
-                    <input 
-                      value={form.salary} 
-                      onChange={handleChange("salary")} 
-                      placeholder="e.g. $120k - $150k"
-                      className="w-full bg-white/[0.03] border border-white/10 rounded-2xl pl-14 pr-6 py-4 text-sm font-medium focus:border-blue-500 outline-none transition-all placeholder:text-gray-700" 
-                    />
-                  </div>
-                </div>
-              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="group">
-                  <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 mb-3 ml-1">Industry Vertical</label>
-                  <div className="relative">
-                    <FiLayers className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-500 transition-colors pointer-events-none" />
-                    <select 
-                      value={form.type} 
-                      onChange={handleChange("type")}
-                      className="w-full bg-white/[0.03] border border-white/10 rounded-2xl pl-14 pr-6 py-4 text-sm font-medium focus:border-blue-500 outline-none transition-all appearance-none cursor-pointer"
+                  <button
+                    type="button"
+                    onClick={() => setStep(2)}
+                    className="w-full py-6 rounded-[2rem] bg-blue-600 text-white font-black text-sm hover:bg-blue-500 transition-all uppercase tracking-widest flex items-center justify-center gap-3 group"
+                  >
+                    Proceed to Details <FiChevronRight className="group-hover:translate-x-1 transition-transform" />
+                  </button>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="step2"
+                  custom={1}
+                  variants={stepVariants}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  className="space-y-10"
+                >
+                  <header>
+                    <h2 className="text-5xl font-black text-white tracking-tighter mb-4">Final <span className="text-blue-500 italic">Metrics.</span></h2>
+                    <p className="text-slate-500 font-medium">Logistics, compensation, and submission deadlines.</p>
+                  </header>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <InputField label="Geography" icon={FiMapPin} value={form.location} onChange={handleChange("location")} placeholder="Remote / Global" />
+                    <InputField label="Compensation" icon={FiDollarSign} value={form.salary} onChange={handleChange("salary")} placeholder="Fixed or Range" />
+
+                    <div className="group">
+                      <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-4 ml-1">Industry</label>
+                      <div className="relative">
+                        <FiLayers className="absolute left-7 top-1/2 -translate-y-1/2 text-slate-500" />
+                        <select
+                          value={form.type}
+                          onChange={handleChange("type")}
+                          className="w-full bg-white/[0.03] border border-white/5 rounded-[1.5rem] pl-16 pr-8 py-5 text-sm font-bold focus:border-blue-500/50 outline-none transition-all appearance-none cursor-pointer text-white"
+                        >
+                          {JOB_CATEGORIES.map(c => <option key={c} value={c} className="bg-[#0a0a0a]">{c}</option>)}
+                        </select>
+                      </div>
+                    </div>
+
+                    <InputField label="Deadline" icon={FiCalendar} type="date" value={form.deadline} onChange={handleChange("deadline")} />
+                  </div>
+
+                  <InputField label="Direct Liaison" icon={FiMail} type="email" value={form.contactEmail} onChange={handleChange("contactEmail")} placeholder="lead@company.com" />
+
+                  <div className="flex gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setStep(1)}
+                      className="p-6 rounded-[2rem] bg-white/5 text-slate-400 hover:text-white transition-all"
                     >
-                      {JOB_CATEGORIES.map(c => <option key={c} value={c} className="bg-[#0a0a0a]">{c}</option>)}
-                    </select>
+                      <FiChevronLeft size={24} />
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="flex-1 py-6 rounded-[2rem] bg-white text-black font-black text-sm hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] transition-all uppercase tracking-widest flex items-center justify-center gap-3"
+                    >
+                      {loading ? "Processing..." : "Finalize Posting"}
+                      <FiCheckCircle />
+                    </button>
                   </div>
-                </div>
-                <div className="group">
-                  <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 mb-3 ml-1">Submission Deadline</label>
-                  <div className="relative">
-                    <FiCalendar className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-500 transition-colors" />
-                    <input 
-                      type="date" 
-                      required 
-                      value={form.deadline} 
-                      onChange={handleChange("deadline")}
-                      className="w-full bg-white/[0.03] border border-white/10 rounded-2xl pl-14 pr-6 py-4 text-sm font-medium focus:border-blue-500 outline-none transition-all text-gray-300" 
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="group">
-                <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 mb-3 ml-1">Direct Contact Email</label>
-                <div className="relative">
-                  <FiMail className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-500 transition-colors" />
-                  <input 
-                    required 
-                    type="email" 
-                    value={form.contactEmail} 
-                    onChange={handleChange("contactEmail")} 
-                    placeholder="employer@corporate.com"
-                    className="w-full bg-white/[0.03] border border-white/10 rounded-2xl pl-14 pr-6 py-4 text-sm font-medium focus:border-blue-500 outline-none transition-all placeholder:text-gray-700" 
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="flex gap-4 pt-4">
-              <button 
-                type="button" 
-                onClick={onClose}
-                className="flex-1 py-5 rounded-[2rem] bg-white/5 border border-white/10 text-gray-500 font-black text-sm hover:bg-white/10 hover:text-white transition-all uppercase tracking-widest"
-              >
-                Cancel
-              </button>
-              <button 
-                type="submit" 
-                disabled={loading}
-                className="flex-1 py-5 rounded-[2rem] bg-white text-black font-black text-sm shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:bg-gray-200 active:scale-95 transition-all uppercase tracking-widest disabled:opacity-50"
-              >
-                {loading ? "Processing..." : "Publish Requirement"}
-              </button>
-            </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </form>
-        </motion.div>
-      </div>
-    </AnimatePresence>
+        </div>
+      </motion.div>
+    </div>
   );
 };
+
+// Reusable Sub-component for Inputs
+const InputField = ({ label, icon: Icon, ...props }) => (
+  <div className="group relative">
+    <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-4 ml-1 group-focus-within:text-blue-500 transition-colors">
+      {label}
+    </label>
+    <div className="relative">
+      <Icon className="absolute left-7 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-500 transition-colors" />
+      <input
+        required
+        {...props}
+        className="w-full bg-white/[0.03] border border-white/5 rounded-[1.5rem] pl-16 pr-8 py-5 text-sm font-bold focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/5 outline-none transition-all placeholder:text-slate-700 text-white"
+      />
+    </div>
+  </div>
+);
 
 export default PostJobModal;

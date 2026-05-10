@@ -66,7 +66,7 @@ const PostJobModal = ({ onClose, onCreated, isAdmin }) => {
         initial={{ opacity: 0, scale: 0.9, y: 40 }} 
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 40 }}
-        className="relative z-10 bg-white dark:bg-[#0d0d1a] border border-white/10 rounded-[3rem] shadow-2xl w-full max-w-xl p-10 overflow-hidden"
+        className="relative z-10 bg-white dark:bg-[#0d0d1a] border border-white/10 rounded-[3rem] shadow-2xl w-full max-w-xl p-10 overflow-y-auto max-h-[90vh] no-scrollbar"
       >
         <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-blue-600 via-purple-500 to-indigo-600"></div>
         
@@ -150,12 +150,12 @@ const CreateCourseModal = ({ onClose, onCreated }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[150] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[150] flex items-center justify-center sm:p-4">
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         onClick={onClose} className="absolute inset-0 bg-black/80 backdrop-blur-xl" />
       
       <motion.div initial={{ opacity: 0, scale: 0.9, y: 40 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 40 }}
-        className="relative z-10 bg-[#0d0d1a] border border-white/10 rounded-[3rem] shadow-2xl w-full max-w-2xl p-12 overflow-hidden"
+        className="relative z-10 bg-[#0d0d1a] border border-white/10 sm:rounded-[3rem] shadow-2xl w-full max-w-2xl p-8 sm:p-12 h-[100vh] sm:h-[95vh] overflow-y-auto no-scrollbar"
       >
         <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-emerald-500 via-teal-400 to-blue-500"></div>
         <h2 className="text-4xl font-black text-white mb-2 tracking-tighter">Initialize Global Project</h2>

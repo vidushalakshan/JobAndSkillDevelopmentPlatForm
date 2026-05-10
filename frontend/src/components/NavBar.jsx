@@ -13,6 +13,7 @@ import {
 import ThemeToggle from "./ThemeToggle";
 import { useNavigate, NavLink, useLocation } from "react-router-dom";
 import { useUser } from "../context/context";
+import { Button } from "../common/Button";
 
 const Nav = () => {
   const navigate = useNavigate();
@@ -152,12 +153,13 @@ const Nav = () => {
               </AnimatePresence>
             </div>
           ) : (
-            <button
-              className="px-6 py-2.5 rounded-xl text-sm font-black bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/20 transition-all active:scale-95"
+            <Button
+              variant="primary"
+              size="small"
               onClick={() => navigate("/signup")}
             >
               Get Started
-            </button>
+            </Button>
           )}
         </div>
       </motion.div>

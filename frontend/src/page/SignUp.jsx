@@ -9,6 +9,7 @@ import instance from "../service/axios";
 
 import { useUser } from "../context/context";
 import { motion } from "framer-motion";
+import { Button } from "../common/Button";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -147,13 +148,15 @@ const SignUp = () => {
             />
           </div>
 
-          <button
+          <Button
             type="submit"
             disabled={loading}
-            className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-blue-500/30 transition-all transform hover:scale-[1.02] active:scale-95 disabled:opacity-50"
+            variant="bgBlack"
+            className="w-full"
+            size="medium"
           >
             {loading ? "Creating Account..." : "Sign Up"}
-          </button>
+          </Button>
         </form>
 
         <div className="relative my-8">

@@ -46,7 +46,7 @@ const ApplyModal = ({ job, onClose }) => {
           transition: { type: "spring", damping: 25, stiffness: 300 } 
         }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        className="bg-[#0b0f1a] rounded-[2.5rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)] w-full max-w-xl relative z-10 border border-white/10 overflow-hidden"
+        className="bg-[#0b0f1a] rounded-[2.5rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)] w-full max-w-xl relative z-10 border border-white/10 overflow-y-auto max-h-[90vh] no-scrollbar"
       >
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-50" />
 
