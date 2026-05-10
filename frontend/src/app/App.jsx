@@ -12,6 +12,7 @@ import UserProfile from '../page/UserProfile';
 import CoursesPage from '../page/CoursesPage';
 import TalentSearch from '../page/TalentSearch';
 import CourseViewerPage from '../page/CourseViewerPage';
+import AiResumeParser from '../components/ai/AiResumeParser';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path="/courses" element={<CoursesPage />} />
         <Route path="/talents" element={<TalentSearch />} />
         <Route path="/profile" element={<UserProfile />} />
+        <Route path="/ai-resume" element={<AiResumeParser />} />
       </Route>
       
       <Route path="/login" element={<Login />} />

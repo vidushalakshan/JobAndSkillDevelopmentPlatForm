@@ -17,9 +17,9 @@ export const NotificationProvider = ({ children }) => {
         if (!user) return;
         try {
             const res = await instance.get('/notifications');
-            setNotifications(res.data);
+            setNotifications(res.data.data || []);
             const countRes = await instance.get('/notifications/unread-count');
-            setUnreadCount(countRes.data);
+            setUnreadCount(countRes.data.data || 0);
         } catch (err) {
             console.error("Failed to fetch notifications:", err);
         }
@@ -34,7 +34,7 @@ export const NotificationProvider = ({ children }) => {
             client.debug = null; // Disable console logging for cleaner UI
 
             client.connect({}, () => {
-                client.subscribe(`/user/${user.email}/queue/notifications`, (msg) => {
+                client.subscribe(`/user/queue/notifications`, (msg) => {
                     const newNotif = JSON.parse(msg.body);
                     setNotifications(prev => [newNotif, ...prev]);
                     setUnreadCount(prev => prev + 1);

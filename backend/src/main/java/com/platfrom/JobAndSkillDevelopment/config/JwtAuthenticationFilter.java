@@ -47,10 +47,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 "/api/v1//getjobs",
                 "/auth/login",
                 "/auth/register",
-                "/auth/verify"
+                "/auth/verify",
+                "/api/ai/"
         );
 
-        return publicEndpoints.contains(path);
+        return publicEndpoints.stream().anyMatch(path::startsWith);
     }
 
     @Override

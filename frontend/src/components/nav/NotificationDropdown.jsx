@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { BellIcon, CheckCircleIcon, InformationCircleIcon, BriefcaseIcon } from "@heroicons/react/24/outline";
+import { BellIcon, CheckCircleIcon, InformationCircleIcon, BriefcaseIcon, AcademicCapIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { useNotifications } from "../../context/NotificationContext";
 
 const NotificationDropdown = () => {
@@ -43,16 +43,29 @@ const NotificationDropdown = () => {
                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-700">No signals detected</p>
                   </div>
                 ) : (
-                  notifications.map((notif) => (
-                    <button
-                      key={notif.id}
-                      onClick={() => { markAsRead(notif.id); }}
-                      className={`w-full p-5 rounded-3xl text-left transition-all border ${notif.read ? "bg-transparent border-transparent opacity-50" : "bg-white/5 border-white/5 hover:bg-white/10"}`}
-                    >
-                      <div className="flex gap-4">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${notif.type === 'JOB_UPDATE' ? 'bg-blue-500/20 text-blue-500' : 'bg-slate-500/20 text-slate-500'}`}>
-                          {notif.type === 'JOB_UPDATE' ? <BriefcaseIcon className="w-5 h-5" /> : <InformationCircleIcon className="w-5 h-5" />}
-                        </div>
+                  notifications.map((notif) => {
+                    const Icon = {
+                      'JOB_UPDATE': BriefcaseIcon,
+                      'ENROLLMENT': AcademicCapIcon,
+                      'PROFILE_VIEW': UserCircleIcon,
+                    }[notif.type] || InformationCircleIcon;
+
+                    const Color = {
+                      'JOB_UPDATE': 'bg-blue-500/20 text-blue-500',
+                      'ENROLLMENT': 'bg-green-500/20 text-green-500',
+                      'PROFILE_VIEW': 'bg-purple-500/20 text-purple-500',
+                    }[notif.type] || 'bg-slate-500/20 text-slate-500';
+
+                    return (
+                      <button
+                        key={notif.id}
+                        onClick={() => { markAsRead(notif.id); }}
+                        className={`w-full p-5 rounded-3xl text-left transition-all border ${notif.read ? "bg-transparent border-transparent opacity-50" : "bg-white/5 border-white/5 hover:bg-white/10"}`}
+                      >
+                        <div className="flex gap-4">
+                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${Color}`}>
+                            <Icon className="w-5 h-5" />
+                          </div>
                         <div className="min-w-0">
                           <p className="text-sm font-black text-white truncate uppercase tracking-tight italic">{notif.title}</p>
                           <p className="text-xs text-slate-500 leading-relaxed mt-1">{notif.message}</p>
@@ -60,8 +73,9 @@ const NotificationDropdown = () => {
                         </div>
                         {!notif.read && <div className="w-2 h-2 rounded-full bg-blue-600 shrink-0 mt-2" />}
                       </div>
-                    </button>
-                  ))
+                      </button>
+                    );
+                  })
                 )}
               </div>
 

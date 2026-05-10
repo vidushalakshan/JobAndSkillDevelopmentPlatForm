@@ -10,12 +10,25 @@ import org.springframework.context.annotation.Bean;
 public class JobAndSkillDevelopmentApplication {
 
 	public static void main(String[] args) {
-		Dotenv dotenv = Dotenv.load();
-		System.setProperty("JWT_SECRET_KEY", dotenv.get("JWT_SECRET_KEY"));
-		System.setProperty("SUPPORT_EMAIL", dotenv.get("SUPPORT_EMAIL"));
-		System.setProperty("APP_PASSWORD", dotenv.get("APP_PASSWORD"));
-		System.setProperty("GOOGLE_CLIENT_ID", dotenv.get("GOOGLE_CLIENT_ID"));
+		// This makes it work whether you run from root or from /backend
+		Dotenv dotenv = Dotenv.configure()
+				.ignoreIfMissing()
+				.load();
+		
+		// If not found in current folder, try looking one level up
+		if (dotenv.get("GEMINI_API_KEY") == null) {
+			dotenv = Dotenv.configure()
+					.directory("..")
+					.ignoreIfMissing()
+					.load();
+		}
 
+		System.setProperty("JWT_SECRET_KEY", dotenv.get("JWT_SECRET_KEY") != null ? dotenv.get("JWT_SECRET_KEY") : "");
+		System.setProperty("SUPPORT_EMAIL", dotenv.get("SUPPORT_EMAIL") != null ? dotenv.get("SUPPORT_EMAIL") : "");
+		System.setProperty("APP_PASSWORD", dotenv.get("APP_PASSWORD") != null ? dotenv.get("APP_PASSWORD") : "");
+		System.setProperty("GOOGLE_CLIENT_ID", dotenv.get("GOOGLE_CLIENT_ID") != null ? dotenv.get("GOOGLE_CLIENT_ID") : "");
+		System.setProperty("GEMINI_API_KEY", dotenv.get("GEMINI_API_KEY") != null ? dotenv.get("GEMINI_API_KEY") : "");
+		
 		SpringApplication.run(JobAndSkillDevelopmentApplication.class, args);
 	}
 

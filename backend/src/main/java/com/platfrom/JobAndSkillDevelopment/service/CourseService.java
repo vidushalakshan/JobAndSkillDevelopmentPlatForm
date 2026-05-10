@@ -17,11 +17,13 @@ public class CourseService {
     private final CourseRepo courseRepo;
     private final UserRepo userRepo;
     private final com.platfrom.JobAndSkillDevelopment.repository.CourseEnrollmentRepository enrollmentRepo;
+    private final NotificationService notificationService;
 
-    public CourseService(CourseRepo courseRepo, UserRepo userRepo, com.platfrom.JobAndSkillDevelopment.repository.CourseEnrollmentRepository enrollmentRepo) {
+    public CourseService(CourseRepo courseRepo, UserRepo userRepo, com.platfrom.JobAndSkillDevelopment.repository.CourseEnrollmentRepository enrollmentRepo, NotificationService notificationService) {
         this.courseRepo = courseRepo;
         this.userRepo = userRepo;
         this.enrollmentRepo = enrollmentRepo;
+        this.notificationService = notificationService;
     }
 
     private User getCurrentUser() {
@@ -100,6 +102,14 @@ public class CourseService {
             
             course.setEnrollmentCount(course.getEnrollmentCount() + 1);
             courseRepo.save(course);
+
+            // Notify Instructor
+            notificationService.sendNotification(
+                course.getUser(),
+                "New Enrollment",
+                user.getUsername() + " has joined your course: " + course.getTitle(),
+                com.platfrom.JobAndSkillDevelopment.entity.NotificationType.ENROLLMENT
+            );
         }
         
         return course;

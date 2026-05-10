@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { FiArrowLeft, FiPlus } from "react-icons/fi";
 import { Button } from "../../common/Button";
 
-const ActivityHeader = ({ user, activeTab, setActiveTab, navigate, setShowModal }) => {
+const ActivityHeader = ({ user, activeTab, setActiveTab, navigate, setShowModal, setShowCourseModal }) => {
   return (
     <header className="flex flex-col lg:flex-row lg:items-end justify-between gap-10 mb-16">
       <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }}>
@@ -34,11 +34,9 @@ const ActivityHeader = ({ user, activeTab, setActiveTab, navigate, setShowModal 
         </div>
         
         <div className="flex items-center gap-4">
-          {user.role === "ADMIN" && (
-            <Button onClick={() => navigate("/courses")} variant="bgBlack" size="small" className="!px-5 border border-blue-500/20 text-blue-400">
-              CREATE COURSE <FiPlus className="w-4 h-4 ml-2" />
-            </Button>
-          )}
+          <Button onClick={() => setShowCourseModal(true)} variant="bgBlack" size="small" className="!px-5 border border-blue-500/20 text-blue-400">
+            CREATE COURSE <FiPlus className="w-4 h-4 ml-2" />
+          </Button>
           <Button onClick={() => setShowModal(true)} variant="primary" size="small" className="px-5 shadow-[0_10px_20px_rgba(37,99,235,0.2)]">
             POST JOB <FiPlus className="w-4 h-4 ml-2" />
           </Button>

@@ -10,6 +10,7 @@ import ActivityHeader from "../components/activity/ActivityHeader";
 import JobPostingsList from "../components/activity/JobPostingsList";
 import LearningTrackList from "../components/activity/LearningTrackList";
 import PostJobModal from "../components/PostJobModal";
+import CreateCourseModal from "../components/course/CreateCourseModal";
 
 const MyJobsPage = () => {
   const { user } = useUser();
@@ -18,7 +19,13 @@ const MyJobsPage = () => {
   const [enrolledCourses, setEnrolledCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [showCourseModal, setShowCourseModal] = useState(false);
   const [activeTab, setActiveTab] = useState("postings");
+  const [courseForm, setCourseForm] = useState({ 
+    title: "", description: "", category: "IT Software", 
+    level: "Beginner", duration: "", price: "Free", instructor: "", syllabus: "",
+    videoUrl: "", thumbnail: ""
+  });
 
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
@@ -45,6 +52,21 @@ const MyJobsPage = () => {
     else fetchData();
   }, [user, navigate]);
 
+  const handleCourseSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await instance.post("/courses", courseForm);
+      toast.success("Project blueprint submitted for review.");
+      setShowCourseModal(false);
+      fetchData();
+    } catch (err) {
+      toast.error("Protocol initialization failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleDelete = async (id) => {
     if (!window.confirm("Permanently remove this posting?")) return;
     try {
@@ -69,6 +91,16 @@ const MyJobsPage = () => {
 
       <AnimatePresence>
         {showModal && <PostJobModal onClose={() => setShowModal(false)} onCreated={fetchData} />}
+        {showCourseModal && (
+          <CreateCourseModal 
+            isOpen={showCourseModal} 
+            onClose={() => setShowCourseModal(false)} 
+            onSubmit={handleCourseSubmit}
+            form={courseForm}
+            setForm={setCourseForm}
+            loading={loading}
+          />
+        )}
       </AnimatePresence>
 
       <main className="max-w-7xl mx-auto px-6 py-20">
@@ -78,6 +110,7 @@ const MyJobsPage = () => {
           setActiveTab={setActiveTab} 
           navigate={navigate} 
           setShowModal={setShowModal} 
+          setShowCourseModal={setShowCourseModal}
         />
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>

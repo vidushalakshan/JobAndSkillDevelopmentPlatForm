@@ -11,7 +11,8 @@ import {
   ChevronDownIcon,
   Bars3Icon,
   XMarkIcon,
-  MagnifyingGlassIcon
+  MagnifyingGlassIcon,
+  SparklesIcon
 } from "@heroicons/react/24/outline";
 import ThemeToggle from "./ThemeToggle";
 import { useNavigate, NavLink, useLocation } from "react-router-dom";
@@ -42,6 +43,7 @@ const Nav = () => {
     { label: "Courses", to: "/courses", icon: <AcademicCapIcon className="w-4 h-4" /> },
     { label: "Talents", to: "/talents", icon: <UserGroupIcon className="w-4 h-4" /> },
     { label: "Find Jobs", to: "/jobs", icon: <BriefcaseIcon className="w-4 h-4" /> },
+    { label: "AI Resume", to: "/ai-resume", icon: <SparklesIcon className="w-4 h-4 text-purple-500" /> },
   ];
 
   return (

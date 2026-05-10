@@ -32,12 +32,6 @@ const CoursesPage = () => {
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [selectedLevel, setSelectedLevel] = useState("All Levels");
   const [enrolling, setEnrolling] = useState(null);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [createForm, setCreateForm] = useState({ 
-    title: "", description: "", category: "IT Software", 
-    level: "Beginner", duration: "", price: "Free", instructor: "", syllabus: "",
-    videoUrl: "" 
-  });
   const [enrolledIds, setEnrolledIds] = useState(new Set());
 
   useEffect(() => {
@@ -86,22 +80,6 @@ const CoursesPage = () => {
     return matchSearch && matchCat && matchLevel;
   }), [courses, search, selectedCategory, selectedLevel]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      await instance.post("/courses", createForm);
-      toast.success("Project blueprint submitted for review.");
-      setShowCreateModal(false);
-      // Refresh list
-      const res = await instance.get("/courses/published");
-      setCourses(res.data);
-    } catch (err) {
-      toast.error("Protocol initialization failed.");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="h-screen bg-[#050508] text-slate-200 selection:bg-blue-500/30 overflow-hidden font-sans flex flex-col">
@@ -112,72 +90,6 @@ const CoursesPage = () => {
         <div className="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] bg-indigo-600/5 blur-[180px] rounded-full" />
       </div>
 
-      <AnimatePresence>
-        {showCreateModal && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center sm:p-6">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={() => setShowCreateModal(false)} className="absolute inset-0 bg-black/95 backdrop-blur-2xl" />
-            <motion.form 
-              onSubmit={handleSubmit}
-              initial={{ opacity: 0, y: 50, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, scale: 0.9, y: 50 }}
-              className="relative bg-white/[0.02] backdrop-blur-3xl border border-white/10 sm:rounded-[3rem] shadow-[0_0_100px_rgba(0,0,0,0.8)] w-full max-w-4xl p-10 sm:p-16 h-[100vh] sm:h-[95vh] overflow-y-auto no-scrollbar">
-              
-              <button type="button" onClick={() => setShowCreateModal(false)} className="absolute top-10 right-10 p-3 hover:bg-white/5 rounded-full transition-colors group">
-                <FiX size={24} className="text-gray-500 group-hover:text-white" />
-              </button>
-              
-              <div className="mb-12">
-                <h2 className="text-5xl font-black mb-3 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-600 tracking-tighter">Architect Learning</h2>
-                <p className="text-gray-500 font-medium tracking-wide">Synthesize your expertise into a world-class educational experience.</p>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {[
-                  { key: "title", label: "Program Designation", placeholder: "e.g. Full-Stack Systems Design" },
-                  { key: "instructor", label: "Lead Architect", placeholder: "Your Name" },
-                  { key: "duration", label: "Project Timeline", placeholder: "e.g. 12 Weeks" },
-                  { key: "price", label: "Investment Protocol", placeholder: "e.g. Free / Premium" },
-                ].map(({ key, label, placeholder }) => (
-                  <div key={key} className="group">
-                    <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-blue-500 mb-3 ml-1">{label}</label>
-                    <input required value={createForm[key]} onChange={e => setCreateForm({ ...createForm, [key]: e.target.value })}
-                      placeholder={placeholder}
-                      className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-5 text-sm font-medium focus:border-blue-500/50 focus:bg-blue-500/5 focus:shadow-[0_0_30px_rgba(59,130,246,0.1)] outline-none transition-all placeholder:text-gray-700" />
-                  </div>
-                ))}
-              </div>
-              
-              <div className="mt-8 space-y-8">
-                <div>
-                  <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-blue-500 mb-3 ml-1">Curriculum Abstract</label>
-                  <textarea 
-                    required
-                    rows={4}
-                    value={createForm.description}
-                    onChange={e => setCreateForm({ ...createForm, description: e.target.value })}
-                    className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-5 text-sm font-medium focus:border-blue-500/50 focus:bg-blue-500/5 focus:shadow-[0_0_30px_rgba(59,130,246,0.1)] outline-none transition-all placeholder:text-gray-700 resize-none"
-                    placeholder="Summarize the core learning objectives..."
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-blue-500 mb-3 ml-1">Content Repository (YouTube URL)</label>
-                  <input 
-                    value={createForm.videoUrl}
-                    onChange={e => setCreateForm({ ...createForm, videoUrl: e.target.value })}
-                    placeholder="e.g. https://www.youtube.com/watch?v=..."
-                    className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-5 text-sm font-medium focus:border-blue-500/50 focus:bg-blue-500/5 focus:shadow-[0_0_30px_rgba(59,130,246,0.1)] outline-none transition-all placeholder:text-gray-700"
-                  />
-                </div>
-              </div>
-
-              <Button type="submit" disabled={loading} variant="primary" size="large" className="w-full mt-12 uppercase tracking-widest">
-                {loading ? "SYNCHRONIZING..." : "Initialize Program"}
-              </Button>
-            </motion.form>
-          </div>
-        )}
-      </AnimatePresence>
 
       <div className="relative z-10 max-w-7xl mx-auto px-8 pt-24 pb-32 flex-1 overflow-y-auto w-full no-scrollbar">
         
@@ -196,11 +108,6 @@ const CoursesPage = () => {
             </p>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1 }}>
-              <Button onClick={() => setShowCreateModal(true)} variant="primary" size="large">
-                CURATE PROGRAM <FiPlus className="w-6 h-6" />
-              </Button>
-          </motion.div>
         </header>
 
         {/* Global Stats */}
@@ -285,7 +192,7 @@ const CourseCard = ({ course, i, onEnroll, isEnrolling, enrolledIds }) => (
   >
     <div className="relative aspect-video overflow-hidden">
       <img 
-        src={course.thumbnail || `https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2070&auto=format&fit=crop`} 
+        src={course.thumbnail || `https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2070&auto=format&fit=crop`} 
         className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 grayscale-[0.3] group-hover:grayscale-0"
         alt={course.title}
       />

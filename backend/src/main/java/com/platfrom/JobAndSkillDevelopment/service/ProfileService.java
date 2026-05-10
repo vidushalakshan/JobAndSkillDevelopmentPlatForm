@@ -20,11 +20,13 @@ public class ProfileService {
     private final EducationRepo educationRepo;
     private final WorkExperienceRepo workExperienceRepo;
     private final UserRepo userRepo;
+    private final NotificationService notificationService;
 
-    public ProfileService(EducationRepo educationRepo, WorkExperienceRepo workExperienceRepo, UserRepo userRepo) {
+    public ProfileService(EducationRepo educationRepo, WorkExperienceRepo workExperienceRepo, UserRepo userRepo, NotificationService notificationService) {
         this.educationRepo = educationRepo;
         this.workExperienceRepo = workExperienceRepo;
         this.userRepo = userRepo;
+        this.notificationService = notificationService;
     }
 
     private User getCurrentUser() {
@@ -85,7 +87,23 @@ public class ProfileService {
     }
 
     public User getPublicProfile(Long userId) {
-        return userRepo.findById(userId)
+        User targetUser = userRepo.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        try {
+            User viewer = getCurrentUser();
+            if (!viewer.getId().equals(targetUser.getId())) {
+                notificationService.sendNotification(
+                    targetUser,
+                    "Profile View",
+                    viewer.getUsername() + " viewed your profile.",
+                    com.platfrom.JobAndSkillDevelopment.entity.NotificationType.PROFILE_VIEW
+                );
+            }
+        } catch (Exception e) {
+            // Viewer is anonymous or system error, skip notification
+        }
+        
+        return targetUser;
     }
 }

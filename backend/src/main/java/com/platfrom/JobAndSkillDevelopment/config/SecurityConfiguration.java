@@ -44,8 +44,10 @@ public class SecurityConfiguration {
                                 "/courses/published",
                                 "/profile/talents",
                                 "/profile/talents/**",
-                                "/ws-nexus/**"
+                                "/ws-nexus/**",
+                                "/api/ai/**"
                         ).permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/job/all", "/job/pending", "/job/admin-create", "/job/*/status").hasRole("ADMIN")
                         .requestMatchers("/apply/all", "/apply/*/status").hasRole("ADMIN")
                         .requestMatchers("/users/", "/users/*/role").hasRole("ADMIN")
@@ -64,8 +66,8 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("https://app-backend.com","http://localhost:5173","http://localhost:8080"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+        configuration.setAllowedOrigins(List.of("https://app-backend.com","http://localhost:5173","http://localhost:8080","http://localhost:8081"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
