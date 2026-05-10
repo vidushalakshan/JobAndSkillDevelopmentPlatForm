@@ -31,7 +31,7 @@ export const Button = ({
 
   const hoverBgAnimation =
     variant === "primary"
-      ? "before:absolute before:top-0 before:left-0 before:h-full before:w-0 hover:before:w-full before:bg-orange-600 before:z-0 before:transition-all before:duration-500 before:ease-in-out before:shadow-[0_4px_12px_rgba(33,137,255,0.3)]"
+      ? "before:absolute before:top-0 before:left-0 before:h-full before:w-0 hover:before:w-full before:bg-blue-600 before:z-0 before:transition-all before:duration-500 before:ease-in-out before:shadow-[0_4px_12px_rgba(33,137,255,0.3)]"
       : variant === "bgBlack"
       ? "before:absolute before:top-0 before:left-0 before:h-full before:w-0 hover:before:w-full  before:bg-[#4d4f4e] before:z-0 before:transition-all before:duration-500 before:ease-in-out before:shadow-[0_4px_12px_rgba(33,137,255,0.4)]"
       : "";

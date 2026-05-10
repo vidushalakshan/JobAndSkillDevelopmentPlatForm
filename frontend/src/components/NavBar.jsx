@@ -67,7 +67,7 @@ const Nav = () => {
           <div className="bg-blue-600 p-2 rounded-xl shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform">
              <img src={navLogo} alt="Logo" className="w-8 h-8 object-contain brightness-0 invert" />
           </div>
-          <span className="text-xl font-black tracking-tighter text-gray-900 dark:text-white uppercase">
+          <span className="text-xl font-black tracking-tighter text-gray-200 dark:text-white uppercase">
             Career<span className="text-blue-600">Flow</span>
           </span>
         </div>
@@ -82,7 +82,7 @@ const Nav = () => {
                 relative flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold transition-all duration-300
                 ${isActive 
                   ? "bg-white dark:bg-white/10 text-blue-600 dark:text-blue-400 shadow-sm" 
-                  : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"}
+                  : "text-gray-300 dark:text-gray-300 hover:text-white dark:hover:text-white"}
               `}
             >
               {icon}
@@ -156,7 +156,8 @@ const Nav = () => {
             <Button
               variant="primary"
               size="small"
-              onClick={() => navigate("/signup")}
+              onClick={() => navigate("/signup")} 
+              className="px-5"
             >
               Get Started
             </Button>
