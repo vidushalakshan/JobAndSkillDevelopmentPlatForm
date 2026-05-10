@@ -110,7 +110,6 @@ const CoursesPage = () => {
 
         </header>
 
-        {/* Global Stats */}
         <section className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-24">
           <GlobalStat label="Curated Programs" value={courses.length} icon={FiZap} color="text-blue-400" />
           <GlobalStat label="Active Nodes" value={courses.reduce((a, c) => a + (c.enrollmentCount || 0), 0)} icon={FiTarget} color="text-purple-400" />
@@ -118,7 +117,6 @@ const CoursesPage = () => {
           <GlobalStat label="Mastery Rating" value="4.9/5" icon={FiStar} color="text-amber-400" />
         </section>
 
-        {/* Discovery Interface */}
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
           className="flex flex-col md:flex-row gap-6 mb-16">
           <div className="relative flex-1 group">
@@ -138,7 +136,6 @@ const CoursesPage = () => {
           </div>
         </motion.div>
 
-        {/* Cinematic Grid */}
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
             {[1, 2, 3].map(i => <div key={i} className="h-[500px] rounded-[3.5rem] bg-white/5 animate-pulse border border-white/5" />)}
@@ -205,7 +202,6 @@ const CourseCard = ({ course, i, onEnroll, isEnrolling, enrolledIds }) => (
     </div>
 
     <div className="p-12 flex flex-col flex-1 relative">
-      {/* Background Decor */}
       <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/5 blur-[80px] rounded-full pointer-events-none" />
       
       <div className="flex items-center gap-6 mb-8">
