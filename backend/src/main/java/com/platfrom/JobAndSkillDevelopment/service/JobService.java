@@ -49,6 +49,10 @@ public class JobService {
         return jobRepo.save(job);
     }
 
+    public JobPost getJobById(Long jobId) {
+        return jobRepo.findById(jobId).orElseThrow(() -> new RuntimeException("Job not found"));
+    }
+
     public void deleteJob(Long jobId) {
         jobRepo.deleteById(jobId);
     }

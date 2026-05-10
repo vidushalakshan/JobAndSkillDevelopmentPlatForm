@@ -1,9 +1,12 @@
 package com.platfrom.JobAndSkillDevelopment.controller;
 
 import com.platfrom.JobAndSkillDevelopment.dto.JobRequest;
+import com.platfrom.JobAndSkillDevelopment.dto.JobResponseDTO;
 import com.platfrom.JobAndSkillDevelopment.entity.JobPost;
 import com.platfrom.JobAndSkillDevelopment.entity.JobStatus;
 import com.platfrom.JobAndSkillDevelopment.entity.User;
+import com.platfrom.JobAndSkillDevelopment.mapper.DtoMapper;
+import com.platfrom.JobAndSkillDevelopment.responses.ApiResponse;
 import com.platfrom.JobAndSkillDevelopment.service.JobService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -11,20 +14,22 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/job")
 @CrossOrigin(origins = "http://localhost:5173")
 public class JobController {
     private final JobService jobService;
+    private final DtoMapper dtoMapper;
 
-    public JobController(JobService jobService) {
+    public JobController(JobService jobService, DtoMapper dtoMapper) {
         this.jobService = jobService;
+        this.dtoMapper = dtoMapper;
     }
 
-    // Any logged-in user can submit a job — goes to PENDING for admin approval
     @PostMapping("/create")
-    public ResponseEntity<JobPost> createJob(@RequestBody JobRequest jobRequest, @AuthenticationPrincipal User user) {
+    public ResponseEntity<ApiResponse<JobResponseDTO>> createJob(@RequestBody JobRequest jobRequest, @AuthenticationPrincipal User user) {
         JobPost job = new JobPost();
         job.setTitle(jobRequest.getTitle());
         job.setDescription(jobRequest.getDescription());
@@ -33,13 +38,14 @@ public class JobController {
         job.setSalary(jobRequest.getSalary());
         job.setDeadline(jobRequest.getDeadline());
         job.setContactEmail(jobRequest.getContactEmail());
-        return ResponseEntity.ok(jobService.createJob(job, user));
+        
+        JobPost savedJob = jobService.createJob(job, user);
+        return ResponseEntity.ok(ApiResponse.success(dtoMapper.toJobDTO(savedJob), "Job submitted for review."));
     }
 
-    // Admin can post a job that is immediately APPROVED
     @PostMapping("/admin-create")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<JobPost> adminCreateJob(@RequestBody JobRequest jobRequest, @AuthenticationPrincipal User user) {
+    public ResponseEntity<ApiResponse<JobResponseDTO>> adminCreateJob(@RequestBody JobRequest jobRequest, @AuthenticationPrincipal User user) {
         JobPost job = new JobPost();
         job.setTitle(jobRequest.getTitle());
         job.setDescription(jobRequest.getDescription());
@@ -48,59 +54,60 @@ public class JobController {
         job.setSalary(jobRequest.getSalary());
         job.setDeadline(jobRequest.getDeadline());
         job.setContactEmail(jobRequest.getContactEmail());
-        return ResponseEntity.ok(jobService.createJobAsAdmin(job, user));
+        
+        JobPost savedJob = jobService.createJobAsAdmin(job, user);
+        return ResponseEntity.ok(ApiResponse.success(dtoMapper.toJobDTO(savedJob), "Job posted and approved."));
     }
 
-    // Admin: get all jobs
     @GetMapping("/all")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> getAllJobs() {
-        try {
-            return ResponseEntity.ok(jobService.getAllJobs());
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error fetching all jobs: " + e.getMessage());
-        }
+    public ResponseEntity<ApiResponse<List<JobResponseDTO>>> getAllJobs() {
+        List<JobResponseDTO> jobs = jobService.getAllJobs().stream()
+                .map(dtoMapper::toJobDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(ApiResponse.success(jobs, "All records retrieved."));
     }
 
-    // Admin: get only pending jobs (approval queue)
     @GetMapping("/pending")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> getPendingJobs() {
-        try {
-            return ResponseEntity.ok(jobService.getPendingJobs());
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error fetching pending jobs: " + e.getMessage());
-        }
+    public ResponseEntity<ApiResponse<List<JobResponseDTO>>> getPendingJobs() {
+        List<JobResponseDTO> jobs = jobService.getPendingJobs().stream()
+                .map(dtoMapper::toJobDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(ApiResponse.success(jobs, "Approval queue retrieved."));
     }
 
-    // Public: get approved jobs
     @GetMapping("/approved")
-    public ResponseEntity<?> getApprovedJobs() {
-        try {
-            return ResponseEntity.ok(jobService.getApprovedJobs());
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error fetching approved jobs: " + e.getMessage());
-        }
+    public ResponseEntity<ApiResponse<List<JobResponseDTO>>> getApprovedJobs() {
+        List<JobResponseDTO> jobs = jobService.getApprovedJobs().stream()
+                .map(dtoMapper::toJobDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(ApiResponse.success(jobs, "Market data synchronized."));
     }
 
-    // Logged-in user: get their own job posts
     @GetMapping("/my")
-    public ResponseEntity<List<JobPost>> getMyJobs(@AuthenticationPrincipal User user) {
-        return ResponseEntity.ok(jobService.getMyJobs(user));
+    public ResponseEntity<ApiResponse<List<JobResponseDTO>>> getMyJobs(@AuthenticationPrincipal User user) {
+        List<JobResponseDTO> jobs = jobService.getMyJobs(user).stream()
+                .map(dtoMapper::toJobDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(ApiResponse.success(jobs, "Personal deployments retrieved."));
     }
 
-    // Admin: approve or reject a job
     @PutMapping("/{id}/status")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<JobPost> updateStatus(@PathVariable Long id, @RequestParam JobStatus status) {
-        return ResponseEntity.ok(jobService.updateStatus(id, status));
+    public ResponseEntity<ApiResponse<JobResponseDTO>> updateStatus(@PathVariable Long id, @RequestParam JobStatus status) {
+        JobPost updated = jobService.updateStatus(id, status);
+        return ResponseEntity.ok(ApiResponse.success(dtoMapper.toJobDTO(updated), "Status updated successfully."));
     }
 
-    // Admin: delete a job
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> deleteJob(@PathVariable Long id) {
-        jobService.deleteJob(id);
-        return ResponseEntity.ok("Job deleted successfully");
+    public ResponseEntity<ApiResponse<Void>> deleteJob(@PathVariable Long id, @AuthenticationPrincipal User user) {
+        // Simple security check: admin can delete any, user can delete own
+        JobPost job = jobService.getJobById(id);
+        if (user.getRole().name().equals("ADMIN") || job.getUser().getId().equals(user.getId())) {
+            jobService.deleteJob(id);
+            return ResponseEntity.ok(ApiResponse.success(null, "Resource decommissioned."));
+        }
+        return ResponseEntity.status(403).body(ApiResponse.error("Unauthorized to delete this resource."));
     }
 }

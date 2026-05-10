@@ -19,7 +19,7 @@ public class DtoMapper {
                 .email(user.getEmail())
                 .role(user.getRole())
                 .phone(user.getPhone())
-                .verified(user.isVerified())
+                .verified(user.isEnabled())
                 .build();
     }
 

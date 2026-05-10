@@ -16,6 +16,7 @@ const Home = () => {
   const navigate = useNavigate();
   const { user } = useUser();
   const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedJob, setSelectedJob] = useState(null);
   const containerRef = useRef(null);
 
@@ -34,10 +35,15 @@ const Home = () => {
 
   useEffect(() => {
     const fetchApproved = async () => {
+      setLoading(true);
       try {
         const res = await instance.get("job/approved");
         setJobs(res.data);
-      } catch (err) { console.error("Market data sync failure:", err); }
+      } catch (err) { 
+        console.error("Market data sync failure:", err); 
+      } finally {
+        setLoading(false);
+      }
     };
     fetchApproved();
   }, []);
@@ -60,7 +66,7 @@ const Home = () => {
 
       <FeatureGrid />
 
-      <JobCatalog jobs={jobs} setSelectedJob={setSelectedJob} />
+      <JobCatalog jobs={jobs} loading={loading} setSelectedJob={setSelectedJob} />
 
       <CallToAction navigate={navigate} />
 
