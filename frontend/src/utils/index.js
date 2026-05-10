@@ -1,5 +1,1 @@
-import navImage from '../../public/assets/NabBar/NavIcon.png';
-
-
-
-export const navLogo = navImage;
+export const navLogo = "/assets/NabBar/NavIcon.png";

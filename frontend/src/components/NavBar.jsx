@@ -17,6 +17,7 @@ import ThemeToggle from "./ThemeToggle";
 import { useNavigate, NavLink, useLocation } from "react-router-dom";
 import { useUser } from "../context/context";
 import { Button } from "../common/Button";
+import NotificationDropdown from "./nav/NotificationDropdown";
 
 const Nav = () => {
   const navigate = useNavigate();
@@ -38,9 +39,9 @@ const Nav = () => {
   }, [location.pathname]);
 
   const navLinks = [
-    { label: "Matrix", to: "/courses", icon: <AcademicCapIcon className="w-4 h-4" /> },
-    { label: "Registry", to: "/talents", icon: <UserGroupIcon className="w-4 h-4" /> },
-    { label: "Market", to: "/jobs", icon: <BriefcaseIcon className="w-4 h-4" /> },
+    { label: "Courses", to: "/courses", icon: <AcademicCapIcon className="w-4 h-4" /> },
+    { label: "Talents", to: "/talents", icon: <UserGroupIcon className="w-4 h-4" /> },
+    { label: "Find Jobs", to: "/jobs", icon: <BriefcaseIcon className="w-4 h-4" /> },
   ];
 
   return (
@@ -57,11 +58,11 @@ const Nav = () => {
       >
         {/* --- LOGO --- */}
         <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate("/")}>
-          <div className="bg-blue-600 p-2 rounded-2xl shadow-xl shadow-blue-500/20 group-hover:rotate-12 transition-all">
+          <div className="bg-blue-600 p-2 rounded-2xl shadow-xl shadow-blue-500/20 group-hover:scale-105 transition-all">
              <img src={navLogo} alt="Logo" className="w-8 h-8 object-contain brightness-0 invert" />
           </div>
           <span className="text-2xl font-black tracking-tighter text-white uppercase italic">
-            Nexus<span className="text-blue-600">Core</span>
+            Career<span className="text-blue-600">Flow</span>
           </span>
         </div>
 
@@ -89,6 +90,8 @@ const Nav = () => {
           <button className="hidden sm:flex p-3 rounded-xl bg-white/5 text-slate-500 hover:text-blue-500 transition-colors">
             <MagnifyingGlassIcon className="w-5 h-5" />
           </button>
+          
+          {user && <NotificationDropdown />}
           
           <ThemeToggle />
 
@@ -166,7 +169,7 @@ const Nav = () => {
             className="fixed inset-0 z-[150] bg-[#050508] p-12 flex flex-col md:hidden"
           >
             <div className="flex justify-between items-center mb-20">
-               <span className="text-3xl font-black tracking-tighter text-white uppercase italic">Nexus<span className="text-blue-600">Core</span></span>
+               <span className="text-3xl font-black tracking-tighter text-white uppercase italic">Career<span className="text-blue-600">Flow</span></span>
                <button onClick={() => setMobileMenuOpen(false)} className="p-4 rounded-full bg-white/5 text-white">
                  <XMarkIcon className="w-8 h-8" />
                </button>

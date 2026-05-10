@@ -2,6 +2,7 @@ package com.platfrom.JobAndSkillDevelopment.service;
 
 import com.platfrom.JobAndSkillDevelopment.entity.JobPost;
 import com.platfrom.JobAndSkillDevelopment.entity.JobStatus;
+import com.platfrom.JobAndSkillDevelopment.entity.NotificationType;
 import com.platfrom.JobAndSkillDevelopment.entity.User;
 import com.platfrom.JobAndSkillDevelopment.repo.JobRepo;
 import org.springframework.stereotype.Service;
@@ -10,9 +11,11 @@ import java.util.List;
 @Service
 public class JobService {
     private final JobRepo jobRepo;
+    private final NotificationService notificationService;
 
-    public JobService(JobRepo jobRepo) {
+    public JobService(JobRepo jobRepo, NotificationService notificationService) {
         this.jobRepo = jobRepo;
+        this.notificationService = notificationService;
     }
 
     public JobPost createJob(JobPost job, User user) {
@@ -46,7 +49,16 @@ public class JobService {
     public JobPost updateStatus(Long jobId, JobStatus status) {
         JobPost job = jobRepo.findById(jobId).orElseThrow(() -> new RuntimeException("Job not found"));
         job.setStatus(status);
-        return jobRepo.save(job);
+        JobPost updated = jobRepo.save(job);
+        
+        notificationService.sendNotification(
+            job.getUser(), 
+            "Job Post " + status, 
+            "Your posting '" + job.getTitle() + "' has been " + status.toString().toLowerCase() + ".",
+            NotificationType.JOB_UPDATE
+        );
+        
+        return updated;
     }
 
     public JobPost getJobById(Long jobId) {
@@ -57,4 +69,3 @@ public class JobService {
         jobRepo.deleteById(jobId);
     }
 }
-

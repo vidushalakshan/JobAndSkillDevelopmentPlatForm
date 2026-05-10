@@ -11,12 +11,14 @@ import java.util.Properties;
 @Configuration
 public class EmailConfiguration {
 
+    @Value("${spring.mail.username}")
+    private String emailUsername;
+
+    @Value("${spring.mail.password}")
+    private String emailPassword;
+
     @Bean
     public JavaMailSender javaMailSender() {
-        io.github.cdimascio.dotenv.Dotenv dotenv = io.github.cdimascio.dotenv.Dotenv.load();
-        String emailUsername = dotenv.get("SUPPORT_EMAIL");
-        String emailPassword = dotenv.get("APP_PASSWORD");
-
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost("smtp.gmail.com");
         mailSender.setPort(587);
@@ -33,5 +35,4 @@ public class EmailConfiguration {
 
         return mailSender;
     }
-
 }

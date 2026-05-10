@@ -43,7 +43,8 @@ public class SecurityConfiguration {
                                 "/job/approved",
                                 "/courses/published",
                                 "/profile/talents",
-                                "/profile/talents/**"
+                                "/profile/talents/**",
+                                "/ws-nexus/**"
                         ).permitAll()
                         .requestMatchers("/job/all", "/job/pending", "/job/admin-create", "/job/*/status").hasRole("ADMIN")
                         .requestMatchers("/apply/all", "/apply/*/status").hasRole("ADMIN")
