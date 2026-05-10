@@ -40,7 +40,6 @@ const PostJobModal = ({ onClose, onCreated }) => {
 
   const handleChange = (field) => (e) => setForm({ ...form, [field]: e.target.value });
 
-  // Animation Variants
   const containerVariants = {
     hidden: { opacity: 0, scale: 0.9, y: 40 },
     visible: {
@@ -58,7 +57,6 @@ const PostJobModal = ({ onClose, onCreated }) => {
 
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6">
-      {/* Ultra-Dark Backdrop */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -74,7 +72,6 @@ const PostJobModal = ({ onClose, onCreated }) => {
         exit="exit"
         className="relative bg-[#08080a] border border-white/10 rounded-[3.5rem] shadow-[0_0_100px_rgba(0,0,0,0.8)] w-full max-w-3xl overflow-y-auto max-h-[90vh] no-scrollbar"
       >
-        {/* Animated Gradient Border Top */}
         <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-blue-600 via-indigo-400 to-purple-600 animate-pulse" />
 
         <button
@@ -85,7 +82,6 @@ const PostJobModal = ({ onClose, onCreated }) => {
         </button>
 
         <div className="p-10 sm:p-16">
-          {/* Progress Indicator */}
           <div className="flex items-center gap-3 mb-12">
             {[1, 2].map((i) => (
               <div
@@ -122,14 +118,14 @@ const PostJobModal = ({ onClose, onCreated }) => {
                       placeholder="e.g. Senior Cloud Architect"
                     />
                     <div className="group">
-                      <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-4 ml-1">Context & Scope</label>
+                      <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4 ml-1">Context & Scope</label>
                       <textarea
                         required
                         rows={5}
                         value={form.description}
                         onChange={handleChange("description")}
                         placeholder="Detail the technical stack and expectations..."
-                        className="w-full bg-white/[0.03] border border-white/5 rounded-3xl px-8 py-6 text-sm font-medium focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/5 outline-none transition-all placeholder:text-slate-700 resize-none text-white"
+                        className="w-full bg-white/[0.03] border border-white/5 rounded-3xl px-8 py-6 text-sm font-medium focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/5 outline-none transition-all placeholder:text-slate-700 resize-none text-slate-400 focus:text-white"
                       />
                     </div>
                   </div>
@@ -138,7 +134,7 @@ const PostJobModal = ({ onClose, onCreated }) => {
                     type="button"
                     onClick={() => setStep(2)}
                     variant="primary"
-                    className="w-full py-8 text-[12px]"
+                    size="medium"
                   >
                     Proceed to Details <FiChevronRight className="group-hover:translate-x-1 transition-transform" />
                   </Button>
@@ -169,9 +165,9 @@ const PostJobModal = ({ onClose, onCreated }) => {
                         <select
                           value={form.type}
                           onChange={handleChange("type")}
-                          className="w-full bg-white/[0.03] border border-white/5 rounded-[1.5rem] pl-16 pr-8 py-5 text-sm font-bold focus:border-blue-500/50 outline-none transition-all appearance-none cursor-pointer text-white"
+                          className="w-full bg-white/[0.03] border border-white/5 rounded-[1.5rem] pl-16 pr-8 py-5 text-sm font-bold focus:border-blue-500/50 outline-none transition-all appearance-none cursor-pointer text-slate-400 focus:text-white"
                         >
-                          {JOB_CATEGORIES.map(c => <option key={c} value={c} className="bg-[#0a0a0a]">{c}</option>)}
+                          {JOB_CATEGORIES.map(c => <option key={c} value={c} className="bg-[#0a0a0a] text-white">{c}</option>)}
                         </select>
                       </div>
                     </div>
@@ -185,7 +181,7 @@ const PostJobModal = ({ onClose, onCreated }) => {
                     <button
                       type="button"
                       onClick={() => setStep(1)}
-                      className="p-6 rounded-[2.5rem] bg-white/5 text-slate-400 hover:text-white transition-all border border-white/5"
+                      className="p-3 rounded-[2.5rem] bg-white/5 text-slate-400 hover:text-white transition-all border border-white/5"
                     >
                       <FiChevronLeft size={24} />
                     </button>
@@ -193,7 +189,7 @@ const PostJobModal = ({ onClose, onCreated }) => {
                       type="submit"
                       disabled={loading}
                       variant="primary"
-                      className="flex-1 py-8 text-[12px]"
+                      size="medium"
                     >
                       {loading ? "Processing..." : "Finalize Posting"}
                       <FiCheckCircle />
@@ -209,7 +205,6 @@ const PostJobModal = ({ onClose, onCreated }) => {
   );
 };
 
-// Reusable Sub-component for Inputs
 const InputField = ({ label, icon: Icon, ...props }) => (
   <div className="group relative">
     <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-4 ml-1 group-focus-within:text-blue-500 transition-colors">
@@ -220,7 +215,7 @@ const InputField = ({ label, icon: Icon, ...props }) => (
       <input
         required
         {...props}
-        className="w-full bg-white/[0.03] border border-white/5 rounded-[1.5rem] pl-16 pr-8 py-5 text-sm font-bold focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/5 outline-none transition-all placeholder:text-slate-700 text-white"
+        className="w-full bg-white/[0.03] border border-white/5 rounded-[1.5rem] pl-16 pr-8 py-5 text-sm font-bold focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/5 outline-none transition-all placeholder:text-slate-700 text-slate-400 focus:text-white"
       />
     </div>
   </div>
