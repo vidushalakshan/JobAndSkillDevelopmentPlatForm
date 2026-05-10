@@ -311,7 +311,7 @@ const CourseViewerPage = () => {
           </div>
 
           <div className="p-10 border-t border-white/5">
-            <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[2.5rem] p-8 relative overflow-hidden group shadow-2xl">
+            <div className="bg-gradient-to-br bg-gray-900 to-indigo-700 rounded-[2.5rem] p-8 relative overflow-hidden group shadow-2xl">
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-3xl" />
               <div className="relative z-10">
                 <div className="flex items-start gap-4 mb-8">
@@ -340,7 +340,7 @@ const CourseViewerPage = () => {
                   onClick={handleClaimCredential}
                   disabled={course.progress < 100} 
                   variant={course.progress >= 100 ? "primary" : "bgBlack"}
-                  className="w-full mt-8 uppercase tracking-[0.3em] text-[10px]">
+                  className="w-full mt-8 uppercase tracking-[0.1em] text-[10px]">
                   {course.progress >= 100 ? "Claim Credential" : "Module Incomplete"}
                 </Button>
               </div>
