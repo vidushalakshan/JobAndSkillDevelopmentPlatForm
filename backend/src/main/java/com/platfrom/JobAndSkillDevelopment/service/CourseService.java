@@ -74,7 +74,17 @@ public class CourseService {
         Course course = courseRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Course not found"));
         course.setPublished(true);
-        return courseRepo.save(course);
+        Course saved = courseRepo.save(course);
+        
+        if (course.getUser() != null) {
+            notificationService.sendNotification(
+                course.getUser(),
+                "Project Blueprint Published",
+                "Your program '" + course.getTitle() + "' has been approved and is now live in the Matrix.",
+                com.platfrom.JobAndSkillDevelopment.entity.NotificationType.SYSTEM
+            );
+        }
+        return saved;
     }
 
     public Course unpublishCourse(Long id) {
@@ -98,18 +108,20 @@ public class CourseService {
             com.platfrom.JobAndSkillDevelopment.entity.CourseEnrollment enrollment = new com.platfrom.JobAndSkillDevelopment.entity.CourseEnrollment();
             enrollment.setUser(user);
             enrollment.setCourse(course);
+            enrollment.setStatus("PENDING"); // Approval Workflow
             enrollmentRepo.save(enrollment);
             
-            course.setEnrollmentCount(course.getEnrollmentCount() + 1);
-            courseRepo.save(course);
+            // Do not increment enrollmentCount yet until approved.
 
-            // Notify Instructor
-            notificationService.sendNotification(
-                course.getUser(),
-                "New Enrollment",
-                user.getUsername() + " has joined your course: " + course.getTitle(),
-                com.platfrom.JobAndSkillDevelopment.entity.NotificationType.ENROLLMENT
-            );
+            // Notify Instructor/Admin
+            if (course.getUser() != null) {
+                notificationService.sendNotification(
+                    course.getUser(),
+                    "Enrollment Request",
+                    user.getUsername() + " has requested access to your course: " + course.getTitle(),
+                    com.platfrom.JobAndSkillDevelopment.entity.NotificationType.ENROLLMENT
+                );
+            }
         }
         
         return course;
@@ -127,5 +139,46 @@ public class CourseService {
             enrollment.setCompletedAt(java.time.LocalDateTime.now());
         }
         return enrollmentRepo.save(enrollment);
+    }
+
+    public List<com.platfrom.JobAndSkillDevelopment.entity.CourseEnrollment> getPendingEnrollments() {
+        return enrollmentRepo.findByStatus("PENDING");
+    }
+
+    public com.platfrom.JobAndSkillDevelopment.entity.CourseEnrollment approveEnrollment(Long enrollmentId) {
+        com.platfrom.JobAndSkillDevelopment.entity.CourseEnrollment enrollment = enrollmentRepo.findById(enrollmentId)
+                .orElseThrow(() -> new RuntimeException("Enrollment not found"));
+        
+        enrollment.setStatus("ENROLLED");
+        enrollmentRepo.save(enrollment);
+
+        Course course = enrollment.getCourse();
+        course.setEnrollmentCount(course.getEnrollmentCount() + 1);
+        courseRepo.save(course);
+
+        // Notify User
+        notificationService.sendNotification(
+            enrollment.getUser(),
+            "Access Approved",
+            "Your request to access '" + course.getTitle() + "' has been approved. You can now watch the video.",
+            com.platfrom.JobAndSkillDevelopment.entity.NotificationType.ENROLLMENT
+        );
+
+        return enrollment;
+    }
+
+    public void rejectEnrollment(Long enrollmentId) {
+        com.platfrom.JobAndSkillDevelopment.entity.CourseEnrollment enrollment = enrollmentRepo.findById(enrollmentId)
+                .orElseThrow(() -> new RuntimeException("Enrollment not found"));
+        
+        // Notify User
+        notificationService.sendNotification(
+            enrollment.getUser(),
+            "Access Denied",
+            "Your request to access '" + enrollment.getCourse().getTitle() + "' was rejected.",
+            com.platfrom.JobAndSkillDevelopment.entity.NotificationType.SYSTEM
+        );
+
+        enrollmentRepo.delete(enrollment);
     }
 }

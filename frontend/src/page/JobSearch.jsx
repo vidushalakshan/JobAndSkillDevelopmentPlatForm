@@ -178,7 +178,7 @@ const JobSearch = () => {
                         href={`mailto:${selectedJob.contactEmail}?subject=Application for ${selectedJob.title}`}
                         className="px-8 py-4 bg-white text-black rounded-xl font-bold hover:bg-blue-500 hover:text-white transition-all transform active:scale-95 shadow-xl shadow-white/5 flex items-center gap-2"
                       >
-                        Contact Employer
+                        Apply Job
                       </a>
                     ) : (
                       <span className="text-slate-500 text-xs font-bold uppercase tracking-widest bg-white/5 px-4 py-2 rounded-lg">

@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/courses")
-@CrossOrigin(origins = "http://localhost:5173")
 public class CourseController {
 
     private final CourseService courseService;
@@ -98,5 +97,24 @@ public class CourseController {
     public ResponseEntity<ApiResponse<Void>> deleteCourse(@PathVariable Long id) {
         courseService.deleteCourse(id);
         return ResponseEntity.ok(ApiResponse.success(null, "Course permanently removed."));
+    }
+
+    @GetMapping("/enrollments/pending")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<List<com.platfrom.JobAndSkillDevelopment.entity.CourseEnrollment>>> getPendingEnrollments() {
+        return ResponseEntity.ok(ApiResponse.success(courseService.getPendingEnrollments(), "Pending enrollment requests retrieved."));
+    }
+
+    @PutMapping("/enrollments/{id}/approve")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<com.platfrom.JobAndSkillDevelopment.entity.CourseEnrollment>> approveEnrollment(@PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.success(courseService.approveEnrollment(id), "Enrollment approved successfully."));
+    }
+
+    @DeleteMapping("/enrollments/{id}/reject")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<Void>> rejectEnrollment(@PathVariable Long id) {
+        courseService.rejectEnrollment(id);
+        return ResponseEntity.ok(ApiResponse.success(null, "Enrollment request rejected."));
     }
 }

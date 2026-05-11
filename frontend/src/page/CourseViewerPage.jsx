@@ -20,17 +20,20 @@ const CourseViewerPage = () => {
         instance.get(`/courses/${id}`),
         instance.get("/courses/enrolled")
       ]);
-      
+
       const courseData = courseRes.data;
       const enrollment = enrolledRes.data.find(e => e.course.id === parseInt(id));
-      
-      if (enrollment) {
-        courseData.progress = enrollment.progress;
+
+      if (!enrollment || (enrollment.status !== "ENROLLED" && enrollment.status !== "COMPLETED")) {
+        toast.warn("Access Denied: You must be approved by an admin to view this content.");
+        navigate("/courses");
+        return;
       }
-      
+
+      courseData.progress = enrollment.progress;
       setCourse(courseData);
     } catch (err) {
-      toast.error("Failed to load project content.");
+      toast.error("Security clearing failed. Returning to lobby.");
       navigate("/courses");
     } finally {
       setLoading(false);
@@ -67,14 +70,14 @@ const CourseViewerPage = () => {
 
   if (!course) return null;
 
-  const roadmapSteps = course.syllabus 
+  const roadmapSteps = course.syllabus
     ? course.syllabus.split('\n').filter(s => s.trim()).map((s, i) => ({ id: i + 1, title: s.trim(), duration: "Flexible" }))
     : [
-        { id: 1, title: "Foundational Protocols", duration: "45m" },
-        { id: 2, title: "Infrastructure Orchestration", duration: "1h 20m" },
-        { id: 3, title: "Edge Case Synthesis", duration: "30m" },
-        { id: 4, title: "Final Deployment Hub", duration: "15m" },
-      ];
+      { id: 1, title: "Foundational Protocols", duration: "45m" },
+      { id: 2, title: "Infrastructure Orchestration", duration: "1h 20m" },
+      { id: 3, title: "Edge Case Synthesis", duration: "30m" },
+      { id: 4, title: "Final Deployment Hub", duration: "15m" },
+    ];
 
   const getEmbedUrl = (url) => {
     if (!url) return "https://www.youtube.com/embed/dQw4w9WgXcQ";
@@ -95,7 +98,7 @@ const CourseViewerPage = () => {
 
       <CourseHeader course={course} navigate={navigate} />
 
-      <CourseContentPlayer 
+      <CourseContentPlayer
         course={course}
         activeTab={activeTab}
         setActiveTab={setActiveTab}

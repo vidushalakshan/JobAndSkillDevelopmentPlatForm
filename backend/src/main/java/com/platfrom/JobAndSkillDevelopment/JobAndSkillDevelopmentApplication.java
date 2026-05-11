@@ -10,12 +10,10 @@ import org.springframework.context.annotation.Bean;
 public class JobAndSkillDevelopmentApplication {
 
 	public static void main(String[] args) {
-		// This makes it work whether you run from root or from /backend
 		Dotenv dotenv = Dotenv.configure()
 				.ignoreIfMissing()
 				.load();
-		
-		// If not found in current folder, try looking one level up
+
 		if (dotenv.get("GEMINI_API_KEY") == null) {
 			dotenv = Dotenv.configure()
 					.directory("..")

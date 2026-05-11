@@ -17,9 +17,9 @@ export const NotificationProvider = ({ children }) => {
         if (!user) return;
         try {
             const res = await instance.get('/notifications');
-            setNotifications(res.data.data || []);
+            setNotifications(res.data || []);
             const countRes = await instance.get('/notifications/unread-count');
-            setUnreadCount(countRes.data.data || 0);
+            setUnreadCount(countRes.data || 0);
         } catch (err) {
             console.error("Failed to fetch notifications:", err);
         }
@@ -29,23 +29,38 @@ export const NotificationProvider = ({ children }) => {
         if (user) {
             fetchNotifications();
 
-            const socket = new SockJS('http://localhost:8080/ws-nexus');
+            const socket = new SockJS('http://localhost:8081/ws-nexus');
             const client = Stomp.over(socket);
-            client.debug = null; // Disable console logging for cleaner UI
+            client.debug = null; 
 
-            client.connect({}, () => {
+            const token = localStorage.getItem("token");
+            client.connect({ Authorization: `Bearer ${token}` }, () => {
                 client.subscribe(`/user/queue/notifications`, (msg) => {
                     const newNotif = JSON.parse(msg.body);
                     setNotifications(prev => [newNotif, ...prev]);
                     setUnreadCount(prev => prev + 1);
-                    toast.info(`🔔 ${newNotif.title}: ${newNotif.message}`);
+                    toast.info(`🔔 ${newNotif.title}: ${newNotif.message}`, {
+                        position: "top-right",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        theme: "dark",
+                    });
                 });
             });
 
             setStompClient(client);
 
             return () => {
-                if (client) client.disconnect();
+                if (client && client.connected) {
+                    try {
+                        client.disconnect();
+                    } catch (e) {
+                        console.warn("WebSocket disconnect error:", e);
+                    }
+                }
             };
         } else {
             setNotifications([]);

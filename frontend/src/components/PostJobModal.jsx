@@ -175,7 +175,7 @@ const PostJobModal = ({ onClose, onCreated }) => {
                     <InputField label="Deadline" icon={FiCalendar} type="date" value={form.deadline} onChange={handleChange("deadline")} />
                   </div>
 
-                  <InputField label="Direct Liaison" icon={FiMail} type="email" value={form.contactEmail} onChange={handleChange("contactEmail")} placeholder="lead@company.com" />
+                  <InputField label="Job Owner Email" icon={FiMail} type="email" value={form.contactEmail} onChange={handleChange("contactEmail")} placeholder="owner@company.com" />
 
                   <div className="flex gap-4">
                     <button

@@ -21,7 +21,7 @@ public class WorkExperience {
     @Column(nullable = false)
     private String role;
 
-    @Column(length = 1000)
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     private String startDate; // e.g. "Jan 2022"

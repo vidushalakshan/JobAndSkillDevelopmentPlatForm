@@ -22,6 +22,7 @@ const AdminDashboard = () => {
   const [pendingJobs, setPendingJobs] = useState([]);
   const [users, setUsers] = useState([]);
   const [courses, setCourses] = useState([]);
+  const [pendingEnrollments, setPendingEnrollments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showPostModal, setShowPostModal] = useState(false);
   const [showCourseModal, setShowCourseModal] = useState(false);
@@ -40,12 +41,14 @@ const AdminDashboard = () => {
         instance.get("/job/pending"),
         instance.get("/users/"),
         instance.get("/courses/all"),
+        instance.get("/courses/enrollments/pending")
       ]);
       
       if (responses[0].status === "fulfilled") setJobs(responses[0].value.data);
       if (responses[1].status === "fulfilled") setPendingJobs(responses[1].value.data);
       if (responses[2].status === "fulfilled") setUsers(responses[2].value.data);
       if (responses[3].status === "fulfilled") setCourses(responses[3].value.data);
+      if (responses[4].status === "fulfilled") setPendingEnrollments(responses[4].value.data);
 
       if (responses.some(r => r.status === "rejected")) {
         toast.warn("Incomplete data synchronization.");
@@ -93,6 +96,14 @@ const AdminDashboard = () => {
   const handleDeleteCourse = async (id) => {
     if (!window.confirm("Delete this course permanently?")) return;
     try { await instance.delete(`/courses/${id}`); toast.success("Course deleted."); fetchAll(); } catch { toast.error("Delete failed."); }
+  };
+
+  const handleApproveEnrollment = async (id) => {
+    try { await instance.put(`/courses/enrollments/${id}/approve`); toast.success("Access request approved."); fetchAll(); } catch { toast.error("Approval failed."); }
+  };
+
+  const handleRejectEnrollment = async (id) => {
+    try { await instance.delete(`/courses/enrollments/${id}/reject`); toast.success("Access request rejected."); fetchAll(); } catch { toast.error("Rejection failed."); }
   };
 
   if (!user || user.role !== "ADMIN") return null;
@@ -175,11 +186,14 @@ const AdminDashboard = () => {
             {activeTab === "courses" && (
               <AdminProjectMatrix 
                 courses={courses} 
+                pendingEnrollments={pendingEnrollments}
                 searchTerm={searchTerm} 
                 setShowCourseModal={setShowCourseModal}
                 handlePublishCourse={handlePublishCourse}
                 handleUnpublishCourse={handleUnpublishCourse}
                 handleDeleteCourse={handleDeleteCourse}
+                handleApproveEnrollment={handleApproveEnrollment}
+                handleRejectEnrollment={handleRejectEnrollment}
               />
             )}
           </motion.div>

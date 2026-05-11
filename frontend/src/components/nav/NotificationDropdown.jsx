@@ -29,18 +29,29 @@ const NotificationDropdown = () => {
               initial={{ opacity: 0, y: 15, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 15, scale: 0.95 }}
-              className="absolute right-0 mt-6 w-96 bg-[#0d0d15] rounded-[2.5rem] shadow-2xl border border-white/10 p-4 z-20 overflow-hidden"
+              className="absolute right-0 mt-6 w-96 bg-[#0a0a0f] rounded-[2.5rem] shadow-2xl border border-white/10 p-5 z-20 overflow-hidden backdrop-blur-3xl"
             >
-              <div className="p-6 border-b border-white/5 flex justify-between items-center mb-4">
-                <h4 className="text-sm font-black text-white uppercase tracking-widest italic">System Alerts</h4>
-                <span className="text-[10px] font-black text-slate-600 uppercase">{unreadCount} Unread</span>
+              <div className="flex justify-between items-center mb-6 px-2">
+                <div>
+                  <h4 className="text-lg font-black text-white uppercase italic tracking-tighter">Command Feed</h4>
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">{unreadCount} Pending Intel</p>
+                </div>
+                <button 
+                  onClick={() => {/* Implement mark all as read */}}
+                  className="p-2 rounded-xl bg-white/5 border border-white/10 text-blue-400 hover:text-white transition-colors"
+                  title="Clear all"
+                >
+                  <CheckCircleIcon className="w-5 h-5" />
+                </button>
               </div>
 
-              <div className="max-h-[450px] overflow-y-auto no-scrollbar space-y-2">
+              <div className="max-h-[480px] overflow-y-auto no-scrollbar space-y-3 pr-1">
                 {notifications.length === 0 ? (
-                  <div className="py-20 text-center">
-                    <BellIcon className="w-12 h-12 text-white/5 mx-auto mb-4" />
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-700">No signals detected</p>
+                  <div className="py-24 text-center">
+                    <div className="w-20 h-20 rounded-full bg-white/[0.02] border border-white/5 flex items-center justify-center mx-auto mb-6">
+                      <BellIcon className="w-10 h-10 text-slate-800" />
+                    </div>
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-700 italic">No incoming transmissions</p>
                   </div>
                 ) : (
                   notifications.map((notif) => {
@@ -48,39 +59,73 @@ const NotificationDropdown = () => {
                       'JOB_UPDATE': BriefcaseIcon,
                       'ENROLLMENT': AcademicCapIcon,
                       'PROFILE_VIEW': UserCircleIcon,
+                      'SYSTEM': InformationCircleIcon,
+                      'COURSE_UPDATE': AcademicCapIcon,
+                      'ACCOUNT': UserCircleIcon,
                     }[notif.type] || InformationCircleIcon;
 
                     const Color = {
-                      'JOB_UPDATE': 'bg-blue-500/20 text-blue-500',
-                      'ENROLLMENT': 'bg-green-500/20 text-green-500',
-                      'PROFILE_VIEW': 'bg-purple-500/20 text-purple-500',
-                    }[notif.type] || 'bg-slate-500/20 text-slate-500';
+                      'JOB_UPDATE': 'from-blue-500 to-indigo-600',
+                      'ENROLLMENT': 'from-emerald-500 to-teal-600',
+                      'PROFILE_VIEW': 'from-purple-500 to-pink-600',
+                      'SYSTEM': 'from-amber-500 to-orange-600',
+                      'COURSE_UPDATE': 'from-cyan-500 to-blue-600',
+                      'ACCOUNT': 'from-rose-500 to-red-600',
+                    }[notif.type] || 'from-slate-500 to-slate-600';
 
                     return (
-                      <button
+                      <motion.button
+                        layout
                         key={notif.id}
                         onClick={() => { markAsRead(notif.id); }}
-                        className={`w-full p-5 rounded-3xl text-left transition-all border ${notif.read ? "bg-transparent border-transparent opacity-50" : "bg-white/5 border-white/5 hover:bg-white/10"}`}
+                        className={`w-full group p-5 rounded-[2rem] text-left transition-all border relative overflow-hidden ${
+                          notif.read 
+                          ? "bg-transparent border-transparent opacity-40 hover:opacity-100" 
+                          : "bg-white/[0.03] border-white/10 hover:border-white/20 hover:bg-white/[0.05]"
+                        }`}
                       >
-                        <div className="flex gap-4">
-                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${Color}`}>
-                            <Icon className="w-5 h-5" />
+                        {!notif.read && (
+                          <div className="absolute top-0 left-0 w-1 h-full bg-blue-600" />
+                        )}
+                        
+                        <div className="flex gap-5">
+                          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 bg-gradient-to-br ${Color} shadow-lg shadow-black/20`}>
+                            <Icon className="w-6 h-6 text-white" />
                           </div>
-                        <div className="min-w-0">
-                          <p className="text-sm font-black text-white truncate uppercase tracking-tight italic">{notif.title}</p>
-                          <p className="text-xs text-slate-500 leading-relaxed mt-1">{notif.message}</p>
-                          <p className="text-[8px] font-black text-slate-800 uppercase tracking-widest mt-2">Received: {new Date(notif.createdAt).toLocaleTimeString()}</p>
+                          
+                          <div className="min-w-0 flex-1">
+                            <div className="flex justify-between items-start mb-1">
+                              <p className="text-sm font-black text-white truncate uppercase tracking-tight italic group-hover:text-blue-400 transition-colors">
+                                {notif.title}
+                              </p>
+                              {!notif.read && (
+                                <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+                              )}
+                            </div>
+                            <p className="text-[11px] text-slate-400 leading-relaxed font-medium line-clamp-2">
+                              {notif.message}
+                            </p>
+                            <div className="flex items-center gap-2 mt-3">
+                              <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest bg-white/5 px-2 py-0.5 rounded-md">
+                                {new Date(notif.createdAt).toLocaleDateString()}
+                              </span>
+                              <span className="text-[8px] font-black text-slate-700 uppercase tracking-widest italic">
+                                {new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                            </div>
+                          </div>
                         </div>
-                        {!notif.read && <div className="w-2 h-2 rounded-full bg-blue-600 shrink-0 mt-2" />}
-                      </div>
-                      </button>
+                      </motion.button>
                     );
                   })
                 )}
               </div>
 
-              <div className="mt-4 p-4 text-center">
-                 <button className="text-[10px] font-black text-blue-500 uppercase tracking-widest hover:underline">Mark all as synchronized</button>
+              <div className="mt-6 pt-4 border-t border-white/5 flex justify-center">
+                 <button className="flex items-center gap-2 text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] hover:text-white transition-all group">
+                    Sync Intelligence Feed
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500 group-hover:animate-ping" />
+                 </button>
               </div>
             </motion.div>
           </>

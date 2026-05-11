@@ -20,7 +20,7 @@ public class JobPost {
     @Column(nullable = false)
     String title;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     String description;
 
     @Column(nullable = false)

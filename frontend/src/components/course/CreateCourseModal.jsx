@@ -32,22 +32,43 @@ const CreateCourseModal = ({ isOpen, onClose, onSubmit, form, setForm, loading }
               { key: "duration", label: "Project Timeline", placeholder: "e.g. 12 Weeks" },
               { key: "price", label: "Investment Protocol", placeholder: "e.g. Free / Premium" },
               { key: "thumbnail", label: "Cover Asset URL", placeholder: "Image URL (Unsplash/Direct)" },
+              { key: "videoUrl", label: "Technical Asset (YouTube URL)", placeholder: "e.g. https://www.youtube.com/watch?v=..." },
             ].map(({ key, label, placeholder }) => (
               <div key={key} className="group">
                 <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-blue-500 mb-3 ml-1">{label}</label>
-                <input required={key !== "thumbnail"} value={form[key]} onChange={e => setForm({ ...form, [key]: e.target.value })}
+                <input required={key !== "thumbnail" && key !== "videoUrl"} value={form[key]} onChange={e => setForm({ ...form, [key]: e.target.value })}
                   placeholder={placeholder}
                   className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-5 text-sm font-medium focus:border-blue-500/50 focus:bg-blue-500/5 focus:shadow-[0_0_30px_rgba(59,130,246,0.1)] outline-none transition-all placeholder:text-gray-700" />
               </div>
             ))}
+            
+            <div className="group">
+              <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-blue-500 mb-3 ml-1">Knowledge Vertical</label>
+              <select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}
+                className="w-full bg-[#0d0d15] border border-white/10 rounded-2xl px-6 py-5 text-sm font-medium focus:border-blue-500/50 outline-none transition-all cursor-pointer">
+                {["IT Software", "IT Hardware", "Accounting", "Banking & Finance", "Civil Engineering", "HR & Training", "Business", "Design", "Other"].map(c => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="group">
+              <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-blue-500 mb-3 ml-1">Complexity Level</label>
+              <select value={form.level} onChange={e => setForm({ ...form, level: e.target.value })}
+                className="w-full bg-[#0d0d15] border border-white/10 rounded-2xl px-6 py-5 text-sm font-medium focus:border-blue-500/50 outline-none transition-all cursor-pointer">
+                {["Beginner", "Intermediate", "Advanced"].map(l => (
+                  <option key={l} value={l}>{l}</option>
+                ))}
+              </select>
+            </div>
           </div>
           
           <div className="mt-8 space-y-8">
             <div>
-              <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-blue-500 mb-3 ml-1">Curriculum Abstract</label>
+              <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-blue-500 mb-3 ml-1">Program Abstract</label>
               <textarea 
                 required
-                rows={4}
+                rows={3}
                 value={form.description}
                 onChange={e => setForm({ ...form, description: e.target.value })}
                 className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-5 text-sm font-medium focus:border-blue-500/50 focus:bg-blue-500/5 focus:shadow-[0_0_30px_rgba(59,130,246,0.1)] outline-none transition-all placeholder:text-gray-700 resize-none"
@@ -56,12 +77,13 @@ const CreateCourseModal = ({ isOpen, onClose, onSubmit, form, setForm, loading }
             </div>
 
             <div>
-              <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-blue-500 mb-3 ml-1">Content Repository (YouTube URL)</label>
-              <input 
-                value={form.videoUrl}
-                onChange={e => setForm({ ...form, videoUrl: e.target.value })}
-                placeholder="e.g. https://www.youtube.com/watch?v=..."
-                className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-5 text-sm font-medium focus:border-blue-500/50 focus:bg-blue-500/5 focus:shadow-[0_0_30px_rgba(59,130,246,0.1)] outline-none transition-all placeholder:text-gray-700"
+              <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-blue-500 mb-3 ml-1">Technical Roadmap (One topic per line)</label>
+              <textarea 
+                rows={4}
+                value={form.syllabus}
+                onChange={e => setForm({ ...form, syllabus: e.target.value })}
+                className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-5 text-sm font-medium focus:border-blue-500/50 focus:bg-blue-500/5 focus:shadow-[0_0_30px_rgba(59,130,246,0.1)] outline-none transition-all placeholder:text-gray-700 resize-none"
+                placeholder="Topic 1: Introduction&#10;Topic 2: Core Protocols&#10;Topic 3: Final Deployment..."
               />
             </div>
           </div>

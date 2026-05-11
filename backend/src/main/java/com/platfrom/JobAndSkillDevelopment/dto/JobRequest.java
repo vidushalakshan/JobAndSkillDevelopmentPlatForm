@@ -1,5 +1,6 @@
 package com.platfrom.JobAndSkillDevelopment.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import java.time.LocalDate;
 
@@ -10,6 +11,7 @@ public class JobRequest {
     private String location;
     private String type;
     private String salary;
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate deadline;
     private String contactEmail;
 }

@@ -16,7 +16,6 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/api/ai")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 @Slf4j
 public class AiController {
 

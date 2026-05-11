@@ -13,7 +13,7 @@ const CallToAction = ({ navigate }) => {
         viewport={{ once: true, amount: 0.5 }}
         className="max-w-6xl mx-auto rounded-[4rem] p-16 md:p-32 bg-white/[0.01] border border-white/10 backdrop-blur-3xl shadow-2xl relative overflow-hidden text-center group"
       >
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-overlay" />
+        <div className="absolute inset-0 opacity-10 mix-blend-overlay" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E\")" }} />
         <div className="relative z-10">
           <h2 className="text-5xl md:text-7xl font-black text-white mb-14 tracking-tighter leading-none uppercase">
             Ready to become a <br /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">specialist?</span>

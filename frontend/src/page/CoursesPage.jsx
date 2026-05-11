@@ -33,6 +33,7 @@ const CoursesPage = () => {
   const [selectedLevel, setSelectedLevel] = useState("All Levels");
   const [enrolling, setEnrolling] = useState(null);
   const [enrolledIds, setEnrolledIds] = useState(new Set());
+  const [pendingIds, setPendingIds] = useState(new Set());
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -44,7 +45,8 @@ const CoursesPage = () => {
         
         if (res.status === "fulfilled") setCourses(res.value.data);
         if (enrolledRes.status === "fulfilled") {
-          setEnrolledIds(new Set(enrolledRes.value.data.map(e => e.course.id)));
+          setEnrolledIds(new Set(enrolledRes.value.data.filter(e => e.status === "ENROLLED" || e.status === "COMPLETED").map(e => e.course.id)));
+          setPendingIds(new Set(enrolledRes.value.data.filter(e => e.status === "PENDING").map(e => e.course.id)));
         }
       } catch (err) {
         toast.error("Network synchronization failed.");
@@ -58,13 +60,13 @@ const CoursesPage = () => {
   const handleEnroll = async (id) => {
     if (!user) return navigate("/login");
     if (enrolledIds.has(id)) return navigate(`/course/${id}/viewer`);
+    if (pendingIds.has(id)) { toast.info("Your access request is currently pending admin approval."); return; }
     
     setEnrolling(id);
     try {
       await instance.post(`/courses/${id}/enroll`);
-      setEnrolledIds(prev => new Set([...prev, id]));
-      // Direct jump to Viewer for immediate access
-      navigate(`/course/${id}/viewer`);
+      setPendingIds(prev => new Set([...prev, id]));
+      toast.success("Access request submitted to Admin.");
     } catch (err) {
       toast.error(err.response?.data?.message || "Protocol error.");
     } finally {
@@ -151,6 +153,7 @@ const CoursesPage = () => {
                   onEnroll={() => handleEnroll(course.id)}
                   isEnrolling={enrolling === course.id}
                   enrolledIds={enrolledIds}
+                  pendingIds={pendingIds}
                 />
               ))}
             </AnimatePresence>
@@ -178,7 +181,17 @@ const GlobalStat = ({ label, value, icon: Icon, color }) => (
   </motion.div>
 );
 
-const CourseCard = ({ course, i, onEnroll, isEnrolling, enrolledIds }) => (
+const getThumbnailUrl = (course) => {
+  if (course.thumbnail) return course.thumbnail;
+  if (course.videoUrl) {
+    const match = course.videoUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+    if (match) return `https://img.youtube.com/vi/${match[1]}/maxresdefault.jpg`;
+  }
+  // Fallback dynamic image based on course ID to ensure variety
+  return `https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2070&auto=format&fit=crop&sig=${course.id || 1}`;
+};
+
+const CourseCard = ({ course, i, onEnroll, isEnrolling, enrolledIds, pendingIds }) => (
   <motion.div
     layout
     initial={{ opacity: 0, y: 30 }}
@@ -189,9 +202,10 @@ const CourseCard = ({ course, i, onEnroll, isEnrolling, enrolledIds }) => (
   >
     <div className="relative aspect-video overflow-hidden">
       <img 
-        src={course.thumbnail || `https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2070&auto=format&fit=crop`} 
+        src={getThumbnailUrl(course)} 
         className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 grayscale-[0.3] group-hover:grayscale-0"
         alt={course.title}
+        onError={(e) => { e.target.onerror = null; e.target.src = `https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2070&auto=format&fit=crop`; }}
       />
       <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent opacity-60" />
       <div className="absolute top-8 left-8">
@@ -236,11 +250,11 @@ const CourseCard = ({ course, i, onEnroll, isEnrolling, enrolledIds }) => (
         
         <Button
           onClick={onEnroll}
-          variant={enrolledIds.has(course.id) ? "primary" : "bgBlack"}
+          variant={enrolledIds.has(course.id) ? "primary" : pendingIds.has(course.id) ? "outline" : "bgBlack"}
           size="medium"
           className="w-full"
         >
-          {isEnrolling ? "SYNCHRONIZING..." : enrolledIds.has(course.id) ? "WATCH NOW" : "ACCESS PROJECT"}
+          {isEnrolling ? "REQUESTING..." : enrolledIds.has(course.id) ? "WATCH NOW" : pendingIds.has(course.id) ? "REQUEST PENDING" : "REQUEST ACCESS"}
           <FiChevronRight className="w-4 h-4" />
         </Button>
       </div>

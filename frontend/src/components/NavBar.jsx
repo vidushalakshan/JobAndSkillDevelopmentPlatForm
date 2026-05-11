@@ -127,9 +127,7 @@ const Nav = () => {
                       <div className="space-y-2">
                         <MenuButton onClick={() => navigate("/profile")} icon={<UserCircleIcon className="w-5 h-5" />} label="Terminal Profile" />
                         <MenuButton onClick={() => navigate("/my-jobs")} icon={<BriefcaseIcon className="w-5 h-5" />} label="Activity Hub" />
-                        {user.role === "ADMIN" && (
-                          <MenuButton onClick={() => navigate("/admin")} icon={<Squares2X2Icon className="w-5 h-5" />} label="Command Center" />
-                        )}
+                       
                         <div className="h-px bg-white/5 my-2 mx-4" />
                         <button
                           onClick={() => { logout(); navigate("/login"); }}

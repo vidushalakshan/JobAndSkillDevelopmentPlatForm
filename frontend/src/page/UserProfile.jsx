@@ -80,6 +80,12 @@ const UserProfile = () => {
     }
   };
 
+  const handleReset = () => {
+    setForm({ ...profile });
+    setSkills(profile?.skills ? profile.skills.split(",").map(s => s.trim()).filter(Boolean) : []);
+    toast.info("Form reset to original state.");
+  };
+
   const addSkill = (skill) => {
     const trimmed = skill.trim();
     if (trimmed && !skills.includes(trimmed)) setSkills([...skills, trimmed]);
@@ -147,7 +153,8 @@ const UserProfile = () => {
           <div className="flex gap-4">
             {editing ? (
               <div className="flex gap-2">
-                <button onClick={() => setEditing(false)} className="px-6 py-2 rounded-full border border-white/10 hover:bg-white/5 transition-all text-sm">Cancel</button>
+                <button onClick={handleReset} className="px-6 py-2 rounded-full border border-amber-500/30 text-amber-500 hover:bg-amber-500/10 transition-all text-sm">Reset</button>
+                <button onClick={() => { setEditing(false); handleReset(); }} className="px-6 py-2 rounded-full border border-white/10 hover:bg-white/5 transition-all text-sm">Cancel</button>
                 <button onClick={handleSave} disabled={saving} className="px-8 py-2 rounded-full bg-white text-black font-bold text-sm hover:bg-gray-200 transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)]">
                   {saving ? "Processing..." : "Save Identity"}
                 </button>
@@ -175,7 +182,7 @@ const UserProfile = () => {
                   <div className="relative">
                     <div className="w-32 h-32 rounded-3xl bg-gradient-to-br from-blue-500 to-indigo-600 p-[2px]">
                       <div className="w-full h-full rounded-3xl bg-[#0a0a0a] flex items-center justify-center text-4xl font-light">
-                         {profile?.pictureUrl ? <img src={profile.pictureUrl} className="w-full h-full object-cover rounded-3xl" /> : profile?.username?.[0]}
+                         {profile?.pictureUrl ? <img src={profile.pictureUrl} onError={(e) => { e.target.onerror = null; e.target.src = `https://ui-avatars.com/api/?name=${profile.username || 'U'}&background=3b82f6&color=fff&size=128`; }} className="w-full h-full object-cover rounded-3xl" /> : profile?.username?.[0] || 'U'}
                       </div>
                     </div>
                   </div>

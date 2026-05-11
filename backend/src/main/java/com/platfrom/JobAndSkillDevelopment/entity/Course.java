@@ -20,7 +20,7 @@ public class Course {
     @Column(nullable = false)
     String title;
 
-    @Column(nullable = false, length = 2000)
+    @Column(nullable = false, columnDefinition = "TEXT")
     String description;
 
     @Column(nullable = false)

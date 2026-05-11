@@ -13,7 +13,6 @@ public class CourseEnrollment {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @com.fasterxml.jackson.annotation.JsonIgnore
     private User user;
 
     @ManyToOne
