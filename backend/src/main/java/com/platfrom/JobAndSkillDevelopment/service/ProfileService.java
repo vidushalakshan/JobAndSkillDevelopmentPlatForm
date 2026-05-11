@@ -35,7 +35,6 @@ public class ProfileService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-    // --- EDUCATION ---
     public List<Education> getMyEducation() {
         return educationRepo.findByUser(getCurrentUser());
     }
@@ -57,7 +56,6 @@ public class ProfileService {
         educationRepo.deleteById(id);
     }
 
-    // --- WORK EXPERIENCE ---
     public List<WorkExperience> getMyWorkExperience() {
         return workExperienceRepo.findByUser(getCurrentUser());
     }

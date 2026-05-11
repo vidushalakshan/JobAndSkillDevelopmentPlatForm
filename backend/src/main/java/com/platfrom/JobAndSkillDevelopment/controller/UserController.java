@@ -28,13 +28,11 @@ public class UserController {
         return ResponseEntity.ok(currentUser);
     }
 
-    // Get my full profile
     @GetMapping("/profile")
     public ResponseEntity<User> getMyProfile() {
         return ResponseEntity.ok(userService.getMyProfile());
     }
 
-    // Update my profile
     @PutMapping("/profile")
     public ResponseEntity<User> updateMyProfile(@RequestBody UserProfileRequest req) {
         return ResponseEntity.ok(userService.updateMyProfile(req));

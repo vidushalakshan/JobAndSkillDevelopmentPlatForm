@@ -19,13 +19,11 @@ public class JobApplicationController {
         this.applicationService = applicationService;
     }
 
-    // User: apply to a job
     @PostMapping("/{jobId}")
     public ResponseEntity<JobApplication> apply(@PathVariable Long jobId, @AuthenticationPrincipal User user, @RequestBody String coverLetter) {
         return ResponseEntity.ok(applicationService.apply(jobId, user, coverLetter));
     }
 
-    // User: view my applications
     @GetMapping("/my")
     public ResponseEntity<List<JobApplication>> getMyApplications(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok(applicationService.getMyApplications(user));
@@ -37,8 +35,7 @@ public class JobApplicationController {
     public ResponseEntity<List<JobApplication>> getAllApplications() {
         return ResponseEntity.ok(applicationService.getAllApplications());
     }
-
-    // Admin: update application status (PENDING, REVIEWED, ACCEPTED, REJECTED)
+    
     @PutMapping("/{id}/status")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<JobApplication> updateApplicationStatus(@PathVariable Long id, @RequestParam ApplicationStatus status) {

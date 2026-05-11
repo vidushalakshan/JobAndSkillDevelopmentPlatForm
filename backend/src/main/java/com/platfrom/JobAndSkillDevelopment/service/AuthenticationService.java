@@ -88,7 +88,6 @@ public class AuthenticationService {
 //        return user;
 
         try {
-            // This will now properly validate credentials through your CustomAuthenticationProvider
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             input.getEmail(),

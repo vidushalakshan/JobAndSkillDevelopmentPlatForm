@@ -55,7 +55,7 @@ public class ProfileController {
         return ResponseEntity.noContent().build();
     }
 
-    // --- Public: Talent Search ---
+  
     @GetMapping("/talents")
     public ResponseEntity<List<User>> getTalents() {
         return ResponseEntity.ok(profileService.getAllPublicProfiles());

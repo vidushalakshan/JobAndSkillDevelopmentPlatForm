@@ -51,7 +51,6 @@ const AiResumeParser = () => {
         setError(null);
         
         try {
-            // Sync Profile Basics
             await axios.put('/users/profile', {
                 headline: "AI Extracted Profile",
                 bio: data.summary,
@@ -59,7 +58,6 @@ const AiResumeParser = () => {
                 skills: data.skills?.join(", ") || ""
             });
 
-            // Sync Experiences
             if (data.experiences) {
                 for (const exp of data.experiences) {
                     await axios.post('/profile/experience', {
@@ -73,7 +71,6 @@ const AiResumeParser = () => {
                 }
             }
 
-            // Sync Education
             if (data.educations) {
                 for (const edu of data.educations) {
                     await axios.post('/profile/education', {

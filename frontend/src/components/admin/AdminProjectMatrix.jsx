@@ -11,7 +11,6 @@ const AdminProjectMatrix = ({
 
   return (
     <div className="space-y-12">
-      {/* 1. COURSE SUBMISSION QUEUE */}
       {pendingCourses.length > 0 && (
         <div className="bg-white/5 rounded-[3rem] border border-amber-500/30 shadow-[0_0_50px_rgba(245,158,11,0.1)] overflow-hidden backdrop-blur-md">
           <div className="p-10 border-b border-white/5 bg-amber-500/5 flex items-center justify-between">
@@ -60,7 +59,6 @@ const AdminProjectMatrix = ({
         </div>
       )}
 
-      {/* 2. ACCESS REQUESTS QUEUE */}
       {pendingEnrollments?.length > 0 && (
         <div className="bg-white/5 rounded-[3rem] border border-blue-500/30 shadow-[0_0_50px_rgba(59,130,246,0.1)] overflow-hidden backdrop-blur-md">
           <div className="p-10 border-b border-white/5 bg-blue-500/5">
@@ -100,7 +98,6 @@ const AdminProjectMatrix = ({
         </div>
       )}
 
-      {/* 3. LIVE PROJECT MATRIX */}
       <div className="bg-white/5 rounded-[3rem] border border-white/5 shadow-2xl overflow-hidden backdrop-blur-md">
         <div className="p-10 border-b border-white/5 flex items-center justify-between">
           <h3 className="font-black text-xl text-white uppercase italic tracking-tighter">Live Matrix</h3>

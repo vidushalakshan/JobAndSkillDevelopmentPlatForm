@@ -110,8 +110,6 @@ public class CourseService {
             enrollment.setCourse(course);
             enrollment.setStatus("PENDING"); // Approval Workflow
             enrollmentRepo.save(enrollment);
-            
-            // Do not increment enrollmentCount yet until approved.
 
             // Notify Instructor/Admin
             if (course.getUser() != null) {
@@ -156,7 +154,6 @@ public class CourseService {
         course.setEnrollmentCount(course.getEnrollmentCount() + 1);
         courseRepo.save(course);
 
-        // Notify User
         notificationService.sendNotification(
             enrollment.getUser(),
             "Access Approved",
@@ -171,7 +168,7 @@ public class CourseService {
         com.platfrom.JobAndSkillDevelopment.entity.CourseEnrollment enrollment = enrollmentRepo.findById(enrollmentId)
                 .orElseThrow(() -> new RuntimeException("Enrollment not found"));
         
-        // Notify User
+                
         notificationService.sendNotification(
             enrollment.getUser(),
             "Access Denied",

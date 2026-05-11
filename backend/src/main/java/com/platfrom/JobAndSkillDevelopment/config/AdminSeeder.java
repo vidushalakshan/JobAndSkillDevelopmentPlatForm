@@ -29,7 +29,7 @@ public class AdminSeeder implements CommandLineRunner {
             User admin = new User();
             admin.setUsername("Admin");
             admin.setEmail(adminEmail);
-            admin.setPassword(passwordEncoder.encode("admin123")); // Default password
+            admin.setPassword(passwordEncoder.encode("admin123")); 
             admin.setRole(Role.ADMIN);
             admin.setEnabled(true);
             userRepository.save(admin);

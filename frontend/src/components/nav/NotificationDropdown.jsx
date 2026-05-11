@@ -37,7 +37,7 @@ const NotificationDropdown = () => {
                   <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">{unreadCount} Pending Intel</p>
                 </div>
                 <button 
-                  onClick={() => {/* Implement mark all as read */}}
+                  onClick={() => {}}
                   className="p-2 rounded-xl bg-white/5 border border-white/10 text-blue-400 hover:text-white transition-colors"
                   title="Clear all"
                 >
